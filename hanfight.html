@@ -1,0 +1,1601 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>네이버 블로그 댓글 보조 도구</title>
+  <style>
+    :root {
+      color-scheme: light;
+      --bg: #f6f7fb;
+      --panel: #ffffff;
+      --ink: #18212f;
+      --muted: #687383;
+      --line: #d9e0ea;
+      --naver: #03c75a;
+      --naver-dark: #02a64b;
+      --amber: #f2a93b;
+      --red: #d94848;
+      --blue: #246bfe;
+      --shadow: 0 14px 35px rgba(25, 38, 60, 0.09);
+    }
+
+    * {
+      box-sizing: border-box;
+    }
+
+    body {
+      margin: 0;
+      background: var(--bg);
+      color: var(--ink);
+      font-family: "Malgun Gothic", "Apple SD Gothic Neo", system-ui, sans-serif;
+      min-height: 100vh;
+      overflow: hidden;
+    }
+
+    button,
+    input,
+    textarea,
+    select {
+      font: inherit;
+    }
+
+    button {
+      border: 0;
+      cursor: pointer;
+    }
+
+    .app {
+      display: grid;
+      grid-template-columns: minmax(280px, 380px) minmax(0, 1fr);
+      min-height: 100vh;
+    }
+
+    aside {
+      background: #111827;
+      color: #f8fafc;
+      padding: 28px;
+      display: flex;
+      flex-direction: column;
+      gap: 22px;
+      height: 100vh;
+      overflow: auto;
+    }
+
+    main {
+      padding: 28px;
+      display: grid;
+      grid-template-rows: auto auto minmax(0, 1fr);
+      gap: 20px;
+      height: 100vh;
+      min-height: 0;
+      overflow: hidden;
+    }
+
+    h1,
+    h2,
+    h3,
+    p {
+      margin: 0;
+    }
+
+    h1 {
+      font-size: 26px;
+      line-height: 1.25;
+      letter-spacing: 0;
+    }
+
+    h2 {
+      font-size: 18px;
+    }
+
+    h3 {
+      font-size: 15px;
+    }
+
+    .subtitle {
+      color: #b9c4d6;
+      line-height: 1.6;
+      font-size: 14px;
+    }
+
+    .notice {
+      background: rgba(3, 199, 90, 0.12);
+      border: 1px solid rgba(3, 199, 90, 0.35);
+      color: #dbffe9;
+      padding: 14px;
+      border-radius: 8px;
+      line-height: 1.55;
+      font-size: 13px;
+    }
+
+    .panel {
+      background: var(--panel);
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      box-shadow: var(--shadow);
+    }
+
+    .form-block {
+      display: grid;
+      gap: 12px;
+    }
+
+    label {
+      display: grid;
+      gap: 7px;
+      color: inherit;
+      font-size: 13px;
+      font-weight: 700;
+    }
+
+    aside label span {
+      color: #d8e0ed;
+    }
+
+    input,
+    textarea,
+    select {
+      width: 100%;
+      border: 1px solid #cad3df;
+      background: #ffffff;
+      color: #142033;
+      border-radius: 8px;
+      padding: 11px 12px;
+      outline: none;
+    }
+
+    textarea {
+      min-height: 100px;
+      resize: vertical;
+      line-height: 1.5;
+    }
+
+    aside input,
+    aside textarea,
+    aside select {
+      border-color: #374151;
+      background: #1f2937;
+      color: #f8fafc;
+    }
+
+    input:focus,
+    textarea:focus,
+    select:focus {
+      border-color: var(--naver);
+      box-shadow: 0 0 0 3px rgba(3, 199, 90, 0.15);
+    }
+
+    .row {
+      display: flex;
+      gap: 10px;
+      align-items: center;
+    }
+
+    .row > * {
+      flex: 1;
+    }
+
+    .btn {
+      min-height: 42px;
+      border-radius: 8px;
+      padding: 0 14px;
+      font-weight: 800;
+      color: #ffffff;
+      background: var(--naver);
+      white-space: nowrap;
+    }
+
+    .btn:hover {
+      background: var(--naver-dark);
+    }
+
+    .btn.secondary {
+      background: #334155;
+    }
+
+    .btn.secondary:hover {
+      background: #475569;
+    }
+
+    .btn.ghost {
+      background: #edf2f7;
+      color: #18212f;
+    }
+
+    .btn.ghost:hover {
+      background: #dfe7f0;
+    }
+
+    .btn.warn {
+      background: var(--amber);
+    }
+
+    .btn.danger {
+      background: var(--red);
+    }
+
+    .toolbar {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 12px;
+      padding: 18px;
+    }
+
+    .toolbar-actions {
+      display: flex;
+      gap: 10px;
+      flex-wrap: wrap;
+      justify-content: flex-end;
+    }
+
+    .stats {
+      display: grid;
+      grid-template-columns: repeat(4, minmax(110px, 1fr));
+      gap: 12px;
+    }
+
+    .stat {
+      padding: 15px;
+      background: #ffffff;
+      border: 1px solid var(--line);
+      border-radius: 8px;
+    }
+
+    .stat strong {
+      display: block;
+      font-size: 24px;
+      margin-bottom: 4px;
+    }
+
+    .stat span {
+      color: var(--muted);
+      font-size: 12px;
+      font-weight: 700;
+    }
+
+    .workspace {
+      display: grid;
+      grid-template-columns: minmax(320px, 420px) minmax(0, 1fr);
+      gap: 20px;
+      height: 100%;
+      min-height: 0;
+    }
+
+    .list {
+      overflow: auto;
+      padding: 12px;
+      display: grid;
+      gap: 10px;
+      align-content: start;
+      min-height: 0;
+    }
+
+    .list-panel {
+      display: grid;
+      grid-template-rows: auto minmax(0, 1fr);
+      min-height: 0;
+      overflow: hidden;
+    }
+
+    .list-controls {
+      padding: 12px;
+      border-bottom: 1px solid var(--line);
+      display: grid;
+      gap: 10px;
+      background: #ffffff;
+    }
+
+    .segmented {
+      display: grid;
+      grid-template-columns: repeat(4, minmax(0, 1fr));
+      gap: 6px;
+    }
+
+    .filter-btn {
+      min-height: 36px;
+      border-radius: 8px;
+      background: #edf2f7;
+      color: #334155;
+      font-size: 12px;
+      font-weight: 800;
+      padding: 0 8px;
+    }
+
+    .filter-btn.active {
+      background: var(--naver);
+      color: #ffffff;
+    }
+
+    .target {
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      padding: 12px;
+      background: #ffffff;
+      display: grid;
+      gap: 10px;
+    }
+
+    .target .hint {
+      display: -webkit-box;
+      -webkit-line-clamp: 3;
+      -webkit-box-orient: vertical;
+      overflow: hidden;
+    }
+
+    .target.active {
+      border-color: var(--naver);
+      box-shadow: 0 0 0 3px rgba(3, 199, 90, 0.13);
+    }
+
+    .target.done {
+      background: #f2fbf6;
+    }
+
+    .target-head {
+      display: flex;
+      justify-content: space-between;
+      gap: 10px;
+      align-items: flex-start;
+    }
+
+    .target-title {
+      font-weight: 800;
+      line-height: 1.35;
+      word-break: break-word;
+    }
+
+    .target-url {
+      color: var(--muted);
+      font-size: 12px;
+      word-break: break-all;
+    }
+
+    .badge {
+      flex: 0 0 auto;
+      border-radius: 999px;
+      padding: 5px 9px;
+      color: #ffffff;
+      background: #64748b;
+      font-size: 11px;
+      font-weight: 800;
+    }
+
+    .badge.done {
+      background: var(--naver);
+    }
+
+    .badge.ready {
+      background: var(--blue);
+    }
+
+    .target-actions {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 8px;
+    }
+
+    .editor {
+      padding: 20px;
+      display: grid;
+      grid-template-rows: auto auto auto;
+      gap: 16px;
+      min-height: 0;
+      align-content: start;
+    }
+
+    .editor-head {
+      display: flex;
+      justify-content: space-between;
+      gap: 12px;
+      align-items: flex-start;
+    }
+
+    .selected-url {
+      color: var(--muted);
+      font-size: 13px;
+      word-break: break-all;
+      margin-top: 5px;
+    }
+
+    .draft-area {
+      min-height: 96px;
+      height: 112px;
+      font-size: 16px;
+    }
+
+    .empty {
+      padding: 24px;
+      color: var(--muted);
+      text-align: center;
+      line-height: 1.6;
+      border: 1px dashed var(--line);
+      border-radius: 8px;
+      background: #ffffff;
+    }
+
+    .hint {
+      color: var(--muted);
+      font-size: 12px;
+      line-height: 1.5;
+    }
+
+    .rss-status {
+      min-height: 38px;
+      padding: 10px 12px;
+      border: 1px solid rgba(255, 255, 255, 0.12);
+      border-radius: 8px;
+      color: #cbd5e1;
+      background: rgba(15, 23, 42, 0.42);
+      font-size: 12px;
+      line-height: 1.45;
+    }
+
+    .toast {
+      position: fixed;
+      right: 20px;
+      bottom: 20px;
+      background: #111827;
+      color: #ffffff;
+      border-radius: 8px;
+      padding: 12px 14px;
+      box-shadow: var(--shadow);
+      opacity: 0;
+      transform: translateY(10px);
+      transition: 0.2s ease;
+      pointer-events: none;
+      max-width: min(360px, calc(100vw - 40px));
+      line-height: 1.45;
+    }
+
+    .toast.show {
+      opacity: 1;
+      transform: translateY(0);
+    }
+
+    .modal-backdrop {
+      position: fixed;
+      inset: 0;
+      background: rgba(15, 23, 42, 0.58);
+      display: none;
+      align-items: center;
+      justify-content: center;
+      padding: 20px;
+      z-index: 20;
+    }
+
+    .modal-backdrop.show {
+      display: flex;
+    }
+
+    .modal {
+      width: min(760px, 100%);
+      max-height: min(760px, calc(100vh - 40px));
+      overflow: auto;
+      background: #ffffff;
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      box-shadow: var(--shadow);
+      padding: 22px;
+      display: grid;
+      gap: 18px;
+    }
+
+    .modal-head {
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-start;
+      gap: 12px;
+    }
+
+    .settings-grid {
+      display: grid;
+      gap: 14px;
+    }
+
+    .settings-template-list {
+      display: grid;
+      gap: 8px;
+      max-height: 260px;
+      overflow: auto;
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      padding: 10px;
+      background: #f8fafc;
+    }
+
+    .settings-template {
+      display: grid;
+      grid-template-columns: minmax(0, 1fr) auto;
+      gap: 10px;
+      align-items: center;
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      padding: 10px;
+      background: #ffffff;
+    }
+
+    .settings-template small {
+      color: #334155;
+      line-height: 1.45;
+    }
+
+    @media (max-width: 980px) {
+      .app,
+      .workspace {
+        grid-template-columns: 1fr;
+      }
+
+      aside {
+        min-height: auto;
+        height: auto;
+        max-height: none;
+      }
+
+      body {
+        overflow: auto;
+      }
+
+      main {
+        height: auto;
+        overflow: visible;
+      }
+
+      .workspace {
+        height: auto;
+      }
+
+      .list {
+        max-height: 420px;
+      }
+
+      .stats {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+      }
+    }
+
+    @media (max-width: 620px) {
+      main,
+      aside {
+        padding: 18px;
+      }
+
+      .toolbar,
+      .editor-head,
+      .row {
+        align-items: stretch;
+        flex-direction: column;
+      }
+
+      .stats {
+        grid-template-columns: 1fr;
+      }
+
+      .target-actions {
+        grid-template-columns: 1fr;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="app">
+    <aside>
+      <div class="form-block">
+        <h1>네이버 블로그 댓글 보조 도구</h1>
+        <p class="subtitle">댓글을 자동 게시하지 않고, 문안 작성과 복사, 방문 기록만 도와주는 수동 확인형 작업대입니다.</p>
+      </div>
+
+      <div class="notice">
+        상대방 블로그 규칙을 존중하고, 본인이 직접 글을 읽은 뒤 의미 있는 댓글만 남기세요. 대량 반복 댓글이나 홍보성 댓글은 계정 제한과 신고로 이어질 수 있습니다.
+      </div>
+
+      <section class="form-block" aria-label="대상 추가">
+        <h2>대상 추가</h2>
+        <label>
+          <span>네이버 블로그 URL</span>
+          <input id="urlInput" placeholder="https://blog.naver.com/...">
+        </label>
+        <button class="btn" id="addTargetBtn">대상 추가</button>
+      </section>
+
+      <section class="form-block" aria-label="블로그 최신 글 가져오기">
+        <h2>최신 글 가져오기</h2>
+        <label>
+          <span>블로그 주소</span>
+          <input id="blogUrlInput" placeholder="https://blog.naver.com/블로그ID">
+        </label>
+        <div class="row">
+          <select id="fetchLimit" aria-label="가져올 글 수">
+            <option value="5">최신 5개</option>
+            <option value="10">최신 10개</option>
+            <option value="20">최신 20개</option>
+          </select>
+          <button class="btn secondary" id="fetchBlogBtn">자동 조회</button>
+        </div>
+        <label>
+          <span>RSS XML 붙여넣기</span>
+          <textarea id="rssPasteInput" placeholder="자동 조회가 막히면 RSS 페이지 내용을 복사해서 붙여넣으세요."></textarea>
+        </label>
+        <button class="btn secondary" id="parseRssBtn">붙여넣은 RSS 가져오기</button>
+        <p class="hint">블로그 ID만 입력해도 됩니다. 서버 실행 시 https://rss.blog.naver.com/블로그ID.xml을 대신 읽어옵니다.</p>
+        <div class="rss-status" id="rssStatus">조회 결과가 여기에 표시됩니다.</div>
+      </section>
+
+    </aside>
+
+    <main>
+      <section class="toolbar panel">
+        <div>
+          <h2>작업 현황</h2>
+          <p class="hint">URL을 열고 글을 확인한 다음, 생성된 문안을 복사해서 직접 게시하세요.</p>
+        </div>
+        <div class="toolbar-actions">
+          <button class="btn ghost" id="settingsBtn">설정</button>
+          <button class="btn ghost" id="exportBtn">JSON 내보내기</button>
+          <button class="btn ghost" id="importBtn">JSON 가져오기</button>
+          <input id="importFile" type="file" accept="application/json" hidden>
+        </div>
+      </section>
+
+      <section class="stats" aria-label="통계">
+        <div class="stat"><strong id="totalCount">0</strong><span>전체 대상</span></div>
+        <div class="stat"><strong id="readyCount">0</strong><span>진행 중</span></div>
+        <div class="stat"><strong id="doneCount">0</strong><span>완료</span></div>
+        <div class="stat"><strong id="todayCount">0</strong><span>오늘 완료</span></div>
+      </section>
+
+      <section class="workspace">
+        <div class="panel list-panel">
+          <div class="list-controls">
+            <input id="targetSearchInput" placeholder="제목, URL, 메모 검색">
+            <div class="segmented" aria-label="대상 상태 필터">
+              <button class="filter-btn active" data-filter="all">전체</button>
+              <button class="filter-btn" data-filter="ready">대기</button>
+              <button class="filter-btn" data-filter="draft">문안 있음</button>
+              <button class="filter-btn" data-filter="done">완료</button>
+            </div>
+            <button class="btn danger" id="clearBtn">전체 삭제</button>
+          </div>
+          <div class="list" id="targetList"></div>
+        </div>
+
+        <div class="panel editor">
+          <div class="editor-head">
+            <div>
+              <h2 id="selectedTitle">대상을 선택하세요</h2>
+              <p class="selected-url" id="selectedUrl">왼쪽 목록에서 작업할 블로그 글을 고르면 문안을 만들 수 있습니다.</p>
+            </div>
+            <span class="badge" id="selectedStatus">대기</span>
+          </div>
+
+          <textarea class="draft-area" id="draftOutput" placeholder="생성된 댓글 문안이 여기에 표시됩니다."></textarea>
+
+          <div class="form-block">
+            <div class="row">
+              <select id="templateSelect" aria-label="템플릿 선택"></select>
+              <button class="btn" id="generateBtn">문안 생성</button>
+              <button class="btn secondary" id="gptGenerateBtn">GPT 문안 생성</button>
+            </div>
+            <div class="row">
+              <button class="btn secondary" id="copyBtn">복사</button>
+              <button class="btn warn" id="openBtn">글 열기</button>
+              <button class="btn" id="doneBtn">수동 게시 완료</button>
+            </div>
+            <p class="hint">게시 버튼은 제공하지 않습니다. 댓글 내용과 맥락을 본인이 확인한 뒤 네이버 화면에서 직접 등록하세요.</p>
+          </div>
+        </div>
+      </section>
+    </main>
+  </div>
+
+  <div class="modal-backdrop" id="settingsModal" role="dialog" aria-modal="true" aria-labelledby="settingsTitle">
+    <div class="modal">
+      <div class="modal-head">
+        <div>
+          <h2 id="settingsTitle">설정</h2>
+          <p class="hint">GPT API 키와 댓글 템플릿을 관리합니다.</p>
+        </div>
+        <button class="btn ghost" id="closeSettingsBtn">닫기</button>
+      </div>
+
+      <section class="settings-grid" aria-label="GPT 설정">
+        <h3>GPT API</h3>
+        <label>
+          <span>OpenAI API Key</span>
+          <input id="openaiApiKeyInput" type="password" placeholder="sk-...">
+        </label>
+        <p class="hint">키는 이 브라우저의 localStorage에 저장됩니다. 공용 PC에서는 저장하지 마세요.</p>
+        <button class="btn" id="saveSettingsBtn">설정 저장</button>
+      </section>
+
+      <section class="settings-grid" aria-label="댓글 템플릿 설정">
+        <h3>댓글 템플릿</h3>
+        <label>
+          <span>새 템플릿</span>
+          <textarea id="templateInput" placeholder="{keyword}, {memo} 변수를 사용할 수 있습니다. {memo}는 짧은 포인트로 자동 정리됩니다."></textarea>
+        </label>
+        <div class="row">
+          <button class="btn secondary" id="addTemplateBtn">템플릿 저장</button>
+          <button class="btn secondary" id="resetTemplateBtn">기본 복원</button>
+        </div>
+        <div class="settings-template-list" id="templateList"></div>
+      </section>
+    </div>
+  </div>
+
+  <div class="toast" id="toast" role="status"></div>
+
+  <script>
+    const STORAGE_KEY = "naverCommentAssistant:v1";
+
+    const defaultTemplates = [
+      "{keyword} 관련 글 잘 읽었습니다. {memo} 부분이 특히 인상 깊었어요.",
+      "{keyword}에 대해 정리해주신 내용 잘 봤습니다. {memo} 포인트가 도움이 됐습니다.",
+      "글 잘 읽었습니다. {keyword} 내용을 찾던 중이었는데 {memo} 부분이 기억에 남네요.",
+      "{keyword} 이야기를 자연스럽게 풀어주셔서 좋았습니다. {memo} 부분도 잘 봤어요.",
+      "정성스럽게 작성하신 글 잘 봤습니다. {keyword} 관련해서 참고할 만한 내용이 많네요.",
+      "{keyword}에 관심이 있었는데 덕분에 잘 읽고 갑니다. {memo} 부분이 특히 좋았습니다.",
+      "좋은 글 감사합니다. {keyword} 관련 내용 중 {memo} 부분이 눈에 들어왔어요.",
+      "{keyword} 내용이 깔끔하게 정리돼 있어서 보기 좋았습니다. 좋은 정보 감사해요.",
+      "글의 흐름이 좋아서 편하게 읽었습니다. {keyword} 관련해서 도움 되는 내용이네요.",
+      "{keyword}에 대해 잘 몰랐던 부분을 알게 됐습니다. 정리해주셔서 감사합니다.",
+      "잘 읽고 갑니다. {memo} 부분 덕분에 {keyword} 내용이 더 와닿았어요.",
+      "{keyword} 관련해서 실제로 참고하기 좋은 글이네요. 좋은 내용 공유 감사합니다.",
+      "내용이 부담 없이 읽혀서 좋았습니다. {keyword}에 관심 있는 분들께도 도움이 되겠어요.",
+      "{keyword} 관련 포인트를 잘 짚어주신 것 같습니다. 덕분에 잘 보고 갑니다.",
+      "꼼꼼하게 남겨주신 글 잘 읽었습니다. {memo} 부분이 특히 공감됐어요.",
+      "{keyword} 글을 찾다가 들어왔는데 정리가 잘 되어 있어 도움 됐습니다.",
+      "좋은 정보 감사합니다. {keyword} 관련해서 다시 참고하고 싶은 글이네요.",
+      "읽기 편하게 정리해주셔서 좋았습니다. {memo} 부분이 기억에 남습니다.",
+      "{keyword}에 대한 경험이 잘 담긴 글이라 흥미롭게 봤습니다. 감사합니다.",
+      "덕분에 {keyword} 관련 내용을 편하게 이해했습니다. 앞으로도 좋은 글 기대하겠습니다."
+    ];
+
+    const state = loadState();
+    let selectedId = state.targets[0]?.id || null;
+    let targetFilter = "all";
+
+    const $ = (id) => document.getElementById(id);
+
+    const elements = {
+      urlInput: $("urlInput"),
+      blogUrlInput: $("blogUrlInput"),
+      fetchLimit: $("fetchLimit"),
+      rssPasteInput: $("rssPasteInput"),
+      rssStatus: $("rssStatus"),
+      targetSearchInput: $("targetSearchInput"),
+      settingsModal: $("settingsModal"),
+      openaiApiKeyInput: $("openaiApiKeyInput"),
+      templateInput: $("templateInput"),
+      templateList: $("templateList"),
+      targetList: $("targetList"),
+      templateSelect: $("templateSelect"),
+      selectedTitle: $("selectedTitle"),
+      selectedUrl: $("selectedUrl"),
+      selectedStatus: $("selectedStatus"),
+      draftOutput: $("draftOutput"),
+      toast: $("toast"),
+      importFile: $("importFile")
+    };
+
+    $("addTargetBtn").addEventListener("click", addTarget);
+    elements.targetSearchInput.addEventListener("input", renderTargets);
+    document.querySelectorAll(".filter-btn").forEach((button) => {
+      button.addEventListener("click", () => setTargetFilter(button.dataset.filter));
+    });
+    $("settingsBtn").addEventListener("click", openSettings);
+    $("closeSettingsBtn").addEventListener("click", closeSettings);
+    $("settingsModal").addEventListener("click", closeSettingsOnBackdrop);
+    $("saveSettingsBtn").addEventListener("click", saveSettingsFromForm);
+    $("fetchBlogBtn").addEventListener("click", fetchBlogPosts);
+    $("parseRssBtn").addEventListener("click", parsePastedRss);
+    $("addTemplateBtn").addEventListener("click", addTemplate);
+    $("resetTemplateBtn").addEventListener("click", resetTemplates);
+    $("generateBtn").addEventListener("click", generateDraft);
+    $("gptGenerateBtn").addEventListener("click", generateGptDraft);
+    $("copyBtn").addEventListener("click", copyDraft);
+    $("openBtn").addEventListener("click", openSelected);
+    $("doneBtn").addEventListener("click", markSelectedDone);
+    $("exportBtn").addEventListener("click", exportData);
+    $("importBtn").addEventListener("click", () => elements.importFile.click());
+    $("clearBtn").addEventListener("click", clearAll);
+    elements.importFile.addEventListener("change", importData);
+
+    render();
+
+    function loadState() {
+      try {
+        const stored = JSON.parse(localStorage.getItem(STORAGE_KEY));
+        if (stored && Array.isArray(stored.targets) && Array.isArray(stored.templates)) {
+          stored.templates = ensureDefaultTemplates(stored.templates);
+          stored.settings = {
+            openaiApiKey: "",
+            ...(stored.settings || {})
+          };
+          return stored;
+        }
+      } catch (error) {
+        console.warn(error);
+      }
+
+      return {
+        targets: [],
+        templates: [...defaultTemplates],
+        settings: {
+          openaiApiKey: ""
+        }
+      };
+    }
+
+    function ensureDefaultTemplates(templates) {
+      const merged = [...templates];
+      defaultTemplates.forEach((template) => {
+        if (!merged.includes(template)) {
+          merged.push(template);
+        }
+      });
+      return merged;
+    }
+
+    function saveState() {
+      localStorage.setItem(STORAGE_KEY, JSON.stringify(state));
+    }
+
+    function addTarget() {
+      const url = elements.urlInput.value.trim();
+
+      if (!url) {
+        showToast("블로그 URL을 입력해주세요.");
+        return;
+      }
+
+      if (!isNaverBlogUrl(url)) {
+        showToast("네이버 블로그 URL만 추가할 수 있습니다.");
+        return;
+      }
+
+      const target = {
+        id: createId(),
+        title: makeManualTargetTitle(url),
+        url,
+        memo: "",
+        status: "ready",
+        draft: "",
+        createdAt: new Date().toISOString(),
+        completedAt: null
+      };
+
+      state.targets.unshift(target);
+      selectedId = target.id;
+      elements.urlInput.value = "";
+      saveState();
+      render();
+      showToast("대상을 추가했습니다.");
+    }
+
+    function makeManualTargetTitle(url) {
+      try {
+        const parsed = new URL(url);
+        const parts = parsed.pathname.split("/").filter(Boolean);
+        return parts.length >= 2 ? `${parts[0]} 블로그 글` : "수동 추가 블로그 글";
+      } catch (error) {
+        return "수동 추가 블로그 글";
+      }
+    }
+
+    function isNaverBlogUrl(value) {
+      try {
+        const url = new URL(value);
+        return url.hostname === "blog.naver.com" || url.hostname.endsWith(".blog.naver.com");
+      } catch (error) {
+        return false;
+      }
+    }
+
+    async function fetchBlogPosts() {
+      const blogUrl = elements.blogUrlInput.value.trim();
+      const blogId = extractNaverBlogId(blogUrl);
+      if (!blogId) {
+        showToast("네이버 블로그 주소에서 블로그 ID를 찾지 못했습니다.");
+        setRssStatus("블로그 주소를 확인해주세요. 예: https://blog.naver.com/블로그ID");
+        return;
+      }
+
+      setRssStatus(`RSS 조회 중: ${blogId}`);
+
+      if (location.protocol.startsWith("http")) {
+        try {
+          const response = await fetch(`/api/rss?blogId=${encodeURIComponent(blogId)}`);
+          const data = await response.json();
+          if (!response.ok || !data.xml) {
+            throw new Error(data.error || "로컬 RSS 조회에 실패했습니다.");
+          }
+
+          const result = importRssItems(data.xml);
+          reportRssResult(result, data.rssUrl || `https://rss.blog.naver.com/${blogId}.xml`);
+          return;
+        } catch (error) {
+          console.warn(error);
+          setRssStatus(`로컬 서버 조회 실패: ${error.message}. 브라우저 직접 조회를 시도합니다.`);
+        }
+      }
+
+      const rssUrls = [
+        `https://rss.blog.naver.com/${blogId}.xml`,
+        `https://rss.blog.naver.com/${blogId}`,
+        `https://blog.rss.naver.com/${blogId}.xml`
+      ];
+
+      for (const rssUrl of rssUrls) {
+        try {
+          const response = await fetch(rssUrl);
+          if (!response.ok) continue;
+
+          const xml = await response.text();
+          const result = importRssItems(xml);
+          reportRssResult(result, rssUrl);
+          return;
+        } catch (error) {
+          console.warn(error);
+        }
+      }
+
+      showToast("브라우저 보안 정책으로 자동 조회가 막혔습니다. RSS XML 붙여넣기를 사용해주세요.");
+      setRssStatus("자동 조회 실패. RSS 주소를 브라우저에서 열고 전체 복사한 뒤 붙여넣기 칸을 사용해주세요.");
+    }
+
+    function parsePastedRss() {
+      const xml = elements.rssPasteInput.value.trim();
+      if (!xml) {
+        showToast("RSS XML 내용을 붙여넣어주세요.");
+        return;
+      }
+
+      const result = importRssItems(xml);
+      reportRssResult(result, "붙여넣은 RSS");
+      if (result.added) {
+        elements.rssPasteInput.value = "";
+      }
+    }
+
+    function openSettings() {
+      elements.openaiApiKeyInput.value = state.settings.openaiApiKey || "";
+      renderTemplates();
+      elements.settingsModal.classList.add("show");
+      elements.openaiApiKeyInput.focus();
+    }
+
+    function closeSettings() {
+      elements.settingsModal.classList.remove("show");
+    }
+
+    function closeSettingsOnBackdrop(event) {
+      if (event.target === elements.settingsModal) {
+        closeSettings();
+      }
+    }
+
+    function saveSettingsFromForm() {
+      state.settings.openaiApiKey = elements.openaiApiKeyInput.value.trim();
+      saveState();
+      showToast("설정을 저장했습니다.");
+    }
+
+    function extractNaverBlogId(value) {
+      try {
+        const url = new URL(value);
+        const host = url.hostname.replace(/^m\./, "");
+        const blogIdFromQuery = url.searchParams.get("blogId");
+        if (blogIdFromQuery) return blogIdFromQuery;
+
+        if (host === "blog.naver.com") {
+          const firstPath = url.pathname.split("/").filter(Boolean)[0];
+          return firstPath || "";
+        }
+
+        if (host.endsWith(".blog.me")) {
+          return host.split(".")[0];
+        }
+      } catch (error) {
+        return value.replace(/^@/, "").trim();
+      }
+
+      return "";
+    }
+
+    function importRssItems(xml) {
+      const doc = new DOMParser().parseFromString(xml, "text/xml");
+      if (doc.querySelector("parsererror")) {
+        return { added: 0, total: 0, duplicates: 0, skipped: 0, error: "XML 형식을 읽지 못했습니다." };
+      }
+
+      const limit = Number(elements.fetchLimit.value) || 5;
+      const items = getFeedItems(doc).slice(0, limit);
+      let addedCount = 0;
+      let duplicateCount = 0;
+      let skippedCount = 0;
+
+      items.reverse().forEach((item) => {
+        const title = getXmlText(item, "title");
+        const link = normalizePostLink(getItemLink(item));
+        const description = stripHtml(getXmlText(item, "description") || getXmlText(item, "content:encoded"));
+        if (!title || !link) {
+          skippedCount++;
+          return;
+        }
+
+        if (state.targets.some((target) => normalizePostLink(target.url) === link)) {
+          duplicateCount++;
+          return;
+        }
+
+        state.targets.unshift({
+          id: createId(),
+          title,
+          url: link,
+          memo: description.slice(0, 1200),
+          status: "ready",
+          draft: "",
+          createdAt: new Date().toISOString(),
+          completedAt: null
+        });
+        addedCount++;
+      });
+
+      if (addedCount) {
+        selectedId = state.targets[0].id;
+        saveState();
+        render();
+      }
+
+      return {
+        added: addedCount,
+        total: items.length,
+        duplicates: duplicateCount,
+        skipped: skippedCount,
+        error: ""
+      };
+    }
+
+    function getFeedItems(doc) {
+      const rssItems = [...doc.getElementsByTagName("item")];
+      if (rssItems.length) return rssItems;
+      return [...doc.getElementsByTagName("entry")];
+    }
+
+    function getItemLink(item) {
+      const linkNode = item.getElementsByTagName("link")[0];
+      if (!linkNode) return "";
+      return linkNode.getAttribute("href") || linkNode.textContent.trim();
+    }
+
+    function getXmlText(parent, selector) {
+      const directMatch = parent.getElementsByTagName(selector)[0];
+      if (directMatch) {
+        return directMatch.textContent.trim();
+      }
+
+      const safeSelector = selector.replace(":", "\\:");
+      return parent.querySelector(safeSelector)?.textContent?.trim() || "";
+    }
+
+    function normalizePostLink(value) {
+      return value.replace(/^http:\/\//, "https://").replace(/[?#].*$/, "").trim();
+    }
+
+    function stripHtml(value) {
+      const div = document.createElement("div");
+      div.innerHTML = value;
+      return div.textContent.replace(/\s+/g, " ").trim();
+    }
+
+    function reportRssResult(result, source) {
+      if (result.error) {
+        showToast(result.error);
+        setRssStatus(`${source}: ${result.error}`);
+        return;
+      }
+
+      if (!result.total) {
+        showToast("RSS에서 글 항목을 찾지 못했습니다.");
+        setRssStatus(`${source}: 글 항목 0개. RSS 주소가 맞는지, 블로그 RSS 공개가 켜져 있는지 확인해주세요.`);
+        return;
+      }
+
+      if (result.added) {
+        showToast(`최신 글 ${result.added}개를 가져왔습니다.`);
+      } else if (result.duplicates) {
+        showToast("RSS 글은 찾았지만 모두 이미 목록에 있습니다.");
+      } else {
+        showToast("RSS 글은 찾았지만 추가 가능한 항목이 없었습니다.");
+      }
+
+      setRssStatus(
+        `${source}: RSS 글 ${result.total}개 발견, ` +
+        `새로 추가 ${result.added}개, 중복 ${result.duplicates}개, 건너뜀 ${result.skipped}개`
+      );
+    }
+
+    function setRssStatus(message) {
+      elements.rssStatus.textContent = message;
+    }
+
+    function createId() {
+      if (crypto.randomUUID) {
+        return crypto.randomUUID();
+      }
+
+      return `target-${Date.now()}-${Math.random().toString(16).slice(2)}`;
+    }
+
+    function addTemplate() {
+      const template = elements.templateInput.value.trim();
+      if (!template) {
+        showToast("저장할 템플릿을 입력해주세요.");
+        return;
+      }
+
+      state.templates.push(template);
+      elements.templateInput.value = "";
+      saveState();
+      renderTemplates();
+      renderTemplateSelect();
+      showToast("템플릿을 저장했습니다.");
+    }
+
+    function resetTemplates() {
+      if (!confirm("댓글 템플릿을 기본값으로 복원할까요?")) return;
+      state.templates = [...defaultTemplates];
+      saveState();
+      renderTemplates();
+      renderTemplateSelect();
+      showToast("기본 템플릿으로 복원했습니다.");
+    }
+
+    function selectTarget(id) {
+      selectedId = id;
+      render();
+    }
+
+    function removeTarget(id) {
+      const index = state.targets.findIndex((target) => target.id === id);
+      if (index === -1) return;
+      state.targets.splice(index, 1);
+      selectedId = state.targets[0]?.id || null;
+      saveState();
+      render();
+      showToast("대상을 삭제했습니다.");
+    }
+
+    function removeTemplate(index) {
+      if (state.templates.length <= 1) {
+        showToast("템플릿은 최소 1개가 필요합니다.");
+        return;
+      }
+
+      state.templates.splice(index, 1);
+      saveState();
+      renderTemplates();
+      renderTemplateSelect();
+    }
+
+    function setTargetFilter(filter) {
+      targetFilter = filter;
+      document.querySelectorAll(".filter-btn").forEach((button) => {
+        button.classList.toggle("active", button.dataset.filter === filter);
+      });
+      renderTargets();
+    }
+
+    function generateDraft() {
+      const target = getSelectedTarget();
+      if (!target) {
+        showToast("먼저 대상을 선택해주세요.");
+        return;
+      }
+
+      const template = state.templates[Number(elements.templateSelect.value)] || state.templates[0];
+      const draft = applyTemplate(template, target);
+      target.draft = draft;
+      elements.draftOutput.value = draft;
+      saveState();
+      renderTargets();
+      showToast("댓글 문안을 생성했습니다.");
+    }
+
+    async function generateGptDraft() {
+      const target = getSelectedTarget();
+      if (!target) {
+        showToast("먼저 대상을 선택해주세요.");
+        return;
+      }
+
+      if (!location.protocol.startsWith("http")) {
+        showToast("GPT 생성은 로컬 서버로 실행해야 합니다. node server.js 후 localhost 주소로 접속해주세요.");
+        return;
+      }
+
+      if (!state.settings.openaiApiKey) {
+        showToast("설정창에서 GPT API 키를 먼저 입력해주세요.");
+        openSettings();
+        return;
+      }
+
+      const button = $("gptGenerateBtn");
+      button.disabled = true;
+      button.textContent = "생성 중...";
+
+      try {
+        const response = await fetch("/api/comment", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            apiKey: state.settings.openaiApiKey,
+            title: target.title,
+            keyword: makeTitleKeyword(target.title),
+            content: normalizeMemoText(target.memo)
+          })
+        });
+        const data = await response.json();
+        if (!response.ok || !data.comment) {
+          throw new Error(data.error || "GPT 댓글 생성에 실패했습니다.");
+        }
+
+        target.draft = data.comment;
+        elements.draftOutput.value = data.comment;
+        saveState();
+        renderTargets();
+        showToast("GPT 댓글 문안을 생성했습니다.");
+      } catch (error) {
+        showToast(error.message);
+      } finally {
+        button.disabled = false;
+        button.textContent = "GPT 문안 생성";
+      }
+    }
+
+    function applyTemplate(template, target) {
+      const memo = makeCommentPoint(target.memo);
+      const keyword = makeTitleKeyword(target.title);
+      return template
+        .replaceAll("{title}", target.title)
+        .replaceAll("{keyword}", keyword)
+        .replaceAll("{memo}", memo)
+        .replaceAll(/\s+/g, " ")
+        .trim();
+    }
+
+    function makeTitleKeyword(value) {
+      const fallback = "본문";
+      const normalized = normalizeTitleText(value);
+      if (!normalized) return fallback;
+
+      const chunks = normalized
+        .split(/\s*[-|:·,]\s*|\s{2,}/)
+        .map((chunk) => chunk.trim())
+        .filter(Boolean);
+      const usefulChunk = chunks.find(isUsefulKeywordChunk) || normalized;
+      const words = usefulChunk.split(/\s+/).filter(Boolean).filter(isUsefulKeywordWord);
+
+      if (!words.length) return shortenKeyword(usefulChunk || fallback);
+
+      const keyword = words.slice(0, 5).join(" ");
+      return shortenKeyword(keyword);
+    }
+
+    function normalizeTitleText(value) {
+      return stripHtml(value || "")
+        .replace(/\[[^\]]*\]|\([^)]*\)|【[^】]*】/g, " ")
+        .replace(/https?:\/\/\S+/g, " ")
+        .replace(/[!?~♡♥★☆…]+/g, " ")
+        .replace(/[{}[\]<>#*_="'“”‘’]/g, " ")
+        .replace(/\b(feat|review|리뷰|후기|추천|정리|모음|꿀팁|필독|내돈내산)\b/gi, " ")
+        .replace(/\s+/g, " ")
+        .trim();
+    }
+
+    function isUsefulKeywordChunk(value) {
+      return value.length >= 3 && !/^(공지|이벤트|협찬|광고|서이추|댓글|안녕하세요)$/i.test(value);
+    }
+
+    function isUsefulKeywordWord(value) {
+      return value.length > 1 && !/^(그리고|하지만|있는|없는|하는|되는|오늘|이번|정말|너무|추천|후기|리뷰|정리|모음|꿀팁)$/i.test(value);
+    }
+
+    function shortenKeyword(value) {
+      const text = value.trim();
+      if (!text) return "본문";
+      if (text.length <= 28) return text;
+      return `${text.slice(0, 28).trim()}...`;
+    }
+
+    function makeCommentPoint(value) {
+      const fallback = "본문에서 다뤄주신 부분";
+      const clean = normalizeMemoText(value);
+      if (!clean) return fallback;
+
+      const sentences = clean
+        .split(/[\n.!?。！？]+|(?<=다)\s+|(?<=요)\s+/)
+        .map((sentence) => sentence.trim())
+        .filter(Boolean)
+        .filter((sentence) => sentence.length >= 8)
+        .filter((sentence) => !/댓글|공감|서이추|광고|협찬|문의|예약|클릭|http|www\./i.test(sentence));
+
+      const picked = sentences.find((sentence) => sentence.length <= 80) || sentences[0] || clean;
+      return shortenCommentPoint(picked);
+    }
+
+    function normalizeMemoText(value) {
+      return stripHtml(value || "")
+        .replace(/https?:\/\/\S+/g, "")
+        .replace(/www\.\S+/g, "")
+        .replace(/[{}[\]<>]/g, " ")
+        .replace(/[#*_~=|]/g, " ")
+        .replace(/\s+/g, " ")
+        .trim();
+    }
+
+    function shortenCommentPoint(value) {
+      const text = value
+        .replace(/^(오늘은|이번에는|이번 포스팅은|안녕하세요)[,\s]*/i, "")
+        .replace(/\s+/g, " ")
+        .trim();
+
+      if (text.length <= 62) return text;
+
+      const clipped = text.slice(0, 62);
+      const lastSpace = clipped.lastIndexOf(" ");
+      return `${(lastSpace > 24 ? clipped.slice(0, lastSpace) : clipped).trim()}...`;
+    }
+
+    async function copyDraft() {
+      const target = getSelectedTarget();
+      if (!target) {
+        showToast("복사할 대상이 없습니다.");
+        return;
+      }
+
+      const draft = elements.draftOutput.value.trim();
+      if (!draft) {
+        showToast("먼저 문안을 생성하거나 입력해주세요.");
+        return;
+      }
+
+      target.draft = draft;
+      saveState();
+
+      try {
+        await navigator.clipboard.writeText(draft);
+        showToast("댓글 문안을 클립보드에 복사했습니다.");
+      } catch (error) {
+        elements.draftOutput.select();
+        document.execCommand("copy");
+        showToast("댓글 문안을 복사했습니다.");
+      }
+    }
+
+    function openSelected() {
+      const target = getSelectedTarget();
+      if (!target) {
+        showToast("열 대상이 없습니다.");
+        return;
+      }
+
+      window.open(target.url, "_blank", "noopener,noreferrer");
+    }
+
+    function markSelectedDone() {
+      const target = getSelectedTarget();
+      if (!target) {
+        showToast("완료 처리할 대상이 없습니다.");
+        return;
+      }
+
+      target.draft = elements.draftOutput.value.trim();
+      target.status = "done";
+      target.completedAt = new Date().toISOString();
+      saveState();
+      render();
+      showToast("수동 게시 완료로 기록했습니다.");
+    }
+
+    function exportData() {
+      const exportState = {
+        ...state,
+        settings: {
+          ...state.settings,
+          openaiApiKey: ""
+        }
+      };
+      const blob = new Blob([JSON.stringify(exportState, null, 2)], { type: "application/json" });
+      const url = URL.createObjectURL(blob);
+      const anchor = document.createElement("a");
+      anchor.href = url;
+      anchor.download = `naver-comment-assistant-${new Date().toISOString().slice(0, 10)}.json`;
+      anchor.click();
+      URL.revokeObjectURL(url);
+    }
+
+    function importData(event) {
+      const file = event.target.files[0];
+      if (!file) return;
+
+      const reader = new FileReader();
+      reader.onload = () => {
+        try {
+          const data = JSON.parse(reader.result);
+          if (!Array.isArray(data.targets) || !Array.isArray(data.templates)) {
+            throw new Error("Invalid schema");
+          }
+
+          state.targets = data.targets;
+          state.templates = ensureDefaultTemplates(data.templates.length ? data.templates : [...defaultTemplates]);
+          const importedApiKey = String(data.settings?.openaiApiKey || "").trim();
+          state.settings = {
+            ...(data.settings || {}),
+            openaiApiKey: importedApiKey || state.settings.openaiApiKey || ""
+          };
+          selectedId = state.targets[0]?.id || null;
+          saveState();
+          render();
+          showToast("JSON 데이터를 가져왔습니다.");
+        } catch (error) {
+          showToast("가져오기 파일 형식이 올바르지 않습니다.");
+        } finally {
+          event.target.value = "";
+        }
+      };
+      reader.readAsText(file);
+    }
+
+    function clearAll() {
+      if (!confirm("모든 대상과 기록을 삭제할까요? 템플릿은 유지됩니다.")) return;
+      state.targets = [];
+      selectedId = null;
+      saveState();
+      render();
+      showToast("작업 대상을 모두 삭제했습니다.");
+    }
+
+    function getSelectedTarget() {
+      return state.targets.find((target) => target.id === selectedId) || null;
+    }
+
+    function render() {
+      renderStats();
+      renderTargets();
+      renderTemplates();
+      renderTemplateSelect();
+      renderEditor();
+    }
+
+    function renderStats() {
+      const today = new Date().toISOString().slice(0, 10);
+      const done = state.targets.filter((target) => target.status === "done");
+      $("totalCount").textContent = state.targets.length;
+      $("readyCount").textContent = state.targets.length - done.length;
+      $("doneCount").textContent = done.length;
+      $("todayCount").textContent = done.filter((target) => target.completedAt?.startsWith(today)).length;
+    }
+
+    function renderTargets() {
+      const targets = getVisibleTargets();
+
+      if (!state.targets.length) {
+        elements.targetList.innerHTML = '<div class="empty">아직 추가된 블로그 글이 없습니다.<br>왼쪽에서 대상 URL을 추가하세요.</div>';
+        return;
+      }
+
+      if (!targets.length) {
+        elements.targetList.innerHTML = '<div class="empty">검색/필터 조건에 맞는 글이 없습니다.</div>';
+        return;
+      }
+
+      elements.targetList.innerHTML = targets.map((target) => {
+        const active = target.id === selectedId ? " active" : "";
+        const done = target.status === "done" ? " done" : "";
+        const badgeClass = target.status === "done" ? "done" : "ready";
+        const statusText = target.status === "done" ? "완료" : target.draft ? "문안 있음" : "대기";
+
+        return `
+          <article class="target${active}${done}">
+            <div class="target-head">
+              <div>
+                <div class="target-title">${escapeHtml(target.title)}</div>
+                <div class="target-url">${escapeHtml(target.url)}</div>
+              </div>
+              <span class="badge ${badgeClass}">${statusText}</span>
+            </div>
+            <p class="hint">${escapeHtml(previewMemo(target.memo))}</p>
+            <div class="target-actions">
+              <button class="btn ghost" onclick="selectTarget('${target.id}')">선택</button>
+              <button class="btn ghost" onclick="removeTarget('${target.id}')">삭제</button>
+            </div>
+          </article>
+        `;
+      }).join("");
+    }
+
+    function getVisibleTargets() {
+      const query = elements.targetSearchInput.value.trim().toLowerCase();
+      return [...state.targets]
+        .sort((a, b) => {
+          if (a.status === "done" && b.status !== "done") return 1;
+          if (a.status !== "done" && b.status === "done") return -1;
+          return new Date(b.createdAt || 0) - new Date(a.createdAt || 0);
+        })
+        .filter((target) => {
+          if (targetFilter === "ready" && (target.status === "done" || target.draft)) return false;
+          if (targetFilter === "draft" && (target.status === "done" || !target.draft)) return false;
+          if (targetFilter === "done" && target.status !== "done") return false;
+
+          if (!query) return true;
+
+          return [
+            target.title,
+            target.url,
+            target.memo,
+            target.draft
+          ].some((value) => String(value || "").toLowerCase().includes(query));
+        });
+    }
+
+    function renderTemplates() {
+      elements.templateList.innerHTML = state.templates.map((template, index) => `
+        <div class="settings-template">
+          <small>${escapeHtml(template)}</small>
+          <button class="btn secondary" onclick="removeTemplate(${index})">삭제</button>
+        </div>
+      `).join("");
+    }
+
+    function previewMemo(value) {
+      const text = normalizeMemoText(value);
+      if (!text) return "메모 없음";
+      return text.length > 120 ? `${text.slice(0, 120).trim()}...` : text;
+    }
+
+    function renderTemplateSelect() {
+      elements.templateSelect.innerHTML = state.templates.map((template, index) => {
+        const label = template.length > 42 ? `${template.slice(0, 42)}...` : template;
+        return `<option value="${index}">${escapeHtml(label)}</option>`;
+      }).join("");
+    }
+
+    function renderEditor() {
+      const target = getSelectedTarget();
+      if (!target) {
+        elements.selectedTitle.textContent = "대상을 선택하세요";
+        elements.selectedUrl.textContent = "왼쪽 목록에서 작업할 블로그 글을 고르면 문안을 만들 수 있습니다.";
+        elements.selectedStatus.textContent = "대기";
+        elements.selectedStatus.className = "badge";
+        elements.draftOutput.value = "";
+        return;
+      }
+
+      elements.selectedTitle.textContent = target.title;
+      elements.selectedUrl.textContent = target.url;
+      elements.selectedStatus.textContent = target.status === "done" ? "완료" : "진행 중";
+      elements.selectedStatus.className = `badge ${target.status === "done" ? "done" : "ready"}`;
+      elements.draftOutput.value = target.draft || "";
+    }
+
+    function escapeHtml(value) {
+      return String(value)
+        .replaceAll("&", "&amp;")
+        .replaceAll("<", "&lt;")
+        .replaceAll(">", "&gt;")
+        .replaceAll('"', "&quot;")
+        .replaceAll("'", "&#039;");
+    }
+
+    function showToast(message) {
+      elements.toast.textContent = message;
+      elements.toast.classList.add("show");
+      clearTimeout(showToast.timer);
+      showToast.timer = setTimeout(() => elements.toast.classList.remove("show"), 2200);
+    }
+  </script>
+</body>
+</html>
