@@ -2,12 +2,12 @@
 <html lang="ko">
 <head>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
   <title>HAN-SERVIVE</title>
   <style>
     *{box-sizing:border-box}
-    body{margin:0;min-height:100vh;background:#151821;color:#f4f7fb;font-family:"Malgun Gothic","Apple SD Gothic Neo",system-ui,sans-serif;overflow:hidden}
-    .app{position:relative;width:100vw;height:100vh;background:#1c2029}
+    body{margin:0;min-height:100vh;background:#151821;color:#f4f7fb;font-family:"Malgun Gothic","Apple SD Gothic Neo",system-ui,sans-serif;overflow:hidden;touch-action:none;user-select:none}
+    .app{position:relative;width:100vw;height:100vh;background:#1c2029;touch-action:none}
     canvas{display:block;width:100%;height:100%;image-rendering:pixelated}
     .hud{position:absolute;inset:14px 16px auto;display:grid;grid-template-columns:1fr auto auto 1fr;gap:14px;align-items:start;pointer-events:none}
     .panel{background:rgba(20,24,32,.78);border:1px solid rgba(218,228,240,.18);border-radius:8px;box-shadow:0 14px 36px rgba(0,0,0,.28);backdrop-filter:blur(8px)}
@@ -100,9 +100,22 @@
     .test-tools .test-only{display:none}
     .test-tools.on .test-only{display:inline-block}
     .test-tools button:disabled{opacity:.45;cursor:default}
+    .mobile-controls{position:absolute;inset:auto 0 0;z-index:5;display:none;align-items:flex-end;justify-content:space-between;padding:0 22px calc(18px + env(safe-area-inset-bottom));pointer-events:none}
+    .mobile-controls.is-hidden{display:none!important}
+    .mobile-stick{position:relative;width:142px;height:142px;border:4px solid rgba(255,246,208,.72);border-radius:50%;background:rgba(9,12,16,.46);box-shadow:0 10px 28px rgba(0,0,0,.34),inset 0 0 0 3px rgba(86,199,238,.16);pointer-events:auto;touch-action:none}
+    .mobile-stick::before{content:"";position:absolute;left:50%;top:50%;width:42px;height:42px;transform:translate(-50%,-50%);border-radius:50%;border:2px solid rgba(140,232,255,.32)}
+    .mobile-stick-knob{position:absolute;left:50%;top:50%;width:58px;height:58px;margin:-29px 0 0 -29px;border-radius:50%;background:linear-gradient(#fff8dc,#d8c77e);border:4px solid #090c10;box-shadow:0 5px 0 #a5772b,0 0 16px rgba(255,225,92,.28)}
+    .mobile-actions{display:grid;gap:12px;justify-items:end;pointer-events:auto}
+    .mobile-action{min-width:104px;height:58px;border:4px solid #090c10;border-radius:8px;background:#56c7ee;color:#091018;font:900 15px "Courier New","Lucida Console",monospace;box-shadow:0 7px 0 #24637b;padding:0 14px;touch-action:none}
+    .mobile-action.ultimate{min-width:124px;background:#ffe15c;box-shadow:0 7px 0 #a5772b,0 0 18px rgba(255,225,92,.25)}
+    .mobile-action:disabled{opacity:.48;filter:grayscale(.35);box-shadow:0 4px 0 #4d5664}
     @media (max-width:760px){
       .hud{grid-template-columns:1fr auto;inset:10px}.stage-info{grid-column:1/3;justify-self:start}.skills{grid-column:1/3;justify-self:start;max-width:100%}.slot{width:58px;min-height:58px}.timer strong{font-size:19px}.build{grid-template-columns:1fr}.choices{grid-template-columns:1fr}
       .overlay{padding:10px}.start-card{padding:14px}.select-title{font-size:36px;-webkit-text-stroke:2px #090c10}.carousel{height:406px}.select-card{top:18px;width:244px;grid-template-rows:218px auto}.select-card canvas{height:218px}.select-card.is-left-1{transform:translateX(calc(-50% - 178px)) translateY(54px) rotateZ(-10deg) rotateY(18deg) scale(.64)}.select-card.is-right-1{transform:translateX(calc(-50% + 178px)) translateY(54px) rotateZ(10deg) rotateY(-18deg) scale(.64)}.select-card.is-left-2,.select-card.is-right-2{opacity:0}.carousel-btn{width:40px;height:54px}.carousel-btn.prev{left:2px}.carousel-btn.next{right:2px}.select-info{font-size:12px}.start-row{margin-top:12px}
+    }
+    @media (pointer:coarse),(max-width:760px){
+      .mobile-controls{display:flex}
+      .test-tools{bottom:calc(178px + env(safe-area-inset-bottom));max-width:72vw}
     }
   </style>
 </head>
@@ -121,6 +134,15 @@
       <div id="skillHud" class="skills"></div>
     </div>
     <div id="toast" class="toast"></div>
+    <div id="mobileControls" class="mobile-controls is-hidden" aria-hidden="true">
+      <div id="mobileStick" class="mobile-stick" aria-label="이동 조이스틱">
+        <div id="mobileStickKnob" class="mobile-stick-knob"></div>
+      </div>
+      <div class="mobile-actions">
+        <button id="mobileUltimateBtn" class="mobile-action ultimate" type="button">필살기</button>
+        <button id="mobilePauseBtn" class="mobile-action" type="button">일시정지</button>
+      </div>
+    </div>
     <div class="test-tools">
       <button id="testModeBtn" type="button">테스트 OFF</button>
       <button id="invincibleTestBtn" class="test-only" type="button">무적 OFF</button>
@@ -195,6 +217,11 @@ const levelOverlay=document.getElementById("levelOverlay");
 const pauseOverlay=document.getElementById("pauseOverlay");
 const choicesEl=document.getElementById("choices");
 const toast=document.getElementById("toast");
+const mobileControls=document.getElementById("mobileControls");
+const mobileStick=document.getElementById("mobileStick");
+const mobileStickKnob=document.getElementById("mobileStickKnob");
+const mobileUltimateBtn=document.getElementById("mobileUltimateBtn");
+const mobilePauseBtn=document.getElementById("mobilePauseBtn");
 const testTools=document.querySelector(".test-tools");
 const testModeBtn=document.getElementById("testModeBtn");
 const invincibleTestBtn=document.getElementById("invincibleTestBtn");
@@ -254,6 +281,8 @@ const bikeRoadTile=new Image();
 bikeRoadTile.src="assets/bike_road_tile.png";
 const factoryTapeTile=new Image();
 factoryTapeTile.src="assets/factory_tape_tile_simple.png";
+const gymTile=new Image();
+gymTile.src="assets/gym_crossfit_center_tile_v2.png";
 const sojuHealSprite=new Image();
 sojuHealSprite.src="assets/item_soju_heal.png";
 const waveBanner=new Image();
@@ -371,6 +400,7 @@ let audioCtx=null,masterGain=null;
 let selectBgmTimer=null,selectBgmStep=0,gameBgmTimer=null,gameBgmStep=0,gameBgmTheme="office";
 const sfxLast={};
 let keys={},mouse={x:0,y:0};
+let mobileInput={active:false,pointerId:null,x:0,y:0,baseX:0,baseY:0};
 let enemies=[],shots=[],bossShots=[],effects=[],gems=[],floaters=[];
 let spawnTimer=0,elapsed=0,kills=0,shake=0;
 let stageClearMode=false,stageClearBanner={t:0,maxT:0,text:""};
@@ -463,6 +493,7 @@ addEventListener("pointerdown",unlockAudio);
 addEventListener("pointermove",e=>{mouse.x=e.clientX;mouse.y=e.clientY});
 addEventListener("load",()=>attemptAudioAutoplay());
 document.addEventListener("visibilitychange",()=>{if(!document.hidden)attemptAudioAutoplay()});
+setupMobileControls();
 document.getElementById("startBtn").onclick=()=>startGame();
 if(characterPrevBtn)characterPrevBtn.onclick=()=>moveCharacterSelection(-1);
 if(characterNextBtn)characterNextBtn.onclick=()=>moveCharacterSelection(1);
@@ -512,6 +543,8 @@ if(clearTestBtn)clearTestBtn.onclick=()=>{
   triggerStageClearPose();
 };
 if(ultimateBtn)ultimateBtn.onclick=()=>useUltimate();
+if(mobileUltimateBtn)mobileUltimateBtn.onclick=()=>useUltimate();
+if(mobilePauseBtn)mobilePauseBtn.onclick=()=>{pauseMenuOpen?closePauseMenu():openPauseMenu()};
 if(resumeBtn)resumeBtn.onclick=()=>closePauseMenu();
 if(homeBtn)homeBtn.onclick=()=>restart();
 if(soundToggleBtn)soundToggleBtn.onclick=()=>setSoundOn(!soundOn);
@@ -523,6 +556,7 @@ renderCharacterCarousel();
 applyTestModeUi();
 applySoundUi();
 updateUltimateButton();
+updateMobileControlsUi();
 
 function setTestMode(on){
   testMode=!!on;
@@ -586,6 +620,69 @@ function movePauseMenu(delta){
 function activatePauseMenu(){
   const buttons=pauseMenuButtons();
   if(buttons[pauseMenuIndex])buttons[pauseMenuIndex].click();
+}
+
+function setupMobileControls(){
+  if(!mobileStick||!mobileStickKnob)return;
+  const max=48;
+  const setStick=(clientX,clientY)=>{
+    const dx=clientX-mobileInput.baseX;
+    const dy=clientY-mobileInput.baseY;
+    const len=Math.hypot(dx,dy);
+    const pull=Math.min(max,len);
+    const nx=len>0?dx/len:0;
+    const ny=len>0?dy/len:0;
+    mobileInput.x=nx*(pull/max);
+    mobileInput.y=ny*(pull/max);
+    mobileStickKnob.style.transform=`translate(${Math.round(nx*pull)}px,${Math.round(ny*pull)}px)`;
+  };
+  const resetStick=()=>{
+    mobileInput.active=false;
+    mobileInput.pointerId=null;
+    mobileInput.x=0;
+    mobileInput.y=0;
+    if(mobileStickKnob)mobileStickKnob.style.transform="translate(0,0)";
+  };
+  mobileStick.addEventListener("pointerdown",e=>{
+    e.preventDefault();
+    unlockAudio();
+    mobileInput.active=true;
+    mobileInput.pointerId=e.pointerId;
+    const rect=mobileStick.getBoundingClientRect();
+    mobileInput.baseX=rect.left+rect.width/2;
+    mobileInput.baseY=rect.top+rect.height/2;
+    mobileStick.setPointerCapture(e.pointerId);
+    setStick(e.clientX,e.clientY);
+  });
+  mobileStick.addEventListener("pointermove",e=>{
+    if(!mobileInput.active||e.pointerId!==mobileInput.pointerId)return;
+    e.preventDefault();
+    setStick(e.clientX,e.clientY);
+  });
+  ["pointerup","pointercancel","lostpointercapture"].forEach(type=>{
+    mobileStick.addEventListener(type,e=>{
+      if(mobileInput.pointerId!==null&&e.pointerId!==mobileInput.pointerId)return;
+      resetStick();
+    });
+  });
+}
+
+function mobileControlsAvailable(){
+  return !!(matchMedia("(pointer: coarse)").matches||innerWidth<=760);
+}
+
+function updateMobileControlsUi(){
+  if(!mobileControls)return;
+  const visible=mobileControlsAvailable()&&!overlayVisible(startOverlay)&&!overlayVisible(levelOverlay)&&!pauseMenuOpen&&!gameOver;
+  mobileControls.classList.toggle("is-hidden",!visible);
+  mobileControls.setAttribute("aria-hidden",visible?"false":"true");
+  if(!visible&&mobileInput.active){
+    mobileInput.active=false;
+    mobileInput.pointerId=null;
+    mobileInput.x=0;
+    mobileInput.y=0;
+    if(mobileStickKnob)mobileStickKnob.style.transform="translate(0,0)";
+  }
 }
 
 function restart(){location.reload()}
@@ -1421,6 +1518,7 @@ function loop(now){
 }
 
 function update(dt){
+  updateMobileControlsUi();
   elapsed+=dt;player.frame+=dt*6.5;shake=Math.max(0,shake-dt*18);player.inv=Math.max(0,player.inv-dt);player.slowT=Math.max(0,(player.slowT||0)-dt);
   updatePose(dt);
   player.attackTimer=Math.max(0,(player.attackTimer||0)-dt);
@@ -1532,8 +1630,8 @@ function updateBossVsCutscene(dt){
 }
 
 function movePlayer(dt){
-  let x=(keys.d||keys.arrowright?1:0)-(keys.a||keys.arrowleft?1:0);
-  let y=(keys.s||keys.arrowdown?1:0)-(keys.w||keys.arrowup?1:0);
+  let x=(keys.d||keys.arrowright?1:0)-(keys.a||keys.arrowleft?1:0)+(mobileInput.x||0);
+  let y=(keys.s||keys.arrowdown?1:0)-(keys.w||keys.arrowup?1:0)+(mobileInput.y||0);
   if(player.ultimateTimer>0&&player.characterId!=="sangil"){player.moving=false;player.vx=0;player.vy=0;return}
   if(player.action==="clear"&&player.actionTimer>0){player.moving=false;player.vx=0;player.vy=0;return}
   if(player.action&&player.actionTimer>0&&!(x||y)){player.moving=false;player.vx=0;player.vy=0;return}
@@ -2183,10 +2281,15 @@ function updateUltimateButton(){
   if(testMode&&player.ultimateTimer<=0)player.ultimateCd=0;
   if(player.ultimateTimer>0&&player.characterId==="sangil")player.ultimateCd=0;
   if(spFill)spFill.style.width=(ultimateChargeRatio()*100)+"%";
-  if(!ultimateBtn)return;
   const ready=ultimateReady();
-  ultimateBtn.disabled=!ready;
-  ultimateBtn.textContent=ready?"SPACE 필살기":`SPACE ${Math.ceil(player.ultimateCd)}초`;
+  if(ultimateBtn){
+    ultimateBtn.disabled=!ready;
+    ultimateBtn.textContent=ready?"SPACE 필살기":`SPACE ${Math.ceil(player.ultimateCd)}초`;
+  }
+  if(mobileUltimateBtn){
+    mobileUltimateBtn.disabled=!ready;
+    mobileUltimateBtn.textContent=ready?"필살기":`${Math.ceil(player.ultimateCd)}초`;
+  }
 }
 
 function spawn(dt){
@@ -3459,7 +3562,11 @@ function drawGymTileLayer(c){
   ctx.imageSmoothingEnabled=false;
   for(let x=ox-tile;x<W+tile;x+=tile){
     for(let y=oy-tile;y<H+tile;y+=tile){
-      drawGymTile(x,y,tile);
+      if(gymTile.complete&&gymTile.naturalWidth){
+        ctx.drawImage(gymTile,x,y,tile,tile);
+      }else{
+        drawGymTile(x,y,tile);
+      }
     }
   }
 }
