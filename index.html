@@ -110,14 +110,19 @@
     .mobile-action.ultimate{min-width:104px;background:#ffe15c;box-shadow:0 5px 0 #a5772b,0 0 14px rgba(255,225,92,.22)}
     .mobile-action:disabled{opacity:.48;filter:grayscale(.35);box-shadow:0 4px 0 #4d5664}
     @media (max-width:760px){
-      .hud{grid-template-columns:minmax(0,1fr) auto;inset:8px;gap:7px;align-items:start}.status{min-width:0;padding:8px}.bar{height:8px}.bar+.bar{margin-top:5px}.meta{font-size:11px;margin-top:6px}.timer{padding:8px 11px;min-width:82px;margin-right:48px}.timer strong{font-size:20px}.timer span{display:block;width:50px;font-size:11px;line-height:1.35}.stage-info{display:none}.skills{grid-column:1/3;justify-self:start;max-width:calc(100vw - 16px);gap:5px;max-height:44px;overflow:hidden}.slot{width:auto;min-width:48px;min-height:0;height:40px;padding:5px 7px;display:grid;grid-template-columns:auto 1fr;grid-template-rows:1fr 1fr;column-gap:5px;text-align:left}.slot b{grid-row:1/3;font-size:17px;align-self:center}.slot span{margin:0;font-size:9px;max-width:54px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}.slot small{margin:0;font-size:9px}.build{grid-template-columns:1fr}.choices{grid-template-columns:1fr}
-      .overlay{padding:10px}.start-card{padding:14px}.select-title{font-size:36px;-webkit-text-stroke:2px #090c10}.carousel{height:406px}.select-card{top:18px;width:244px;grid-template-rows:218px auto}.select-card canvas{height:218px}.select-card.is-left-1{transform:translateX(calc(-50% - 178px)) translateY(54px) rotateZ(-10deg) rotateY(18deg) scale(.64)}.select-card.is-right-1{transform:translateX(calc(-50% + 178px)) translateY(54px) rotateZ(10deg) rotateY(-18deg) scale(.64)}.select-card.is-left-2,.select-card.is-right-2{opacity:0}.carousel-btn{width:40px;height:54px}.carousel-btn.prev{left:2px}.carousel-btn.next{right:2px}.select-info{font-size:12px}.start-row{margin-top:12px}
+      .hud{grid-template-columns:minmax(0,1fr) auto;inset:8px;gap:7px;align-items:start}.status{min-width:0;padding:8px}.bar{height:8px}.bar+.bar{margin-top:5px}.meta{font-size:11px;margin-top:6px}.timer{padding:8px 11px;min-width:82px;margin-right:48px}.timer strong{font-size:20px}.timer span{display:block;width:50px;font-size:11px;line-height:1.35}.stage-info{grid-column:1/2;justify-self:center;align-self:start;min-width:118px;max-width:168px;padding:5px 9px;text-align:center;background:rgba(20,24,32,.58)}.stage-info strong{font-size:12px;line-height:1}.stage-info span{margin-top:2px;font-size:10px;line-height:1.1;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}.skills{position:fixed;left:8px;right:auto;top:calc(104px + env(safe-area-inset-top));display:flex;max-width:calc(100vw - 16px);gap:5px;max-height:34px;overflow:hidden}.slot{width:32px;min-width:32px;min-height:32px;height:32px;padding:4px;display:grid;place-items:center;text-align:center}.slot b{font-size:17px;line-height:1}.slot span,.slot small{display:none}.build{grid-template-columns:1fr}.choices{grid-template-columns:1fr}
+      .overlay{padding:8px;align-items:center}.start-card{width:min(420px,100%);max-height:calc(100vh - 16px);padding:10px;border-width:3px;box-shadow:0 16px 42px rgba(0,0,0,.46),inset 0 0 0 3px #33465e}.select-title{font-size:clamp(25px,8vw,34px);-webkit-text-stroke:2px #090c10;text-shadow:0 3px 0 #24637b,0 6px 0 #090c10}.character-select{margin-top:8px;gap:7px;padding:8px;border-width:2px}.carousel{height:min(58vh,342px);min-height:286px}.carousel::before{bottom:0;height:52px}.select-card{top:10px;width:min(214px,62vw);padding:8px;border-width:3px;grid-template-rows:min(190px,37vh) auto;gap:6px;box-shadow:0 8px 0 #a5772b,0 18px 34px rgba(0,0,0,.34),inset 0 0 0 3px #fff6d0}.select-card canvas{height:min(190px,37vh);border-width:3px}.select-card.is-center{box-shadow:0 9px 0 #a5772b,0 21px 38px rgba(0,0,0,.38),0 0 0 4px rgba(86,199,238,.16),inset 0 0 0 3px #fff6d0}.select-card.is-left-1{transform:translateX(calc(-50% - min(31vw,122px))) translateY(38px) rotateZ(-8deg) rotateY(16deg) scale(.6)}.select-card.is-right-1{transform:translateX(calc(-50% + min(31vw,122px))) translateY(38px) rotateZ(8deg) rotateY(-16deg) scale(.6)}.select-card.is-left-2,.select-card.is-right-2{opacity:0}.select-card.is-locked::after{top:96px;padding:6px 16px;border-width:3px;font-size:22px}.carousel-btn{top:48%;width:34px;height:46px;border-width:3px;border-radius:7px;font-size:24px;box-shadow:0 5px 0 #24637b}.carousel-btn.prev{left:0}.carousel-btn.next{right:0}.select-info{font-size:11px}.select-info div{grid-template-columns:44px 1fr;min-height:28px;border-bottom-width:2px}.select-info b,.select-info span{padding:5px}.select-hint{padding:5px 10px;font-size:11px}.start-row{margin-top:8px}.press-space{gap:8px;font-size:clamp(17px,5vw,23px);letter-spacing:1px}.space-key{width:82px;border-width:2px}.build{grid-template-columns:1fr}.choices{grid-template-columns:1fr}
+    }
+    @media (max-width:760px) and (max-height:680px){
+      .start-card{padding:8px}.select-title{font-size:24px}.character-select{margin-top:6px;padding:6px}.carousel{height:282px;min-height:256px}.select-card{top:7px;width:196px;grid-template-rows:166px auto}.select-card canvas{height:166px}.select-card.is-left-1{transform:translateX(calc(-50% - min(29vw,104px))) translateY(34px) rotateZ(-8deg) rotateY(16deg) scale(.56)}.select-card.is-right-1{transform:translateX(calc(-50% + min(29vw,104px))) translateY(34px) rotateZ(8deg) rotateY(-16deg) scale(.56)}.select-info{font-size:10px}.select-info div{min-height:24px}.select-hint{display:none}.press-space{font-size:17px}.space-key{width:68px}.start-row{margin-top:6px}
     }
     @media (pointer:coarse),(max-width:760px){
       .mobile-controls{display:flex}
       .mobile-actions{display:block}
       #mobilePauseBtn{position:fixed;right:8px;top:calc(8px + env(safe-area-inset-top));width:42px;min-width:42px;height:42px;padding:0;border-width:3px;border-radius:8px;font-size:0;background:rgba(27,38,54,.88);color:#fff6d0;box-shadow:0 4px 0 #090c10,0 8px 18px rgba(0,0,0,.28)}
-      #mobilePauseBtn::before{content:"II";font:900 18px "Courier New","Lucida Console",monospace;letter-spacing:-2px}
+      #mobilePauseBtn::before,#mobilePauseBtn::after{content:"";position:absolute;top:10px;width:6px;height:18px;border-radius:2px;background:#fff6d0;box-shadow:0 2px 0 #090c10}
+      #mobilePauseBtn::before{left:12px}
+      #mobilePauseBtn::after{right:12px}
       .test-tools{display:none!important}
     }
   </style>
@@ -284,6 +289,8 @@ const bikeRoadTile=new Image();
 bikeRoadTile.src="assets/bike_road_tile.png";
 const factoryTapeTile=new Image();
 factoryTapeTile.src="assets/factory_tape_tile_simple.png";
+const logisticsTile=new Image();
+logisticsTile.src="assets/logistics_tile_simple_v2.png";
 const gymTile=new Image();
 gymTile.src="assets/gym_crossfit_center_tile_v2.png";
 const sojuHealSprite=new Image();
@@ -2502,7 +2509,7 @@ function fireEnemyResignation(e,a){
   bossShots.push({
     kind:"resignationEnvelope",x:e.x+Math.cos(a)*muzzle,y:e.y-10+Math.sin(a)*muzzle,
     vx:Math.cos(a)*spd,vy:Math.sin(a)*spd,
-    r:13,life:2.7,dmg:e.projectileDmg||8,spin:rnd(0,Math.PI*2),
+    r:8,life:2.7,dmg:e.projectileDmg||8,spin:rnd(0,Math.PI*2),
     hitText:"사직서"
   });
 }
@@ -2513,7 +2520,7 @@ function fireEnemyBox(e,a){
   bossShots.push({
     kind:"box",x:e.x+Math.cos(a)*muzzle,y:e.y-10+Math.sin(a)*muzzle,
     vx:Math.cos(a)*spd,vy:Math.sin(a)*spd,
-    r:15,life:2.9,dmg:e.projectileDmg||9,spin:rnd(0,Math.PI*2),
+    r:10,life:2.9,dmg:e.projectileDmg||9,spin:rnd(0,Math.PI*2),
     hitText:"박스"
   });
 }
@@ -3486,7 +3493,11 @@ function drawLogisticsTileLayer(c){
   ctx.imageSmoothingEnabled=false;
   for(let x=ox-tile;x<vw+tile;x+=tile){
     for(let y=oy-tile;y<vh+tile;y+=tile){
-      drawLogisticsTile(x,y,tile);
+      if(logisticsTile.complete&&logisticsTile.naturalWidth){
+        ctx.drawImage(logisticsTile,x,y,tile,tile);
+      }else{
+        drawLogisticsTile(x,y,tile);
+      }
     }
   }
 }
@@ -3752,7 +3763,8 @@ function drawStageOverlay(){
   if(stageBanner.t<=0)return;
   const p=1-stageBanner.t/stageBanner.maxT;
   const alpha=p<.18?p/.18:stageBanner.t<.42?stageBanner.t/.42:1;
-  const scale=p<.2?.78+p*1.4:1+Math.sin(p*Math.PI)*.08;
+  const responsive=mobileControlsAvailable()?clamp(Math.min(W/760,H/920),.48,.82):clamp(Math.min(W/960,H/720),.72,1);
+  const scale=(p<.2?.78+p*1.4:1+Math.sin(p*Math.PI)*.08)*responsive;
   const theme=themeForStage(stageBanner.stage);
   ctx.save();
   ctx.globalAlpha=alpha;
@@ -3762,7 +3774,7 @@ function drawStageOverlay(){
   ctx.textAlign="center";
   ctx.textBaseline="middle";
   ctx.font=`900 ${Math.floor(76*scale)}px "Courier New","Lucida Console",monospace`;
-  ctx.lineWidth=9;
+  ctx.lineWidth=Math.max(4,9*scale);
   ctx.strokeStyle="#090c10";
   ctx.fillStyle="#fff6d0";
   const text=`${stageBanner.stage} STAGE`;
@@ -3770,15 +3782,15 @@ function drawStageOverlay(){
   ctx.fillText(text,0,0);
   let mapFont=Math.floor(58*scale);
   ctx.font=`900 ${mapFont}px "Black Han Sans","Jua","Do Hyeon","Arial Black",sans-serif`;
-  while(ctx.measureText(theme.name).width>W*.9&&mapFont>54){
+  while(ctx.measureText(theme.name).width>W*.82&&mapFont>22){
     mapFont-=4;
     ctx.font=`900 ${mapFont}px "Black Han Sans","Jua","Do Hyeon","Arial Black",sans-serif`;
   }
   ctx.fillStyle="#8ce8ff";
   ctx.strokeStyle="#090c10";
-  ctx.lineWidth=7;
-  ctx.strokeText(theme.name,0,78*scale);
-  ctx.fillText(theme.name,0,78*scale);
+  ctx.lineWidth=Math.max(3,7*scale);
+  ctx.strokeText(theme.name,0,76*scale);
+  ctx.fillText(theme.name,0,76*scale);
   ctx.restore();
 }
 
@@ -3963,14 +3975,15 @@ function drawComicShoutText(text,x,y){
 function drawBossVsCutsceneV2(){
   if(!bossVsCutscene.active)return;
   const mobile=mobileControlsAvailable();
-  const fit=mobile?clamp(Math.min(W/720,H/760),.56,.86):1;
+  const portrait=H>W;
+  const fit=mobile?clamp(Math.min(W/(portrait?820:760),H/(portrait?980:760)),.42,.78):1;
   const p=1-bossVsCutscene.t/bossVsCutscene.maxT;
   const enter=clamp(p/.18,0,1);
   const exit=clamp((p-.86)/.14,0,1);
   const easeIn=1-(1-enter)**3;
   const easeOut=exit**3;
   const alpha=clamp(enter*1.6,0,1)*(1-exit*.45);
-  const panelH=Math.min(mobile?360:500,H*(mobile?.58:.76)),panelY=H/2-panelH/2;
+  const panelH=Math.min(mobile?(portrait?300:340):500,H*(mobile?(portrait?.48:.58):.76)),panelY=H/2-panelH/2;
   const panelW=Math.min(W,Math.floor(panelH*(1600/560)));
   const panelX=W/2-panelW/2;
   const split=W/2;
@@ -4003,8 +4016,12 @@ function drawBossVsCutsceneV2(){
 function drawVsNameV2(text,x,y,fill,scale=1){
   ctx.save();
   ctx.translate(x,y);
-  const fontSize=Math.floor(46*scale);
+  let fontSize=Math.floor(46*scale);
   ctx.font=`900 ${fontSize}px "Black Han Sans","Bagel Fat One","Jua","Arial Black",sans-serif`;
+  while(ctx.measureText(text).width>W*.46&&fontSize>18){
+    fontSize-=2;
+    ctx.font=`900 ${fontSize}px "Black Han Sans","Bagel Fat One","Jua","Arial Black",sans-serif`;
+  }
   ctx.textAlign="center";ctx.textBaseline="middle";
   ctx.lineJoin="round";
   ctx.strokeStyle="#101319";ctx.lineWidth=13*scale;ctx.strokeText(text,0,2);
@@ -4179,6 +4196,7 @@ function drawStageClearBanner(){
   const alpha=p<.12?p/.12:stageClearBanner.t<.35?stageClearBanner.t/.35:1;
   const chars=[...(stageClearBanner.text||"컷 !!!")];
   const fontFamily='"Black Han Sans","Bagel Fat One","Jua","Do Hyeon","Galmuri11","DungGeunMo","NeoDunggeunmo","Arial Black",sans-serif';
+  const responsive=mobileControlsAvailable()?clamp(Math.min(W/760,H/920),.45,.78):clamp(Math.min(W/1040,H/760),.72,1);
   ctx.save();
   ctx.globalAlpha=alpha;
   ctx.translate(W/2,H*.43);
@@ -4186,8 +4204,12 @@ function drawStageClearBanner(){
   ctx.textBaseline="middle";
   ctx.lineJoin="round";
   ctx.miterLimit=2;
-  ctx.font=`900 58px ${fontFamily}`;
-  const widths=chars.map(ch=>ch===" "?22:ctx.measureText(ch).width+(ch==="!"?12:5));
+  const baseSize=58*responsive;
+  ctx.font=`900 ${baseSize}px ${fontFamily}`;
+  let widths=chars.map(ch=>ch===" "?22*responsive:ctx.measureText(ch).width+(ch==="!"?12:5)*responsive);
+  const totalWidth=widths.reduce((sum,w)=>sum+w,0);
+  const fitScale=totalWidth>W*.9?clamp(W*.9/totalWidth,.55,1):1;
+  widths=widths.map(w=>w*fitScale);
   let cursor=-widths.reduce((sum,w)=>sum+w,0)/2;
   chars.forEach((ch,i)=>{
     const w=widths[i];
@@ -4201,11 +4223,11 @@ function drawStageClearBanner(){
     ctx.translate(cursor+w/2-90*(1-ease),Math.sin(i*1.7)*5-26*(1-ease));
     ctx.rotate(((i%5)-2)*.05*(1-cp));
     ctx.scale(pop,pop);
-    const size=ch==="!"?62:ch==="컷"?66:58+(i%3===1?5:0);
+    const size=(ch==="!"?62:ch==="컷"?66:58+(i%3===1?5:0))*responsive*fitScale;
     ctx.font=`900 ${size}px ${fontFamily}`;
-    ctx.strokeStyle="#101319";ctx.lineWidth=14;ctx.strokeText(ch,0,0);
-    ctx.strokeStyle="#ff4f64";ctx.lineWidth=7;ctx.strokeText(ch,0,0);
-    ctx.strokeStyle="#ffe15c";ctx.lineWidth=3;ctx.strokeText(ch,0,0);
+    ctx.strokeStyle="#101319";ctx.lineWidth=Math.max(4,14*responsive*fitScale);ctx.strokeText(ch,0,0);
+    ctx.strokeStyle="#ff4f64";ctx.lineWidth=Math.max(2,7*responsive*fitScale);ctx.strokeText(ch,0,0);
+    ctx.strokeStyle="#ffe15c";ctx.lineWidth=Math.max(1,3*responsive*fitScale);ctx.strokeText(ch,0,0);
     ctx.fillStyle="#fff8d6";ctx.fillText(ch,0,0);
     ctx.restore();
     cursor+=w;
@@ -4599,13 +4621,13 @@ function drawBossShot(p){
     ctx.rotate(Math.atan2(p.vy,p.vx)+Math.PI/2+Math.sin(elapsed*14+p.spin)*.08);
     ctx.fillStyle="#fff6df";
     ctx.strokeStyle="#49342f";
-    ctx.lineWidth=3;
-    ctx.fillRect(-11,-25,22,50);
-    ctx.strokeRect(-11,-25,22,50);
+    ctx.lineWidth=2;
+    ctx.fillRect(-8,-18,16,36);
+    ctx.strokeRect(-8,-18,16,36);
     ctx.fillStyle="#f2dcc4";
-    ctx.fillRect(-8,-22,16,5);
+    ctx.fillRect(-6,-16,12,4);
     ctx.fillStyle="#261b1b";
-    ctx.font="bold 11px sans-serif";
+    ctx.font="bold 8px sans-serif";
     ctx.textAlign="center";
     ctx.textBaseline="middle";
     ctx.fillText("사",0,-10);
@@ -4617,16 +4639,16 @@ function drawBossShot(p){
   if(p.kind==="box"){
     ctx.rotate(Math.atan2(p.vy,p.vx)+Math.sin(elapsed*12+p.spin)*.18);
     if(enemyBoxProjectileSprite.complete&&enemyBoxProjectileSprite.naturalWidth){
-      ctx.drawImage(enemyBoxProjectileSprite,-23,-23,46,46);
+      ctx.drawImage(enemyBoxProjectileSprite,-15,-15,30,30);
       ctx.restore();
       return;
     }
     ctx.fillStyle="#b88248";
-    ctx.fillRect(-16,-14,32,28);
+    ctx.fillRect(-11,-10,22,20);
     ctx.strokeStyle="#5c3b22";
-    ctx.strokeRect(-16,-14,32,28);
+    ctx.strokeRect(-11,-10,22,20);
     ctx.fillStyle="#e8d1a5";
-    ctx.fillRect(-2,-14,4,28);
+    ctx.fillRect(-1,-10,3,20);
     ctx.restore();
     return;
   }
