@@ -125,7 +125,78 @@
       #mobilePauseBtn::after{right:12px}
       .test-tools{display:none!important}
     }
-  </style>
+@media (max-width:760px){
+  .hud .stage-info.panel{
+    position:fixed !important;
+    left:50% !important;
+    top:calc(52px + env(safe-area-inset-top, 0px)) !important;
+    transform:translateX(-50%) !important;
+    min-width:0 !important;
+    width:auto !important;
+    max-width:86vw !important;
+    padding:0 !important;
+    border:0 !important;
+    background:transparent !important;
+    box-shadow:none !important;
+    display:flex !important;
+    align-items:center !important;
+    justify-content:center !important;
+    gap:8px !important;
+    pointer-events:none !important;
+    color:#f8fbff !important;
+    text-align:center !important;
+    text-shadow:0 2px 0 #101520, 0 0 8px rgba(45,214,255,.75), 0 0 12px rgba(0,0,0,.8) !important;
+  }
+  .hud .stage-info.panel strong,
+  .hud .stage-info.panel span{
+    display:inline !important;
+    margin:0 !important;
+    line-height:1 !important;
+    letter-spacing:0 !important;
+    white-space:nowrap !important;
+  }
+  .hud .stage-info.panel strong{font-size:15px !important;color:#fff4b8 !important;}
+  .hud .stage-info.panel span{font-size:14px !important;color:#8fefff !important;}
+  .mobile-action.ultimate{
+    width:86px !important;
+    height:86px !important;
+    min-width:86px !important;
+    border-radius:999px !important;
+    padding:0 !important;
+    overflow:hidden !important;
+    position:relative !important;
+    display:grid !important;
+    place-items:center !important;
+    font-size:0 !important;
+    color:transparent !important;
+    background:radial-gradient(circle at 35% 28%, #fff7b6 0 18%, #ffd84d 42%, #f2a81f 76%, #926211 100%) !important;
+  }
+  .mobile-action.ultimate::before{
+    content:"";
+    position:absolute;
+    inset:15px;
+    z-index:1;
+    background-position:center;
+    background-repeat:no-repeat;
+    background-size:contain;
+    image-rendering:pixelated;
+  }
+  .mobile-action.ultimate[data-character="geontaek"]::before{background-image:var(--ultimate-icon-url, url("assets/geontaek_ultimate_golf_swing.png"));}
+  .mobile-action.ultimate[data-character="sangil"]::before{background-image:var(--ultimate-icon-url, url("assets/sangil_attack.png"));}
+  .mobile-action.ultimate::after{
+    content:"";
+    position:absolute;
+    inset:5px;
+    z-index:2;
+    border-radius:999px;
+    background:conic-gradient(from -90deg, rgba(8,12,18,.76) var(--cooldown-angle, 0deg), transparent 0deg);
+    opacity:var(--cooldown-opacity, 0);
+    pointer-events:none;
+    transition:opacity .12s linear;
+  }
+  .mobile-action.ultimate.is-cooling::before{filter:saturate(.55) brightness(.75);}
+}
+</style>
 </head>
 <body>
   <div class="app">
@@ -5726,6 +5797,56 @@ function drawEffect(e){
   ctx.restore();
 }
 function drawText(f){ctx.fillStyle=f.color;ctx.font="13px Malgun Gothic";ctx.textAlign="center";ctx.fillText(f.text,f.x,f.y)}
+const __mobileUltimateIconCache={};
+function __setMobileUltimateIcon(characterId){
+  if(typeof mobileUltimateBtn==="undefined"||!mobileUltimateBtn)return;
+  const src=characterId==="sangil"?"assets/ultimate_icon_sangil_chroma.png":"assets/ultimate_icon_geontaek_chroma.png";
+  if(__mobileUltimateIconCache[src]){
+    mobileUltimateBtn.style.setProperty("--ultimate-icon-url",`url("${__mobileUltimateIconCache[src]}")`);
+    return;
+  }
+  const img=new Image();
+  img.onload=()=>{
+    try{
+      const canvas=document.createElement("canvas");
+      canvas.width=img.naturalWidth||img.width;
+      canvas.height=img.naturalHeight||img.height;
+      const ctx=canvas.getContext("2d");
+      ctx.imageSmoothingEnabled=false;
+      ctx.drawImage(img,0,0);
+      const pixels=ctx.getImageData(0,0,canvas.width,canvas.height);
+      const data=pixels.data;
+      for(let i=0;i<data.length;i+=4){
+        const r=data[i],g=data[i+1],b=data[i+2];
+        if(g>140&&r<120&&b<120)data[i+3]=0;
+      }
+      ctx.putImageData(pixels,0,0);
+      __mobileUltimateIconCache[src]=canvas.toDataURL("image/png");
+      if(mobileUltimateBtn.dataset.character===characterId){
+        mobileUltimateBtn.style.setProperty("--ultimate-icon-url",`url("${__mobileUltimateIconCache[src]}")`);
+      }
+    }catch(err){}
+  };
+  img.src=src;
+}
+const __hanFightUpdateUltimateButton=updateUltimateButton;
+updateUltimateButton=function(){
+  __hanFightUpdateUltimateButton();
+  if(typeof mobileUltimateBtn==="undefined"||!mobileUltimateBtn)return;
+  const characterId=typeof player!=="undefined"&&player&&player.characterId==="sangil"?"sangil":"geontaek";
+  let ratio=1;
+  if(typeof ultimateChargeRatio==="function"){
+    ratio=Math.max(0,Math.min(1,ultimateChargeRatio()));
+  }
+  const cooling=Math.max(0,1-ratio);
+  mobileUltimateBtn.dataset.character=characterId;
+  mobileUltimateBtn.textContent="";
+  mobileUltimateBtn.setAttribute("aria-label","필살기");
+  __setMobileUltimateIcon(characterId);
+  mobileUltimateBtn.style.setProperty("--cooldown-angle",`${cooling*360}deg`);
+  mobileUltimateBtn.style.setProperty("--cooldown-opacity",cooling>.01?"1":"0");
+  mobileUltimateBtn.classList.toggle("is-cooling",cooling>.01);
+};
 </script>
 </body>
 </html>
