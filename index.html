@@ -325,7 +325,17 @@ const forkliftDriverSprite=new Image();
 forkliftDriverSprite.src="assets/enemy_forklift_driver.png";
 const cultMinionSprite=new Image();
 cultMinionSprite.src="assets/enemy_cult_minion.png";
-const enemySprites={cryingFemale:cryingFemaleSprite,cryingMale:cryingMaleSprite,mzResignation:mzResignationSprite,roadCyclist:roadCyclistSprite,fixieShooter:fixieShooterSprite,fishermanUncle:fishermanUncleSprite,lazyFactoryWorker:lazyFactoryWorkerSprite,tapeThrower:tapeThrowerSprite,juCousinWorker:juCousinWorkerSprite,logisticsOfficeLady:logisticsOfficeLadySprite,boxThrower:boxThrowerSprite,forkliftDriver:forkliftDriverSprite,cultMinion:cultMinionSprite};
+const gymTattooPigSprite=new Image();
+gymTattooPigSprite.src="assets/enemy_gym_tattoo_pig.png";
+const gymLeggingsSprite=new Image();
+gymLeggingsSprite.src="assets/enemy_gym_leggings_member.png";
+const gymBodybuilderSprite=new Image();
+gymBodybuilderSprite.src="assets/enemy_gym_bodybuilder.png";
+const gymFartCloudSprite=new Image();
+gymFartCloudSprite.src="assets/gym_fart_cloud.png";
+const gymDumbbellSprite=new Image();
+gymDumbbellSprite.src="assets/gym_dumbbell_projectile.png";
+const enemySprites={cryingFemale:cryingFemaleSprite,cryingMale:cryingMaleSprite,mzResignation:mzResignationSprite,roadCyclist:roadCyclistSprite,fixieShooter:fixieShooterSprite,fishermanUncle:fishermanUncleSprite,lazyFactoryWorker:lazyFactoryWorkerSprite,tapeThrower:tapeThrowerSprite,juCousinWorker:juCousinWorkerSprite,logisticsOfficeLady:logisticsOfficeLadySprite,boxThrower:boxThrowerSprite,forkliftDriver:forkliftDriverSprite,cultMinion:cultMinionSprite,gymTattooPig:gymTattooPigSprite,gymLeggings:gymLeggingsSprite,gymBodybuilder:gymBodybuilderSprite};
 const juDaeriSprite=new Image();
 juDaeriSprite.src="assets/boss_ju_daeri.png";
 const juDaeriNagSprite=new Image();
@@ -386,6 +396,12 @@ const gossipMaleSprite=new Image();
 gossipMaleSprite.src="assets/boss_gossip_male.png";
 const gossipProjectileSprite=new Image();
 gossipProjectileSprite.src="assets/boss_gossip_projectile.png";
+const emotionCeoSprite=new Image();
+emotionCeoSprite.src="assets/boss_emotion_trash_ceo_sheet.png";
+const emotionCeoSkillSprite=new Image();
+emotionCeoSkillSprite.src="assets/boss_emotion_ceo_skill.png";
+const emotionTearSprite=new Image();
+emotionTearSprite.src="assets/boss_emotion_tear_projectile.png";
 const BOSS_NAG_SKILL={range:320,arc:Math.PI*.42,imgX:16,imgY:-120,imgW:330,imgH:240};
 const BOSS_KICK_SKILL={castT:.62,len:620,wide:74,dashT:.62,dashSpeed:920};
 const BOSS_STAMP_WAVE_DELAY=.28;
@@ -393,6 +409,17 @@ const BOSS_STAMP_SHOT_DELAY=.035;
 const CHEON_HEAT_SKILL={castT:.55,count:18,waves:2,waveDelay:.34,spd:410,dmg:8,ringRadius:230,slowAt:142,holdT:1.2};
 const CHEON_BELLY_SKILL={castT:.82,jumpT:.46,radius:92,dmg:24,range:430,chainTotal:3};
 const CULT_SKILL={chantT:.92,totemHp:260,coffinHp:280,coffinHeal:.026};
+const EMOTION_CEO_SKILL={pullCastT:2.65,pullRadius:285,pullDamageRadius:205,pullForce:70,pullBurst:92,pushCastT:2.1,pushSafe:178,pushOuter:390,pushForce:145,dotGap:.28};
+const EMOTION_CEO_FRAMES={
+  move:[
+    [{x:243,y:0,w:180,h:180},{x:516,y:0,w:180,h:180},{x:788,y:0,w:180,h:180},{x:1058,y:0,w:180,h:180}],
+    [{x:243,y:180,w:180,h:150},{x:511,y:180,w:180,h:150},{x:790,y:180,w:180,h:150},{x:1061,y:180,w:180,h:150}],
+    [{x:250,y:330,w:180,h:140},{x:518,y:330,w:180,h:140},{x:799,y:330,w:180,h:140},{x:1067,y:330,w:180,h:140}],
+    [{x:240,y:485,w:180,h:120},{x:512,y:485,w:180,h:120},{x:791,y:485,w:180,h:120},{x:1058,y:485,w:180,h:120}]
+  ],
+  intro:[{x:210,y:612,w:240,h:191},{x:497,y:612,w:240,h:191},{x:773,y:612,w:240,h:191},{x:1049,y:612,w:240,h:191}],
+  death:[{x:136,y:803,w:330,h:221},{x:436,y:803,w:330,h:221},{x:728,y:803,w:330,h:221},{x:1022,y:803,w:330,h:221}]
+};
 const OUTDOOR_BLEND_SPEED=.36;
 const bossNagFrames=[
   {x:46,y:279,w:316,h:177},
@@ -429,7 +456,7 @@ const stageThemes=[
   {id:"factory",name:"테이프 공장",bossId:"juDaeri"},
   {id:"bike",name:"자전거도로",bossId:"cultFanatic"},
   {id:"logistics",name:"물류센터",bossId:"gossipGroup"},
-  {id:"gym",name:"강호 크로스핏 센터",bossId:"gossipGroup"}
+  {id:"gym",name:"강호 크로스핏 센터",bossId:"emotionCeo"}
 ];
 let boss1Spawned=false;
 let boss2Spawned=false;
@@ -478,6 +505,9 @@ const enemyTypes=[
   {id:"logisticsOfficeLady",name:"차트 든 물류 사무직",hp:30,spd:118,dmg:10,xp:7,color:"#f2eef0",tie:"#d49b57",size:19,drawSize:66},
   {id:"boxThrower",name:"박스 투척 작업자",hp:28,spd:94,dmg:9,xp:8,color:"#2f4b68",tie:"#d3a15a",size:20,drawSize:70,ranged:true,range:370,shootCd:2.35,projectileDmg:9,projectileSpeed:390,attackKind:"boxThrow"},
   {id:"forkliftDriver",name:"지게차 안전조끼 작업자",hp:72,spd:132,dmg:16,xp:14,color:"#f0b23a",tie:"#ff7b22",size:27,drawSize:92},
+  {id:"gymTattooPig",name:"문신 돼지남",hp:44,spd:116,dmg:12,xp:8,color:"#17191f",tie:"#111",size:23,drawSize:76},
+  {id:"gymLeggings",name:"레깅스 여성회원",hp:30,spd:122,dmg:8,xp:9,color:"#282d38",tie:"#ff8ac0",size:20,drawSize:70,ranged:true,range:220,shootCd:3.15,projectileDmg:3,attackKind:"fartCloud"},
+  {id:"gymBodybuilder",name:"덤벨 헬창",hp:68,spd:92,dmg:13,xp:13,color:"#1f2024",tie:"#c84c4c",size:25,drawSize:86,ranged:true,range:410,shootCd:2.55,projectileDmg:11,projectileSpeed:430,attackKind:"dumbbellBoomerang"},
   {id:"cultMinion",name:"좀비 광신도",hp:20,spd:118,dmg:8,xp:3,color:"#8a6d86",tie:"#d5b34d",size:22,drawSize:76}
 ];
 
@@ -1649,7 +1679,8 @@ function updateBossVsCutscene(dt){
   bossVsCutscene.t=Math.max(0,bossVsCutscene.t-dt);
   if(bossVsCutscene.t<=0){
     bossVsCutscene.active=false;
-    if(bossVsCutscene.bossId==="cultFanatic")spawnBoss3(bossVsCutscene.stage);
+    if(bossVsCutscene.bossId==="emotionCeo")spawnBoss5(bossVsCutscene.stage);
+    else if(bossVsCutscene.bossId==="cultFanatic")spawnBoss3(bossVsCutscene.stage);
     else if(bossVsCutscene.bossId==="cheonSangmu")spawnBoss2(bossVsCutscene.stage);
     else if(bossVsCutscene.bossId==="gossipGroup")spawnBoss4(bossVsCutscene.stage);
     else spawnBoss1(bossVsCutscene.stage);
@@ -1715,8 +1746,8 @@ function triggerStageClearPose(){
 
 function beginBossClear(b){
   stageClearMode=true;
-  const clearText=b.id==="gossipGroup"?"뒷담화꾼~~~ 컷 !!!":b.id==="cultFanatic"?"광신도~~~ 컷 !!!":b.id==="cheonSangmu"?"천상무~~~ 컷 !!!":"주대리~~~ 컷 !!!";
-  const clearColor=b.id==="gossipGroup"?"#ff7ad8":b.id==="cultFanatic"?"#b56cff":b.id==="cheonSangmu"?"#ffd15a":"#ff5c78";
+  const clearText=b.id==="emotionCeo"?"사장님~~~ 컷 !!!":b.id==="gossipGroup"?"뒷담화꾼~~~ 컷 !!!":b.id==="cultFanatic"?"광신도~~~ 컷 !!!":b.id==="cheonSangmu"?"천상무~~~ 컷 !!!":"주대리~~~ 컷 !!!";
+  const clearColor=b.id==="emotionCeo"?"#69d7ff":b.id==="gossipGroup"?"#ff7ad8":b.id==="cultFanatic"?"#b56cff":b.id==="cheonSangmu"?"#ffd15a":"#ff5c78";
   stageClearBanner={t:1.65,maxT:1.65,text:clearText};
   playSfx("bossDeath");
   shots.length=0;
@@ -1736,7 +1767,7 @@ function beginBossClear(b){
   spawnTimer=9999;
   stageClearTimer=3.05;
   if(b.id!=="gossipGroup")effects.push({kind:"bossFall",bossId:b.id,x:b.x,y:b.y,row:b.x<player.x?1:0,t:1.7,maxT:1.7,color:clearColor});
-  effects.push({kind:"bossDeath",x:b.x,y:b.y,r:b.id==="cheonSangmu"?128:b.id==="cultFanatic"?120:b.id==="gossipGroup"?140:112,t:1.35,maxT:1.35,color:clearColor});
+  effects.push({kind:"bossDeath",x:b.x,y:b.y,r:b.id==="emotionCeo"?126:b.id==="cheonSangmu"?128:b.id==="cultFanatic"?120:b.id==="gossipGroup"?140:112,t:1.35,maxT:1.35,color:clearColor});
   shake=18;
 }
 
@@ -1891,6 +1922,24 @@ function spawnBoss4(stage=currentStage){
   }
   effects.push({kind:"bossIntro",x:cx,y:cy,t:1.55,maxT:1.55,r:142,color:"#ff7ad8"});
   effects.push({kind:"bossQuote",x:cx,y:cy-118,text:"우리끼리만 아는 얘기야.",t:1.45,maxT:1.45,color:"#ffe1f5"});
+  shake=14;
+}
+
+function spawnBoss5(stage=currentStage){
+  if(bossStageSpawned[stage])return;
+  bossStageSpawned[stage]=true;
+  const scale=bossStageScale(stage);
+  const x=arenaFence?arenaFence.x+arenaFence.w/2:player.x+260;
+  const y=arenaFence?arenaFence.y+100:player.y-260;
+  const hp=Math.floor(2600*scale.hp);
+  enemies.push({
+    id:"emotionCeo",name:"감정쓰레기통 찾는 사장",boss:true,stage,x,y,r:36,size:36,drawSize:126,
+    hp,maxHp:hp,spd:82*scale.spd,dmg:Math.floor(17*scale.dmg),xp:50+stage*8,slow:0,hit:0,
+    state:"intro",stateT:1.45,attackCd:.55,patternCd:1.65,dir:{x:0,y:1},
+    phase:0,inv:1.2,tearBurstLeft:0,tearBurstT:0
+  });
+  effects.push({kind:"bossIntro",x,y,t:1.55,maxT:1.55,r:132,color:"#69d7ff"});
+  effects.push({kind:"bossQuote",x,y:y-112,text:"사장은 너무 외로워 ㅠㅠ",t:1.55,maxT:1.55,color:"#e7f8ff"});
   shake=14;
 }
 
@@ -2350,13 +2399,18 @@ function spawn(dt){
   const logisticsOfficeLady=enemyTypes.find(e=>e.id==="logisticsOfficeLady");
   const boxThrower=enemyTypes.find(e=>e.id==="boxThrower");
   const forkliftDriver=enemyTypes.find(e=>e.id==="forkliftDriver");
+  const gymTattooPig=enemyTypes.find(e=>e.id==="gymTattooPig");
+  const gymLeggings=enemyTypes.find(e=>e.id==="gymLeggings");
+  const gymBodybuilder=enemyTypes.find(e=>e.id==="gymBodybuilder");
   const roster=theme.id==="bike"
     ?[roadCyclist,fixieShooter,fishermanUncle]
     :theme.id==="factory"
       ?[lazyFactoryWorker,tapeThrower,juCousinWorker]
       :theme.id==="logistics"
         ?[logisticsOfficeLady,boxThrower,forkliftDriver]
-        :[female,male,mzResignation];
+        :theme.id==="gym"
+          ?[gymTattooPig,gymLeggings,gymBodybuilder]
+          :[female,male,mzResignation];
   const pickFromRoster=(weights)=>{
     const roll=Math.random();
     if(roll<weights[0])return roster[0];
@@ -2468,6 +2522,8 @@ function fireEnemyAttack(e,a){
   else if(e.attackKind==="geodeureok")fireEnemyGeodeureok(e,a);
   else if(e.attackKind==="resignationEnvelope")fireEnemyResignation(e,a);
   else if(e.attackKind==="boxThrow")fireEnemyBox(e,a);
+  else if(e.attackKind==="fartCloud")fireEnemyFartCloud(e,a);
+  else if(e.attackKind==="dumbbellBoomerang")fireEnemyDumbbell(e,a);
   else fireEnemyBB(e,a);
 }
 
@@ -2525,8 +2581,278 @@ function fireEnemyBox(e,a){
   });
 }
 
+function fireEnemyFartCloud(e,a){
+  const distOut=54;
+  effects.push({
+    kind:"fartCloud",
+    x:e.x+Math.cos(a)*distOut,
+    y:e.y-6+Math.sin(a)*distOut,
+    t:3.4,maxT:3.4,r:58,dmg:e.projectileDmg||3,poisonT:2.4,tick:.45,color:"#d9df69"
+  });
+}
+
+function fireEnemyDumbbell(e,a){
+  const spd=e.projectileSpeed||430;
+  const muzzle=36;
+  bossShots.push({
+    kind:"dumbbellBoomerang",owner:e,age:0,turnT:.72,
+    x:e.x+Math.cos(a)*muzzle,y:e.y-10+Math.sin(a)*muzzle,
+    vx:Math.cos(a)*spd,vy:Math.sin(a)*spd,
+    r:14,life:2.6,dmg:e.projectileDmg||11,spin:rnd(0,Math.PI*2),
+    hitText:"덤벨"
+  });
+}
+
+function clearEmotionSafetyHeals(){
+  for(let i=gems.length-1;i>=0;i--)if(gems[i].emotionSafety)gems.splice(i,1);
+}
+
+function spawnEmotionSafetyHeal(b,mode){
+  clearEmotionSafetyHeals();
+  let x=b.x,y=b.y;
+  if(mode==="push"){
+    const a=rnd(0,Math.PI*2),r=rnd(42,EMOTION_CEO_SKILL.pushSafe*.72);
+    x=b.x+Math.cos(a)*r;y=b.y+Math.sin(a)*r;
+  }else{
+    const a=angle(b,player)+Math.PI+rnd(-.8,.8),r=rnd(EMOTION_CEO_SKILL.pullDamageRadius+38,EMOTION_CEO_SKILL.pullRadius-22);
+    x=b.x+Math.cos(a)*r;y=b.y+Math.sin(a)*r;
+  }
+  if(arenaFence){
+    x=clamp(x,arenaFence.x+40,arenaFence.x+arenaFence.w-40);
+    y=clamp(y,arenaFence.y+40,arenaFence.y+arenaFence.h-40);
+  }
+  gems.push({x,y,r:11,value:20,kind:"heal",emotionSafety:true});
+}
+
+function updateEmotionCeo(b,dt){
+  b.hit=Math.max(0,b.hit-dt);b.slow=Math.max(0,b.slow-dt);b.inv=Math.max(0,(b.inv||0)-dt);
+  const a=angle(b,player);
+  if(!["pullCast","pushCast"].includes(b.state))b.dir={x:Math.cos(a),y:Math.sin(a)};
+  if(b.stateT>0)b.stateT-=dt;
+  if(b.state==="intro"){
+    if(b.stateT<=0){b.state="idle";b.patternCd=1.45;b.attackCd=.25}
+    return;
+  }
+  if(b.state==="pullCast"){
+    updateEmotionTearBurst(b,dt,.16,5);
+    const d=dist(b,player);
+    if(d<EMOTION_CEO_SKILL.pullRadius+90){
+      const ax=(b.x-player.x)/Math.max(1,d),ay=(b.y-player.y)/Math.max(1,d);
+      const awayX=-ax,awayY=-ay;
+      const resist=clamp(Math.max(0,(player.vx||0)*awayX+(player.vy||0)*awayY),0,1);
+      const pullDepth=clamp(1-d/(EMOTION_CEO_SKILL.pullRadius+90),.04,.72);
+      const strength=pullDepth*(1-resist*.92);
+      player.x=clamp(player.x+ax*EMOTION_CEO_SKILL.pullForce*strength*dt,20,world.w-20);
+      player.y=clamp(player.y+ay*EMOTION_CEO_SKILL.pullForce*strength*dt,20,world.h-20);
+      if(resist<.35)player.slowT=Math.max(player.slowT||0,.06);
+    }
+    if(b.stateT<=0){
+      clearBossTelegraphs();
+      if(dist(b,player)<EMOTION_CEO_SKILL.pullDamageRadius+player.r&&playerCanTakeDamage()){
+        player.hp-=22;player.inv=.85;shake=12;
+        floaters.push({x:player.x,y:player.y-32,t:.7,text:"하소연 늪",color:"#69d7ff"});
+      }
+      b.state="idle";b.patternCd=2.2;b.attackCd=.35;
+    }
+    return;
+  }
+  if(b.state==="pushCast"){
+    const d=dist(b,player);
+    const inPushZone=arenaFence?pointInFence(player.x,player.y,arenaFence,0):d<EMOTION_CEO_SKILL.pushOuter;
+    if(d>EMOTION_CEO_SKILL.pushSafe*.62&&inPushZone){
+      const ax=(player.x-b.x)/Math.max(1,d),ay=(player.y-b.y)/Math.max(1,d);
+      const edgeBoost=arenaFence?1.18:1;
+      player.x=clamp(player.x+ax*EMOTION_CEO_SKILL.pushForce*edgeBoost*dt,20,world.w-20);
+      player.y=clamp(player.y+ay*EMOTION_CEO_SKILL.pushForce*edgeBoost*dt,20,world.h-20);
+    }
+    if(b.stateT<=0){
+      clearBossTelegraphs();
+      const inOuter=arenaFence?pointInFence(player.x,player.y,arenaFence,0):dist(b,player)<EMOTION_CEO_SKILL.pushOuter+player.r;
+      const inSafe=dist(b,player)<EMOTION_CEO_SKILL.pushSafe+player.r;
+      if(inOuter&&!inSafe&&playerCanTakeDamage()){
+        player.hp-=26;player.inv=.9;shake=13;
+        floaters.push({x:player.x,y:player.y-32,t:.75,text:"감정 폭발",color:"#ff6b78"});
+      }
+      effects.push({kind:"emotionPushBlast",x:b.x,y:b.y,r:EMOTION_CEO_SKILL.pushOuter,t:.42,maxT:.42,color:"#69d7ff"});
+      b.state="idle";b.patternCd=2.25;b.attackCd=.35;
+    }
+    return;
+  }
+  const slow=b.slow>0?.38:1,keep=dist(b,player);
+  if(keep>290&&keep<950){b.x+=Math.cos(a)*b.spd*slow*dt;b.y+=Math.sin(a)*b.spd*slow*dt}
+  else if(keep<210){b.x-=Math.cos(a)*b.spd*.58*slow*dt;b.y-=Math.sin(a)*b.spd*.58*slow*dt}
+  if(arenaFence){
+    b.x=clamp(b.x,arenaFence.x+b.r,arenaFence.x+arenaFence.w-b.r);
+    b.y=clamp(b.y,arenaFence.y+b.r,arenaFence.y+arenaFence.h-b.r);
+  }
+  b.patternCd-=dt;b.attackCd-=dt;
+  if(b.patternCd<=0){
+    if((b.phase++%2)===0)beginEmotionPull(b);
+    else beginEmotionPush(b);
+    return;
+  }
+  if(b.attackCd<=0){beginEmotionTearBurst(b,6);b.attackCd=.9}
+  updateEmotionTearBurst(b,dt,.075,1);
+  if(dist(b,player)<b.r+player.r&&playerCanTakeDamage()){
+    player.hp-=b.dmg;player.inv=.75;shake=7;
+    floaters.push({x:player.x,y:player.y-30,t:.7,text:"술자리 압박",color:"#ff6b78"});
+  }
+}
+
+function beginEmotionTearBurst(b,count=7){
+  b.tearBurstLeft=Math.max(b.tearBurstLeft||0,count);
+  b.tearBurstT=0;
+}
+
+function updateEmotionTearBurst(b,dt,gap=.08,spreadShots=1){
+  b.tearBurstT=(b.tearBurstT||0)-dt;
+  while((b.tearBurstLeft||0)>0&&b.tearBurstT<=0){
+    fireEmotionTear(b,spreadShots);
+    b.tearBurstLeft--;
+    b.tearBurstT+=gap;
+  }
+}
+
+function fireEmotionTear(b,spreadShots=1){
+  const base=angle(b,player);
+  const spd=420+(b.stage||1)*12;
+  const count=Math.max(1,spreadShots);
+  for(let i=0;i<count;i++){
+    const a=base+(i-(count-1)/2)*.12+rnd(-.035,.035);
+    bossShots.push({
+      kind:"emotionTear",x:b.x+Math.cos(a)*32,y:b.y-14+Math.sin(a)*32,
+      vx:Math.cos(a)*spd,vy:Math.sin(a)*spd,r:8,life:2.45,dmg:7+(b.stage||1),spin:rnd(0,Math.PI*2),
+      hitText:"눈물탄"
+    });
+  }
+  playSfx("bossNagFire");
+}
+
+function beginEmotionPull(b){
+  playSfx("bossNagCast");
+  b.state="pullCast";b.stateT=EMOTION_CEO_SKILL.pullCastT;b.patternCd=99;b.attackCd=99;
+  effects.push({kind:"emotionPullField",x:b.x,y:b.y,r:EMOTION_CEO_SKILL.pullRadius,damageR:EMOTION_CEO_SKILL.pullDamageRadius,t:EMOTION_CEO_SKILL.pullCastT,maxT:EMOTION_CEO_SKILL.pullCastT,color:"#69d7ff"});
+  effects.push({kind:"bossQuote",x:b.x,y:b.y-104,text:"퇴근만 하지 말고 얘기 좀 들어줘...",t:1.45,maxT:1.45,color:"#e7f8ff"});
+}
+
+function beginEmotionPush(b){
+  playSfx("bossKickCast");
+  b.state="pushCast";b.stateT=EMOTION_CEO_SKILL.pushCastT;b.patternCd=99;b.attackCd=99;
+  effects.push({kind:"emotionPushWarn",x:b.x,y:b.y,safe:EMOTION_CEO_SKILL.pushSafe,r:EMOTION_CEO_SKILL.pushOuter,arena:arenaFence?{x:arenaFence.x,y:arenaFence.y,w:arenaFence.w,h:arenaFence.h}:null,t:EMOTION_CEO_SKILL.pushCastT,maxT:EMOTION_CEO_SKILL.pushCastT,color:"#ff4865"});
+  effects.push({kind:"bossQuote",x:b.x,y:b.y-104,text:"너희들은 내 마음 몰라!",t:1.25,maxT:1.25,color:"#fff0a8"});
+}
+
+function beginEmotionPullV2(b){
+  playSfx("bossNagCast");
+  b.state="pullCast";b.stateT=EMOTION_CEO_SKILL.pullCastT;b.patternCd=99;b.attackCd=99;
+  b.forceBurstDone=false;b.zoneDmgT=.08;
+  spawnEmotionSafetyHeal(b,"pull");
+  effects.push({kind:"emotionPullField",x:b.x,y:b.y,r:EMOTION_CEO_SKILL.pullRadius,damageR:EMOTION_CEO_SKILL.pullDamageRadius,t:EMOTION_CEO_SKILL.pullCastT,maxT:EMOTION_CEO_SKILL.pullCastT,color:"#69d7ff"});
+  effects.push({kind:"bossQuote",x:b.x,y:b.y-104,text:"퇴근만 하지 말고 얘기 좀 들어줘...",t:1.45,maxT:1.45,color:"#e7f8ff"});
+}
+
+function beginEmotionPushV2(b){
+  playSfx("bossKickCast");
+  b.state="pushCast";b.stateT=EMOTION_CEO_SKILL.pushCastT;b.patternCd=99;b.attackCd=99;
+  b.forceBurstDone=false;b.zoneDmgT=.08;
+  spawnEmotionSafetyHeal(b,"push");
+  effects.push({kind:"emotionPushWarn",x:b.x,y:b.y,safe:EMOTION_CEO_SKILL.pushSafe,r:EMOTION_CEO_SKILL.pushOuter,arena:arenaFence?{x:arenaFence.x,y:arenaFence.y,w:arenaFence.w,h:arenaFence.h}:null,t:EMOTION_CEO_SKILL.pushCastT,maxT:EMOTION_CEO_SKILL.pushCastT,color:"#ff4865"});
+  effects.push({kind:"bossQuote",x:b.x,y:b.y-104,text:"너희들은 내 마음 몰라!",t:1.25,maxT:1.25,color:"#fff0a8"});
+}
+
+function updateEmotionCeoV2(b,dt){
+  b.hit=Math.max(0,b.hit-dt);b.slow=Math.max(0,b.slow-dt);b.inv=Math.max(0,(b.inv||0)-dt);
+  const a=angle(b,player);
+  if(!["pullCast","pushCast"].includes(b.state))b.dir={x:Math.cos(a),y:Math.sin(a)};
+  if(b.stateT>0)b.stateT-=dt;
+  if(b.state==="intro"){
+    if(b.stateT<=0){b.state="idle";b.patternCd=1.45;b.attackCd=.25}
+    return;
+  }
+  if(b.state==="pullCast"){
+    updateEmotionTearBurst(b,dt,.16,5);
+    const d=dist(b,player);
+    if(d<EMOTION_CEO_SKILL.pullRadius+90){
+      const ax=(b.x-player.x)/Math.max(1,d),ay=(b.y-player.y)/Math.max(1,d);
+      if(!b.forceBurstDone){
+        player.x=clamp(player.x+ax*EMOTION_CEO_SKILL.pullBurst,20,world.w-20);
+        player.y=clamp(player.y+ay*EMOTION_CEO_SKILL.pullBurst,20,world.h-20);
+        b.forceBurstDone=true;shake=9;
+      }
+      const awayX=-ax,awayY=-ay;
+      const resist=clamp(Math.max(0,(player.vx||0)*awayX+(player.vy||0)*awayY),0,1);
+      const pullDepth=clamp(1-d/(EMOTION_CEO_SKILL.pullRadius+90),.04,.66);
+      const strength=pullDepth*(1-resist*.86);
+      player.x=clamp(player.x+ax*EMOTION_CEO_SKILL.pullForce*strength*dt,20,world.w-20);
+      player.y=clamp(player.y+ay*EMOTION_CEO_SKILL.pullForce*strength*dt,20,world.h-20);
+      if(resist<.35)player.slowT=Math.max(player.slowT||0,.06);
+    }
+    b.zoneDmgT=(b.zoneDmgT||0)-dt;
+    if(d<EMOTION_CEO_SKILL.pullDamageRadius+player.r&&b.zoneDmgT<=0){
+      player.hp=Math.max(0,player.hp-3);
+      b.zoneDmgT=EMOTION_CEO_SKILL.dotGap;
+      floaters.push({x:player.x,y:player.y-32,t:.45,text:"하소연 늪",color:"#69d7ff"});
+      shake=Math.max(shake,4);
+    }
+    if(b.stateT<=0){
+      clearBossTelegraphs();
+      clearEmotionSafetyHeals();
+      b.state="idle";b.patternCd=2.2;b.attackCd=.35;
+    }
+    return;
+  }
+  if(b.state==="pushCast"){
+    const d=dist(b,player);
+    const inPushZone=arenaFence?pointInFence(player.x,player.y,arenaFence,0):d<EMOTION_CEO_SKILL.pushOuter;
+    if(!b.forceBurstDone&&inPushZone){
+      const ax=(player.x-b.x)/Math.max(1,d),ay=(player.y-b.y)/Math.max(1,d);
+      player.x=clamp(player.x+ax*EMOTION_CEO_SKILL.pushForce,20,world.w-20);
+      player.y=clamp(player.y+ay*EMOTION_CEO_SKILL.pushForce,20,world.h-20);
+      b.forceBurstDone=true;shake=10;
+    }
+    if(d>EMOTION_CEO_SKILL.pushSafe*.62&&inPushZone){
+      const ax=(player.x-b.x)/Math.max(1,d),ay=(player.y-b.y)/Math.max(1,d);
+      player.x=clamp(player.x+ax*EMOTION_CEO_SKILL.pushForce*.2*dt,20,world.w-20);
+      player.y=clamp(player.y+ay*EMOTION_CEO_SKILL.pushForce*.2*dt,20,world.h-20);
+    }
+    b.zoneDmgT=(b.zoneDmgT||0)-dt;
+    if(inPushZone&&d>EMOTION_CEO_SKILL.pushSafe+player.r&&b.zoneDmgT<=0){
+      player.hp=Math.max(0,player.hp-4);
+      b.zoneDmgT=EMOTION_CEO_SKILL.dotGap;
+      floaters.push({x:player.x,y:player.y-32,t:.45,text:"감정 폭발",color:"#ff6b78"});
+      shake=Math.max(shake,4);
+    }
+    if(b.stateT<=0){
+      clearBossTelegraphs();
+      clearEmotionSafetyHeals();
+      b.state="idle";b.patternCd=2.25;b.attackCd=.35;
+    }
+    return;
+  }
+  const slow=b.slow>0?.38:1,keep=dist(b,player);
+  if(keep>290&&keep<950){b.x+=Math.cos(a)*b.spd*slow*dt;b.y+=Math.sin(a)*b.spd*slow*dt}
+  else if(keep<210){b.x-=Math.cos(a)*b.spd*.58*slow*dt;b.y-=Math.sin(a)*b.spd*.58*slow*dt}
+  if(arenaFence){
+    b.x=clamp(b.x,arenaFence.x+b.r,arenaFence.x+arenaFence.w-b.r);
+    b.y=clamp(b.y,arenaFence.y+b.r,arenaFence.y+arenaFence.h-b.r);
+  }
+  b.patternCd-=dt;b.attackCd-=dt;
+  if(b.patternCd<=0){
+    if((b.phase++%2)===0)beginEmotionPullV2(b);
+    else beginEmotionPushV2(b);
+    return;
+  }
+  if(b.attackCd<=0){beginEmotionTearBurst(b,6);b.attackCd=.9}
+  updateEmotionTearBurst(b,dt,.075,1);
+  if(dist(b,player)<b.r+player.r&&playerCanTakeDamage()){
+    player.hp-=b.dmg;player.inv=.75;shake=7;
+    floaters.push({x:player.x,y:player.y-30,t:.7,text:"술자리 압박",color:"#ff6b78"});
+  }
+}
+
 function updateBoss(b,dt){
   if(b.bossGroup==="gossip"){updateGossipBoss(b,dt);return}
+  if(b.id==="emotionCeo"){updateEmotionCeoV2(b,dt);return}
   if(b.id==="cultFanatic"){updateCultFanatic(b,dt);return}
   if(b.id==="cheonSangmu"){updateCheonSangmu(b,dt);return}
   b.hit=Math.max(0,b.hit-dt);b.slow=Math.max(0,b.slow-dt);b.inv=Math.max(0,(b.inv||0)-dt);
@@ -2630,8 +2956,9 @@ function startBossKickDash(b){
 
 function clearBossTelegraphs(){
   for(let i=effects.length-1;i>=0;i--){
-    if(effects[i].kind==="bossConeTelegraph"||effects[i].kind==="bossLineTelegraph"||effects[i].kind==="bossCircleTelegraph"||effects[i].kind==="cheonHeatTelegraph"||effects[i].kind==="cultHandsWarn"||effects[i].kind==="cultHandsZone"||effects[i].kind==="gossipRumorWarn"||effects[i].kind==="gossipRumorBlast"||effects[i].kind==="gossipFrameWarn"||effects[i].kind==="gossipFrameBlast")effects.splice(i,1);
+    if(effects[i].kind==="bossConeTelegraph"||effects[i].kind==="bossLineTelegraph"||effects[i].kind==="bossCircleTelegraph"||effects[i].kind==="cheonHeatTelegraph"||effects[i].kind==="cultHandsWarn"||effects[i].kind==="cultHandsZone"||effects[i].kind==="gossipRumorWarn"||effects[i].kind==="gossipRumorBlast"||effects[i].kind==="gossipFrameWarn"||effects[i].kind==="gossipFrameBlast"||effects[i].kind==="emotionPullField"||effects[i].kind==="emotionPushWarn")effects.splice(i,1);
   }
+  clearEmotionSafetyHeals();
 }
 
 function updateCheonSangmu(b,dt){
@@ -3136,6 +3463,15 @@ function updateBossShots(dt){
       }
       p.vx=Math.cos(a)*p.speed;
       p.vy=Math.sin(a)*p.speed;
+    }else if(p.kind==="dumbbellBoomerang"){
+      p.age=(p.age||0)+dt;
+      if(p.age>(p.turnT||.7)&&p.owner&&p.owner.hp>0){
+        const a=angle(p,p.owner),spd=Math.hypot(p.vx,p.vy)||420;
+        p.vx=Math.cos(a)*spd;
+        p.vy=Math.sin(a)*spd;
+        if(dist(p,p.owner)<24){bossShots.splice(i,1);continue}
+      }
+      p.x+=p.vx*dt;p.y+=p.vy*dt;
     }else{
       p.x+=p.vx*dt;p.y+=p.vy*dt;
     }
@@ -3150,6 +3486,15 @@ function updateBossShots(dt){
 }
 
 function updateEffects(dt){
+  if((player.poisonT||0)>0){
+    player.poisonT=Math.max(0,player.poisonT-dt);
+    player.poisonTick=(player.poisonTick||0)-dt;
+    if(player.poisonTick<=0){
+      player.hp=Math.max(0,player.hp-2);
+      player.poisonTick=.5;
+      floaters.push({x:player.x,y:player.y-30,t:.42,text:"중독",color:"#cfe96a"});
+    }
+  }
   for(let i=effects.length-1;i>=0;i--){
     const e=effects[i];
     if(e.kind==="sangilSlash")syncSangilSlashEffect(e);
@@ -3159,6 +3504,12 @@ function updateEffects(dt){
       e.delay=0;
     }
     e.t-=dt;
+    if(e.kind==="fartCloud"){
+      if(dist(e,player)<e.r+player.r){
+        player.poisonT=Math.max(player.poisonT||0,e.poisonT||2.2);
+        player.poisonTick=Math.min(player.poisonTick||0,.08);
+      }
+    }
     if(e.kind==="ultimateBall"){
       e.x+=e.dx*e.speed*dt;
       e.y+=e.dy*e.speed*dt;
@@ -4005,10 +4356,10 @@ function drawBossVsCutsceneV2(){
     ctx.fillStyle="rgba(90,96,96,.96)";
     ctx.fillRect(panelX,panelY,panelW,panelH);
   }
-  const bossName=bossId==="gossipGroup"?"모함하는 뒷담화꾼":bossId==="cultFanatic"?"편집비 먹튀한 광신도":bossId==="cheonSangmu"?"\uD6A1\uB839\uC744 \uC77C\uC0BC\uB294 \uCC9C\uC0C1\uBB34":"\uC0AC\uC7A5 \uBD88\uB95C\uB140 \uC8FC\uB300\uB9AC";
+  const bossName=bossId==="emotionCeo"?"감정쓰레기통 찾는 사장":bossId==="gossipGroup"?"모함하는 뒷담화꾼":bossId==="cultFanatic"?"편집비 먹튀한 광신도":bossId==="cheonSangmu"?"\uD6A1\uB839\uC744 \uC77C\uC0BC\uB294 \uCC9C\uC0C1\uBB34":"\uC0AC\uC7A5 \uBD88\uB95C\uB140 \uC8FC\uB300\uB9AC";
   drawVsPlayer(playerX,playerY,2.45*fit);
-  drawVsBoss(bossX,bossY,(bossId==="gossipGroup"?1.55:bossId==="cheonSangmu"?2.05:bossId==="cultFanatic"?2.0:2.2)*fit,bossId);
-  drawVsNameV2(bossName,bossX,bossY-178*fit,bossId==="gossipGroup"?"#ffe1f5":bossId==="cultFanatic"?"#efe0ff":bossId==="cheonSangmu"?"#fff0a8":"#ffe1ec",fit);
+  drawVsBoss(bossX,bossY,(bossId==="emotionCeo"?1.55:bossId==="gossipGroup"?1.55:bossId==="cheonSangmu"?2.05:bossId==="cultFanatic"?2.0:2.2)*fit,bossId);
+  drawVsNameV2(bossName,bossX,bossY-178*fit,bossId==="emotionCeo"?"#e7f8ff":bossId==="gossipGroup"?"#ffe1f5":bossId==="cultFanatic"?"#efe0ff":bossId==="cheonSangmu"?"#fff0a8":"#ffe1ec",fit);
   drawVsNameV2(getPlayableName(player.characterId),playerX,playerY+128*fit,"#fff7c8",fit);
   ctx.restore();
 }
@@ -4172,14 +4523,17 @@ function drawVsBoss(x,y,scale,bossId="juDaeri"){
     ctx.restore();
     return;
   }
-  const sheet=bossId==="cultFanatic"?cultFanaticSprite:bossId==="cheonSangmu"?cheonSangmuSprite:juDaeriSprite;
-  const size=bossId==="cheonSangmu"?108:bossId==="cultFanatic"?156:96;
+  const sheet=bossId==="emotionCeo"?emotionCeoSprite:bossId==="cultFanatic"?cultFanaticSprite:bossId==="cheonSangmu"?cheonSangmuSprite:juDaeriSprite;
+  const size=bossId==="emotionCeo"?126:bossId==="cheonSangmu"?108:bossId==="cultFanatic"?156:96;
   if(sheet.complete&&sheet.naturalWidth){
-    const fw=Math.floor(sheet.naturalWidth/4),fh=Math.floor(sheet.naturalHeight/4);
+    const fw=Math.floor(sheet.naturalWidth/4),fh=bossId==="emotionCeo"?152:Math.floor(sheet.naturalHeight/4);
     ctx.imageSmoothingEnabled=false;
     if(bossId==="cultFanatic"){
       const sw=Math.min(fw,204),sx=(fw-sw)/2,drawW=size*(sw/fh);
       ctx.drawImage(sheet,sx,0,sw,fh,-drawW/2,-size*.64,drawW,size);
+    }else if(bossId==="emotionCeo"){
+      const r=EMOTION_CEO_FRAMES.move[0][0];
+      ctx.drawImage(sheet,r.x,r.y,r.w,r.h,-size/2,-size*.7,size,size);
     }else{
       ctx.drawImage(sheet,0,0,fw,fh,-size/2,-size*.64,size,size);
     }
@@ -4320,6 +4674,11 @@ function drawEnemy(e){
     ctx.restore();
     return;
   }
+  if(e.boss&&e.id==="emotionCeo"){
+    drawEmotionCeo(e);
+    ctx.restore();
+    return;
+  }
   if(e.bossGroup==="gossip"){
     drawGossipBoss(e);
     ctx.restore();
@@ -4351,6 +4710,40 @@ function drawEnemy(e){
   const barY=e.drawSize?-e.drawSize*.72:-e.r-13;
   ctx.fillStyle="#111821";ctx.fillRect(-e.r,barY,e.r*2,4);ctx.fillStyle="#ff6875";ctx.fillRect(-e.r,barY,e.r*2*(e.hp/e.maxHp),4);
   ctx.restore();
+}
+
+function drawEmotionCeo(e){
+  let sheet=emotionCeoSprite,cols=4,rows=4,row=rowFromVector(e.dir||{x:0,y:1});
+  if((e.state==="pullCast"||e.state==="pushCast")&&emotionCeoSkillSprite.complete&&emotionCeoSkillSprite.naturalWidth){
+    sheet=emotionCeoSkillSprite;
+    cols=4;rows=2;
+    row=e.state==="pushCast"?1:0;
+  }
+  if(sheet.complete&&sheet.naturalWidth){
+    const col=Math.floor(elapsed*(e.state==="pullCast"||e.state==="pushCast"?7:5)+e.x*.01)%4;
+    let fw=sheet.naturalWidth/cols,fh=sheet.naturalHeight/rows,sx=fw*col,sy=fh*row;
+    let drawSquare=false;
+    if(sheet===emotionCeoSprite){
+      if(e.state==="intro"){
+        const r=EMOTION_CEO_FRAMES.intro[col];
+        sx=r.x;sy=r.y;fw=r.w;fh=r.h;
+      }else{
+        const r=EMOTION_CEO_FRAMES.move[row][col];
+        sx=r.x;sy=r.y;fw=r.w;fh=r.h;drawSquare=true;
+      }
+    }
+    const size=(e.drawSize||126)*(sheet===emotionCeoSkillSprite?1.28:1);
+    const drawW=size*(fw/fh);
+    ctx.imageSmoothingEnabled=false;
+    if(drawSquare)ctx.drawImage(sheet,sx,sy,fw,fh,-size/2,-size*.74,size,size);
+    else ctx.drawImage(sheet,sx,sy,fw,fh,-drawW/2,-size*.74,drawW,size);
+  }else{
+    ctx.fillStyle="#2d2530";ctx.fillRect(-28,-60,56,88);
+    ctx.fillStyle="#f4c2a8";ctx.fillRect(-22,-78,44,34);
+  }
+  const barY=-(e.drawSize||126)*.78;
+  ctx.fillStyle="#111821";ctx.fillRect(-42,barY,84,7);
+  ctx.fillStyle="#69d7ff";ctx.fillRect(-42,barY,84*(e.hp/e.maxHp),7);
 }
 
 function drawGossipBoss(e){
@@ -4584,6 +4977,33 @@ function drawBossShot(p){
     ctx.strokeStyle="#8a5a17";
     ctx.lineWidth=1.5;
     ctx.stroke();
+    ctx.restore();
+    return;
+  }
+  if(p.kind==="emotionTear"){
+    ctx.rotate(Math.atan2(p.vy,p.vx)+Math.sin(elapsed*12+p.spin)*.12);
+    if(emotionTearSprite.complete&&emotionTearSprite.naturalWidth){
+      const frames=4,fw=emotionTearSprite.naturalWidth/frames,fh=emotionTearSprite.naturalHeight;
+      const frame=Math.floor(elapsed*12+p.spin)%frames;
+      ctx.drawImage(emotionTearSprite,fw*frame,0,fw,fh,-15,-15,30,30);
+      ctx.restore();
+      return;
+    }
+    ctx.fillStyle="#bfefff";
+    ctx.beginPath();ctx.arc(0,0,9,0,Math.PI*2);ctx.fill();
+    ctx.restore();
+    return;
+  }
+  if(p.kind==="dumbbellBoomerang"){
+    ctx.rotate(p.spin||0);
+    if(gymDumbbellSprite.complete&&gymDumbbellSprite.naturalWidth){
+      const frames=4,fw=gymDumbbellSprite.naturalWidth/frames,fh=gymDumbbellSprite.naturalHeight;
+      const frame=Math.floor(elapsed*14+p.spin)%frames;
+      ctx.drawImage(gymDumbbellSprite,fw*frame,0,fw,fh,-28,-28,56,56);
+      ctx.restore();
+      return;
+    }
+    ctx.fillStyle="#2d3138";ctx.fillRect(-24,-8,48,16);
     ctx.restore();
     return;
   }
@@ -4834,6 +5254,69 @@ function drawGem(g){
 }
 function drawEffect(e){
   ctx.save();ctx.globalAlpha=Math.max(.15,e.t);
+  if(e.kind==="emotionPullField"){
+    const p=1-e.t/e.maxT;
+    ctx.globalAlpha=.16+.14*Math.sin(p*Math.PI*5)**2;
+    ctx.fillStyle=e.color||"#69d7ff";
+    ctx.beginPath();ctx.arc(e.x,e.y,e.r,0,Math.PI*2);ctx.fill();
+    ctx.globalAlpha=.85;
+    ctx.strokeStyle="#e7fbff";ctx.lineWidth=4;
+    ctx.beginPath();ctx.arc(e.x,e.y,e.damageR,0,Math.PI*2);ctx.stroke();
+    for(let i=0;i<18;i++){
+      const a=i*Math.PI*2/18-p*3,r=e.r-18-(i%3)*15;
+      ctx.strokeStyle=i%2?"#b8f3ff":"#ffffff";
+      ctx.lineWidth=3;
+      ctx.beginPath();
+      ctx.moveTo(e.x+Math.cos(a)*r,e.y+Math.sin(a)*r);
+      ctx.lineTo(e.x+Math.cos(a)*(r-34),e.y+Math.sin(a)*(r-34));
+      ctx.stroke();
+    }
+    ctx.restore();return;
+  }
+  if(e.kind==="emotionPushWarn"){
+    const p=1-e.t/e.maxT;
+    ctx.globalAlpha=.18+.18*Math.sin(p*Math.PI*6)**2;
+    ctx.fillStyle=e.color||"#ff4865";
+    ctx.beginPath();
+    if(e.arena)ctx.rect(e.arena.x,e.arena.y,e.arena.w,e.arena.h);
+    else ctx.arc(e.x,e.y,e.r,0,Math.PI*2);
+    ctx.arc(e.x,e.y,e.safe,0,Math.PI*2,true);
+    ctx.fill("evenodd");
+    ctx.globalAlpha=.75;
+    ctx.strokeStyle="#ff9ead";ctx.lineWidth=4;
+    if(e.arena)ctx.strokeRect(e.arena.x,e.arena.y,e.arena.w,e.arena.h);
+    else{ctx.beginPath();ctx.arc(e.x,e.y,e.r,0,Math.PI*2);ctx.stroke()}
+    ctx.strokeStyle="#8fffd8";ctx.lineWidth=5;
+    ctx.beginPath();ctx.arc(e.x,e.y,e.safe,0,Math.PI*2);ctx.stroke();
+    ctx.globalAlpha=.18;
+    ctx.fillStyle="#8fffd8";
+    ctx.beginPath();ctx.arc(e.x,e.y,e.safe*.96,0,Math.PI*2);ctx.fill();
+    ctx.restore();return;
+  }
+  if(e.kind==="emotionPushBlast"){
+    const p=1-e.t/e.maxT;
+    ctx.globalAlpha=(1-p)*.58;
+    ctx.strokeStyle=e.color||"#69d7ff";
+    ctx.lineWidth=7;
+    ctx.beginPath();ctx.arc(e.x,e.y,e.r*(.28+p*.9),0,Math.PI*2);ctx.stroke();
+    ctx.restore();return;
+  }
+  if(e.kind==="fartCloud"){
+    const p=1-e.t/e.maxT;
+    ctx.translate(e.x,e.y);
+    ctx.globalAlpha=p<.16?p/.16:e.t<.5?e.t/.5:.72;
+    ctx.imageSmoothingEnabled=false;
+    if(gymFartCloudSprite.complete&&gymFartCloudSprite.naturalWidth){
+      const frames=4,fw=gymFartCloudSprite.naturalWidth/frames,fh=gymFartCloudSprite.naturalHeight;
+      const frame=clamp(Math.floor(p*4),0,3);
+      const size=e.r*2.15;
+      ctx.drawImage(gymFartCloudSprite,fw*frame,0,fw,fh,-size/2,-size/2,size,size);
+    }else{
+      ctx.fillStyle="rgba(210,225,86,.6)";
+      ctx.beginPath();ctx.arc(0,0,e.r,0,Math.PI*2);ctx.fill();
+    }
+    ctx.restore();return;
+  }
   if(e.kind==="enemyTapeWhip"){
     const p=1-e.t/e.maxT;
     const frame=clamp(Math.floor(p*4),0,3);
@@ -5136,16 +5619,27 @@ function drawEffect(e){
   if(e.kind==="bossFall"){
     const p=1-e.t/e.maxT;
     ctx.translate(e.x,e.y);
-    const deathSprite=e.bossId==="cultFanatic"?cultFanaticDeathSprite:e.bossId==="cheonSangmu"?cheonSangmuDeathSprite:juDaeriDeathSprite;
-    const drawSize=e.bossId==="cheonSangmu"?132:e.bossId==="cultFanatic"?156:116;
+    const deathSprite=e.bossId==="emotionCeo"?emotionCeoSprite:e.bossId==="cultFanatic"?cultFanaticDeathSprite:e.bossId==="cheonSangmu"?cheonSangmuDeathSprite:juDaeriDeathSprite;
+    const drawSize=e.bossId==="emotionCeo"?126:e.bossId==="cheonSangmu"?132:e.bossId==="cultFanatic"?156:116;
     if(deathSprite.complete&&deathSprite.naturalWidth){
-      const fw=deathSprite.naturalWidth/4,fh=deathSprite.naturalHeight/2;
+      const fw=deathSprite.naturalWidth/4;
+      let fh=deathSprite.naturalHeight/2;
       const col=clamp(Math.floor(p*4),0,3);
-      const row=e.row||0;
+      const row=e.bossId==="emotionCeo"?0:(e.row||0);
+      let sx=fw*col,sy=fh*row;
+      if(e.bossId==="emotionCeo"){
+        const r=EMOTION_CEO_FRAMES.death[col];
+        sx=r.x;sy=r.y;fh=r.h;
+        const drawW=drawSize*(r.w/r.h);
+        ctx.imageSmoothingEnabled=false;
+        ctx.globalAlpha=.95;
+        ctx.drawImage(deathSprite,sx,sy,r.w,r.h,-drawW/2,-drawSize*.68,drawW,drawSize);
+        ctx.restore();return;
+      }
       const drawW=e.bossId==="cultFanatic"?drawSize*(fw/fh):drawSize;
       ctx.imageSmoothingEnabled=false;
       ctx.globalAlpha=.95;
-      ctx.drawImage(deathSprite,fw*col,fh*row,fw,fh,-drawW/2,-drawSize*.68,drawW,drawSize);
+      ctx.drawImage(deathSprite,sx,sy,fw,fh,-drawW/2,-drawSize*.68,drawW,drawSize);
       ctx.restore();return;
     }
     ctx.restore();return;
