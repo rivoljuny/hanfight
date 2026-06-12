@@ -1196,10 +1196,10 @@ function active(id){return skills.find(s=>s.id===id)}
 function gameplayScale(){
   if(!mobileControlsAvailable())return 1;
   const short=Math.min(W,H);
-  if(short<=430)return .72;
-  if(short<=760)return .78;
-  if(short<=980)return .86;
-  return .92;
+  if(short<=430)return .62;
+  if(short<=760)return .68;
+  if(short<=980)return .76;
+  return .84;
 }
 function viewW(){return W/gameplayScale()}
 function viewH(){return H/gameplayScale()}
