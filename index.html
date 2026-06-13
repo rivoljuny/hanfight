@@ -196,6 +196,251 @@
   }
   .mobile-action.ultimate.is-cooling::before{filter:saturate(.55) brightness(.75);}
 }
+.choice b.skill-icon,.slot b.skill-icon{
+  background-image:url("assets/active_skill_icons.png");
+  background-repeat:no-repeat;
+  background-size:400% 200%;
+  image-rendering:pixelated;
+  color:transparent !important;
+  font-size:0 !important;
+  border-radius:6px;
+}
+.choice b.skill-icon.passive,.slot b.skill-icon.passive{
+  background-image:url("assets/passive_skill_icons.png");
+}
+.choice b.skill-icon{
+  width:48px !important;
+  height:48px !important;
+}
+.slot b.skill-icon{
+  width:24px;
+  height:24px;
+  display:block;
+}
+.choices{
+  display:grid !important;
+  grid-template-columns:repeat(3,minmax(0,1fr)) !important;
+  gap:12px !important;
+  align-items:stretch !important;
+}
+.choice{
+  position:relative !important;
+  min-height:272px !important;
+  padding:10px 9px 12px !important;
+  display:grid !important;
+  grid-template-rows:auto auto 1fr !important;
+  justify-items:center !important;
+  text-align:center !important;
+  overflow:hidden !important;
+  border-radius:10px !important;
+  background:
+    linear-gradient(180deg,rgba(255,255,255,.1),rgba(255,255,255,0) 28%),
+    linear-gradient(180deg,#293246,#171d2b) !important;
+  border:2px solid #46516a !important;
+  box-shadow:0 8px 0 #0c1018, inset 0 0 0 1px rgba(255,255,255,.08) !important;
+}
+.choice.selected,.choice:hover{
+  border-color:#ffe15c !important;
+  transform:translateY(-3px) !important;
+  box-shadow:0 10px 0 #8b6720,0 0 0 5px rgba(255,245,170,.9),0 0 24px rgba(255,225,92,.65), inset 0 0 0 2px rgba(255,255,255,.2) !important;
+  background:
+    linear-gradient(180deg,rgba(255,255,255,.16),rgba(255,255,255,0) 30%),
+    linear-gradient(180deg,#39425a,#1d2434) !important;
+}
+.choice.selected::before{
+  content:"";
+  position:absolute;
+  inset:4px;
+  border:2px solid rgba(255,255,255,.92);
+  border-radius:7px;
+  pointer-events:none;
+  z-index:3;
+  box-shadow:0 0 12px rgba(255,255,255,.55);
+}
+.choice .choice-art{
+  width:min(118px,78%) !important;
+  aspect-ratio:1/1 !important;
+  margin:4px auto 9px !important;
+  display:grid !important;
+  place-items:center !important;
+  border-radius:8px !important;
+  background:radial-gradient(circle at 50% 42%,rgba(255,255,255,.18),rgba(255,255,255,.04) 48%,rgba(0,0,0,.16) 100%) !important;
+  box-shadow:inset 0 0 0 2px rgba(255,255,255,.08),0 4px 12px rgba(0,0,0,.24) !important;
+}
+.choice .choice-art b{
+  float:none !important;
+  margin:0 !important;
+  width:82% !important;
+  height:82% !important;
+  display:block !important;
+}
+.choice .choice-art b:not(.skill-icon){
+  display:grid !important;
+  place-items:center !important;
+  font-size:42px !important;
+  color:#ffe15c !important;
+}
+.choice strong{
+  display:block !important;
+  min-height:42px !important;
+  font-size:17px !important;
+  line-height:1.18 !important;
+  color:#fff2b0 !important;
+  word-break:keep-all !important;
+}
+.choice p{
+  margin:8px 0 0 !important;
+  align-self:start !important;
+  color:#d8e2f3 !important;
+  font-size:13px !important;
+  line-height:1.38 !important;
+  word-break:keep-all !important;
+}
+.choice.active-card{
+  background:
+    linear-gradient(180deg,rgba(255,255,255,.12),rgba(255,255,255,0) 28%),
+    linear-gradient(180deg,#243b56,#141d2c) !important;
+  border-color:#3d7aa8 !important;
+}
+.choice.passive-card{
+  background:
+    linear-gradient(180deg,rgba(255,255,255,.12),rgba(255,255,255,0) 28%),
+    linear-gradient(180deg,#4a3a24,#211814) !important;
+  border-color:#b3843b !important;
+}
+.choice.evolve-card{
+  background:
+    radial-gradient(circle at 50% 18%,rgba(255,245,150,.36),transparent 38%),
+    linear-gradient(180deg,#51366c,#171329) !important;
+  border-color:#ffe15c !important;
+  box-shadow:0 8px 0 #7d551e,0 0 22px rgba(255,225,92,.42),inset 0 0 0 1px rgba(255,255,255,.18) !important;
+}
+.choice.evolve-card::after{
+  content:"";
+  position:absolute;
+  inset:-20%;
+  background:conic-gradient(from 0deg,transparent,rgba(255,241,138,.2),transparent,rgba(184,117,255,.18),transparent);
+  animation:evolveCardSpin 2.8s linear infinite;
+  pointer-events:none;
+}
+@keyframes evolveCardSpin{to{transform:rotate(360deg)}}
+.choice > *{position:relative;z-index:1}
+#levelOverlay h2{display:none !important}
+#skillHud.skills{
+  display:flex !important;
+  gap:8px !important;
+  align-items:flex-start !important;
+  justify-content:flex-end !important;
+}
+.skill-group{
+  display:grid;
+  grid-template-columns:repeat(3,34px);
+  gap:5px;
+  padding:5px;
+  border-radius:8px;
+  background:rgba(12,16,24,.54);
+  box-shadow:inset 0 0 0 1px rgba(255,255,255,.08);
+}
+.skill-group.active{box-shadow:inset 0 0 0 1px rgba(95,210,255,.3)}
+.skill-group.passive{box-shadow:inset 0 0 0 1px rgba(255,196,94,.34)}
+.slot.empty{
+  width:34px;
+  height:34px;
+  min-width:34px;
+  min-height:34px;
+  padding:0;
+  border:1px dashed rgba(255,255,255,.22);
+  background:rgba(0,0,0,.22);
+  box-shadow:none;
+}
+.slot.skill-mini{
+  width:34px;
+  min-width:34px;
+  height:34px;
+  min-height:34px;
+  padding:3px;
+  position:relative;
+  display:grid;
+  place-items:center;
+}
+.slot.skill-mini small{
+  position:absolute;
+  right:2px;
+  bottom:1px;
+  display:block !important;
+  font-size:9px;
+  line-height:1;
+  color:#fff4b8;
+  text-shadow:0 1px 0 #101520;
+}
+.slot.skill-mini span{display:none !important}
+#levelOverlay .panel{
+  background:transparent !important;
+  border:0 !important;
+  box-shadow:none !important;
+}
+#levelOverlay,
+#levelOverlay .card{
+  background:transparent !important;
+  border:0 !important;
+  box-shadow:none !important;
+}
+#levelOverlay .card{
+  padding:0 !important;
+}
+#levelOverlay h2{
+  text-shadow:0 2px 0 #101520,0 0 10px rgba(0,0,0,.75) !important;
+}
+@media (max-width:760px){
+  #levelOverlay .panel{
+    width:calc(100vw - 18px) !important;
+    max-width:none !important;
+    padding:10px !important;
+  }
+  #levelOverlay .card{
+    background:transparent !important;
+    border:0 !important;
+    box-shadow:none !important;
+    padding:0 !important;
+  }
+  #levelOverlay h2{
+    margin:0 0 8px !important;
+    font-size:20px !important;
+    line-height:1.1 !important;
+  }
+  .choices{
+    gap:7px !important;
+  }
+  .choice{
+    min-height:0 !important;
+    height:clamp(196px,45vh,262px) !important;
+    padding:7px 5px 8px !important;
+    border-radius:8px !important;
+  }
+  .choice .choice-art{
+    width:min(84px,86%) !important;
+    margin:2px auto 6px !important;
+  }
+  .choice strong{
+    min-height:34px !important;
+    font-size:12px !important;
+    line-height:1.18 !important;
+  }
+  .choice p{
+    margin-top:5px !important;
+    font-size:10.5px !important;
+    line-height:1.28 !important;
+    display:-webkit-box !important;
+    -webkit-line-clamp:4 !important;
+    -webkit-box-orient:vertical !important;
+    overflow:hidden !important;
+  }
+  .choice.selected,.choice:hover{
+    transform:none !important;
+    box-shadow:0 8px 0 #0c1018, inset 0 0 0 1px rgba(255,255,255,.08) !important;
+  }
+  .choice.selected::before{display:none !important}
+}
 </style>
 </head>
 <body>
@@ -226,6 +471,7 @@
       <button id="testModeBtn" type="button">테스트 OFF</button>
       <button id="invincibleTestBtn" class="test-only" type="button">무적 OFF</button>
       <button id="basicLv5TestBtn" class="test-only" type="button">평타 Lv.5</button>
+      <button id="forceLevelUpTestBtn" class="test-only" type="button">LEVEL UP</button>
       <button id="clearTestBtn" type="button">클리어 테스트</button>
       <button id="stage1TestBtn" class="test-only" type="button">1 STAGE</button>
       <button id="waveTestBtn" class="test-only" type="button">1 WAVE</button>
@@ -305,6 +551,7 @@ const testTools=document.querySelector(".test-tools");
 const testModeBtn=document.getElementById("testModeBtn");
 const invincibleTestBtn=document.getElementById("invincibleTestBtn");
 const basicLv5TestBtn=document.getElementById("basicLv5TestBtn");
+const forceLevelUpTestBtn=document.getElementById("forceLevelUpTestBtn");
 const clearTestBtn=document.getElementById("clearTestBtn");
 const stage1TestBtn=document.getElementById("stage1TestBtn");
 const waveTestBtn=document.getElementById("waveTestBtn");
@@ -352,6 +599,10 @@ const ultimateBallSprite=new Image();
 ultimateBallSprite.src="assets/ultimate_golf_ball_tornado.png";
 const golfClubSprite=new Image();
 golfClubSprite.src="assets/golf_club_throw_sheet.png";
+const laserBotSprite=new Image();
+laserBotSprite.src="assets/laserbot_4dir.png";
+const laserBotEvolvedSprite=new Image();
+laserBotEvolvedSprite.src="assets/laserbot_evolved_4dir.png";
 const golfClubSpinSprite=new Image();
 golfClubSpinSprite.src="assets/golf_club_spin_sheet.png";
 const bgTile=new Image();
@@ -534,7 +785,7 @@ let boss2Spawned=false;
 let bossStageSpawned={};
 let arenaFence=null;
 const world={w:6400,h:4200};
-const player={x:1400,y:1000,r:18,hp:80,maxHp:80,speed:215,level:1,xp:0,next:16,frame:0,face:1,dir:"down",moving:false,vx:0,vy:0,inv:0,action:null,actionTimer:0,actionDuration:0,ultimateTimer:0,ultimateCd:0,ultimateCdMax:15,ultimateFired:false,ultimateDir:{x:0,y:1}};
+const player={x:1400,y:1000,r:18,hp:80,maxHp:80,speed:215,level:1,xp:0,next:16,frame:0,face:1,dir:"down",moving:false,vx:0,vy:0,inv:0,action:null,actionTimer:0,actionDuration:0,ultimateTimer:0,ultimateCd:0,ultimateCdMax:15,ultimateFired:false,ultimateDir:{x:0,y:1},skillBarrier:0,skillBarrierMax:0,barrierRegenT:0};
 const playerUltimateQuote="노~~오력이 부족해 !!!!";
 const playableCharacters=[
   {id:"geontaek",name:"건택",trait:"골프를 즐겨 하는 계획맨",portrait:"assets/character_portraits_small/geontaek.png",top:"#f8f8f0",hair:"#17191f",skin:"#f0c8bc",playable:true,ultimateQuote:"노~~오력이 부족해 !!!!"},
@@ -562,6 +813,26 @@ const skills=[
   {id:"coffee",icon:"▴",name:"카페인 프로토콜",level:0,max:5,desc:"이동 속도와 회피가 증가합니다. 마스터 시 돌진 충격파.",cd:4.8,t:4.8},
   {id:"chart",icon:"◇",name:"방화벽 차트",level:0,max:5,desc:"회전 방패가 몸을 보호합니다. 마스터 시 반격 차트.",cd:0,t:0}
 ];
+
+skills.splice(0,skills.length,
+  {id:"golf",type:"basic",icon:"/",name:"기본 공격",level:1,max:5,desc:"캐릭터 고유 기본 공격입니다.",cd:1.12,t:.1},
+  {id:"droneBot",type:"active",icon:"D",name:"드론봇",level:0,max:5,desc:"플레이어를 따라다니며 가까운 적에게 탄을 쏩니다.",cd:2.2,t:1.2},
+  {id:"orbitShield",type:"active",icon:"O",name:"회전 쉴드",level:0,max:5,desc:"주변을 회전하며 원거리 공격을 막고 적에게 피해를 줍니다.",cd:0,t:0},
+  {id:"barrier",type:"active",icon:"B",name:"보호막",level:0,max:5,desc:"일정 피해를 대신 버티고, 깨지면 잠시 뒤 재생됩니다.",cd:0,t:0},
+  {id:"littleDragon",type:"active",icon:"F",name:"꼬마용",level:0,max:5,desc:"화이어볼을 발사하는 작은 용을 소환합니다.",cd:2.6,t:1.6},
+  {id:"freezerBird",type:"active",icon:"I",name:"프리져 새",level:0,max:5,desc:"얼음 장판을 쏘아 적의 이동과 공격 속도를 늦춥니다.",cd:4.2,t:2.2},
+  {id:"satelliteBeam",type:"active",icon:"S",name:"위성 광선포",level:0,max:5,desc:"맵 어딘가에 강력한 광선 폭격을 떨어뜨립니다.",cd:6.2,t:3.2},
+  {id:"damageAura",type:"active",icon:"A",name:"오오라",level:0,max:5,desc:"캐릭터 주변 오오라에 닿은 적에게 지속 피해를 줍니다.",cd:0,t:0},
+  {id:"xClaw",type:"active",icon:"X",name:"X자 클로",level:0,max:5,desc:"정면 아주 짧은 거리로 X자 베기를 날립니다.",cd:1.35,t:.8},
+  {id:"moveSpeed",type:"passive",icon:">",name:"이동속도 증가",level:0,max:5,desc:"이동속도가 증가합니다."},
+  {id:"xpGain",type:"passive",icon:"+",name:"경험치 획득량 증가",level:0,max:5,desc:"경험치 구슬의 획득량이 증가합니다."},
+  {id:"maxHealth",type:"passive",icon:"H",name:"최대 체력 증가",level:0,max:5,desc:"최대 체력이 증가하고 일부 체력을 회복합니다."},
+  {id:"cooldownDown",type:"passive",icon:"C",name:"스킬 쿨타임 감소",level:0,max:5,desc:"액티브 스킬의 쿨타임이 감소합니다."},
+  {id:"attackSpeed",type:"passive",icon:"R",name:"공격속도 증가",level:0,max:5,desc:"기본 공격 주기가 빨라집니다."},
+  {id:"defenseUp",type:"passive",icon:"V",name:"방어력 증가",level:0,max:5,desc:"받는 피해가 줄어듭니다."},
+  {id:"basicDamage",type:"passive",icon:"P",name:"기본공격 데미지 증가",level:0,max:5,desc:"캐릭터 고유 기본 공격의 피해가 증가합니다."},
+  {id:"ultimateDodge",type:"passive",icon:"U",name:"필살기 회피율 증가",level:0,max:5,desc:"필살기 사용 중 회피율이 증가합니다. 마스터 시 필살기 중 무적입니다."}
+);
 
 const enemyTypes=[
   {id:"cryingFemale",name:"울고있는 여자사원",hp:14,spd:108,dmg:7,xp:2,color:"#d8c8b7",tie:"#68d7ff",size:17,drawSize:56},
@@ -626,6 +897,11 @@ if(basicLv5TestBtn)basicLv5TestBtn.onclick=()=>{
   s.t=0;
   renderSkillHud();
   show(player.characterId==="sangil"?"등산스틱 난타 Lv.5":"평타 Lv.5");
+};
+if(forceLevelUpTestBtn)forceLevelUpTestBtn.onclick=()=>{
+  if(!testMode||paused||overlayVisible(levelOverlay))return;
+  player.xp=player.next;
+  levelUp();
 };
 if(stage1TestBtn)stage1TestBtn.onclick=()=>enterStage1Test();
 if(waveTestBtn)waveTestBtn.onclick=()=>enterWaveTest();
@@ -821,10 +1097,18 @@ function applyCharacterStats(){
   const sangil=player.characterId==="sangil";
   player.x=world.w/2;
   player.y=world.h/2;
-  player.maxHp=sangil?118:80;
+  for(const s of skills){
+    s.level=s.id==="golf"?1:0;
+    s.evolved=false;
+    s.t=s.id==="golf"?.2:(s.cd||0);
+  }
+  player.maxHp=sangil?108:68;
   player.hp=player.maxHp;
-  player.speed=sangil?205:215;
+  player.speed=sangil?178:184;
   player.r=sangil?20:18;
+  player.skillBarrier=0;
+  player.skillBarrierMax=0;
+  player.barrierRegenT=0;
   player.ultimateTimer=0;
   player.ultimateCd=0;
   player.ultimateCdMax=getUltimateCooldown();
@@ -1263,7 +1547,25 @@ function show(msg){
   toast.textContent="";
   toast.classList.remove("on");
 }
-function active(id){return skills.find(s=>s.id===id)}
+function active(id){
+  const legacy={paper:"droneBot",calendar:"satelliteBeam",meeting:"freezerBird",coffee:"moveSpeed",chart:"orbitShield"};
+  return skills.find(s=>s.id===id)||skills.find(s=>s.id===legacy[id])||{id,level:0,max:5,cd:999,t:999,type:"legacy",desc:""};
+}
+function skillLevel(id){const s=active(id);return s?s.level||0:0}
+function ownedActiveSkills(){return skills.filter(s=>s.type==="active"&&s.level>0)}
+function cooldownMul(){return Math.max(.55,1-skillLevel("cooldownDown")*.07)}
+function attackSpeedMul(){return Math.max(.55,1-skillLevel("attackSpeed")*.075)}
+function basicDamageMul(){return 1+skillLevel("basicDamage")*.14}
+function playerMoveBonus(){return skillLevel("moveSpeed")*14}
+function applyPlayerDamageMitigation(amount){
+  return Math.max(1,Math.round(amount*(1-skillLevel("defenseUp")*.055)));
+}
+function passiveUltimateDodgeActive(){
+  const lv=skillLevel("ultimateDodge");
+  if(lv<=0||player.ultimateTimer<=0)return false;
+  if(lv>=5)return true;
+  return Math.random()<lv*.13;
+}
 function gameplayScale(){
   if(!mobileControlsAvailable())return 1;
   const short=Math.min(W,H);
@@ -1294,7 +1596,24 @@ function ultimateChargeRatio(){
   return clamp(1-(player.ultimateCd||0)/cd,0,1);
 }
 function ultimateReady(){return !gameOver&&player.ultimateTimer<=0&&(testMode||player.ultimateCd<=0)}
-function playerCanTakeDamage(){return !testInvincible&&player.inv<=0}
+function playerCanTakeDamage(){
+  if(testInvincible||player.inv>0)return false;
+  if(passiveUltimateDodgeActive()){
+    floaters.push({x:player.x,y:player.y-34,t:.42,text:"회피",color:"#b9f7ff"});
+    player.inv=.12;
+    return false;
+  }
+  if((player.skillBarrier||0)>0){
+    const loss=applyPlayerDamageMitigation(12);
+    player.skillBarrier=Math.max(0,player.skillBarrier-loss);
+    player.barrierRegenT=player.skillBarrier>0?0:Math.max(player.barrierRegenT||0,8.5-skillLevel("barrier")*.55);
+    effects.push({kind:"pulse",x:player.x,y:player.y,r:48+skillLevel("barrier")*6,t:.22,dmg:0,color:player.skillBarrier>0?"#9ee9ff":"#ff9fb7"});
+    floaters.push({x:player.x,y:player.y-38,t:.46,text:player.skillBarrier>0?"보호막":"보호막 파괴",color:player.skillBarrier>0?"#9ee9ff":"#ff9fb7"});
+    player.inv=.16;
+    return false;
+  }
+  return true;
+}
 
 function unlockAudio(){
   if(audioCtx){
@@ -1773,10 +2092,10 @@ function movePlayer(dt){
     if(Math.abs(x)>Math.abs(y)){player.dir="side";player.face=x>0?1:-1}
     else{player.dir=y>0?"down":"up"}
   }
-  const coffee=active("coffee").level;
   const slowMul=player.slowT>0?.46:1;
-  player.x=clamp(player.x+x*(player.speed+coffee*18)*slowMul*dt,20,world.w-20);
-  player.y=clamp(player.y+y*(player.speed+coffee*18)*slowMul*dt,20,world.h-20);
+  const moveSpeed=player.speed+playerMoveBonus();
+  player.x=clamp(player.x+x*moveSpeed*slowMul*dt,20,world.w-20);
+  player.y=clamp(player.y+y*moveSpeed*slowMul*dt,20,world.h-20);
   if(arenaFence){
     player.x=clamp(player.x,arenaFence.x+28,arenaFence.x+arenaFence.w-28);
     player.y=clamp(player.y,arenaFence.y+28,arenaFence.y+arenaFence.h-28);
@@ -3318,7 +3637,7 @@ function pushSangilSlash(angle,offset,level,side=0){
     kind:"sangilSlash",
     x:player.x+px*offset+sx*side,y:player.y-8+py*offset+sy*side,
     angle,t:.2,maxT:.2,delay:.2,follow:true,offset,side,range:150,wide:128,
-    dmg:32+level*10,hit:false,color:"#f7d889"
+    dmg:(32+level*10)*basicDamageMul(),hit:false,color:"#f7d889"
   });
 }
 
@@ -3347,16 +3666,19 @@ function clearPlayerAttackState(){
 
 function updateSkills(dt){
   for(const s of skills)s.t-=dt;
+  updatePassiveSystems(dt);
   if(player.action==="clear"&&player.actionTimer>0)return;
   if(player.characterId==="sangil"){
     if(player.ultimateTimer<=0)fireSangilMelee();
   }
   else fireGolfClub();
-  firePaper();
-  fireCalendar();
-  fireMeeting();
-  fireCoffee();
-  orbitCharts(dt);
+  fireDroneBot();
+  orbitShield(dt);
+  fireLittleDragon();
+  fireFreezerBird();
+  fireSatelliteBeam();
+  updateDamageAura(dt);
+  fireXClaw();
 }
 
 function nearest(range=900){
@@ -3374,7 +3696,7 @@ function fireSangilMelee(){
   d.x/=len;d.y/=len;
   const a=Math.atan2(d.y,d.x);
   const level=s.level||1;
-  s.t=Math.max(.38,.68-level*.045);
+  s.t=Math.max(.46,.92-level*.04)*attackSpeedMul();
   player.attackTimer=.44;
   player.attackDuration=.44;
   player.attackDir=d;
@@ -3392,12 +3714,12 @@ function fireGolfClub(){
   if(shots.some(p=>p.kind==="golf"))return;
   playSfx("golfThrow");
   const range=230;
-  s.t=Math.max(.44,s.cd-s.level*.055);
+  s.t=Math.max(.56,s.cd-s.level*.055)*attackSpeedMul();
   const target=nearest(640);
   const facing=directionVector();
   const baseAngle=target?angle(player,target):Math.atan2(facing.y,facing.x);
   const speed=330+s.level*48,hold=.32+s.level*.035;
-  const dmg=12+s.level*8;
+  const dmg=(12+s.level*8)*basicDamageMul();
   const dirs=s.level>=5
     ?Array.from({length:8},(_,i)=>i*Math.PI/4)
     :[baseAngle];
@@ -3413,6 +3735,180 @@ function fireGolfClub(){
       color:"#d7e0e8",hit:new Map()
     });
   }
+}
+
+function updatePassiveSystems(dt){
+  const hpLv=skillLevel("maxHealth");
+  const targetMax=(player.characterId==="sangil"?108:68)+hpLv*14;
+  if(player.maxHp!==targetMax){
+    const gain=targetMax-player.maxHp;
+    player.maxHp=targetMax;
+    if(gain>0)player.hp=Math.min(player.maxHp,player.hp+gain);
+  }
+  const b=active("barrier");
+  if(b&&b.level>0){
+    const max=22+b.level*15;
+    player.skillBarrierMax=max;
+    if((player.skillBarrier||0)<=0){
+      player.barrierRegenT=Math.max(0,(player.barrierRegenT||0)-dt);
+      if(player.barrierRegenT<=0)player.skillBarrier=max;
+    }else{
+      player.skillBarrier=Math.min(max,player.skillBarrier);
+    }
+  }else{
+    player.skillBarrier=0;
+    player.skillBarrierMax=0;
+    player.barrierRegenT=0;
+  }
+}
+
+function activeCooldown(skill,base){
+  return Math.max(.25,base*cooldownMul());
+}
+
+function droneBotSlots(level,target=null){
+  const count=1;
+  const slots=[];
+  for(let i=0;i<count;i++){
+    const phase=elapsed*2.2+i*Math.PI*2/count;
+    const side=count===1?-1:(i===0?-1:1);
+    const x=player.x+Math.cos(phase)*10+side*(48+level*3);
+    const y=player.y-46+Math.sin(phase*1.35)*10;
+    const aim=target?{x:target.x-x,y:target.y-y}:directionVector();
+    slots.push({x,y,aim});
+  }
+  return slots;
+}
+
+function droneRowFromVector(v){
+  if(Math.abs(v.x)>Math.abs(v.y))return v.x<0?1:2;
+  return v.y<0?3:0;
+}
+
+function syncDroneEffect(e){
+  if(!e.followDrone)return;
+  const s=active("droneBot");
+  if(!s.level)return;
+  const bot=droneBotSlots(s.level,null)[0];
+  if(!bot)return;
+  const a=e.angle||0;
+  const front=e.kind==="droneBeam"?52:e.kind==="droneCharge"?36:16;
+  e.x=bot.x+Math.cos(a)*front;
+  e.y=bot.y+Math.sin(a)*front;
+}
+
+function fireDroneBot(){
+  const s=active("droneBot");if(!s.level||s.t>0)return;
+  const target=nearest(780);
+  if(!target)return;
+  if(s.evolved&&effects.some(e=>e.kind==="droneBeam"||e.kind==="droneCharge"))return;
+  s.t=s.evolved?6.45:activeCooldown(s,Math.max(1.55,2.15-(s.level-1)*.08));
+  const volley=s.evolved?1:clamp(s.level,1,5);
+  for(const bot of droneBotSlots(s.level,target)){
+    const a=Math.atan2(bot.aim.y,bot.aim.x);
+    if(s.evolved){
+      effects.push({kind:"droneCharge",x:bot.x,y:bot.y,angle:a,t:.45,maxT:.45,r:28,color:"#72f6ff",followDrone:true});
+      effects.push({kind:"droneBeam",x:bot.x,y:bot.y,angle:a,t:2,maxT:2,delay:.45,len:1800,wide:42+s.level*5,dmg:18+s.level*8,tick:.08,color:"#72f6ff",followDrone:true});
+      continue;
+    }
+    effects.push({kind:"droneCharge",x:bot.x,y:bot.y,angle:a,t:.16,maxT:.16,r:14,color:"#72f6ff",followDrone:true});
+    const spd=760+s.level*42;
+    for(let i=0;i<volley;i++){
+      shots.push({
+        kind:"droneLaser",
+        x:bot.x+Math.cos(a)*18,y:bot.y+Math.sin(a)*18,
+        vx:Math.cos(a)*spd,vy:Math.sin(a)*spd,
+        r:5+s.level*.2,life:2.7+i*.11,
+        delay:.16+i*.11,dmg:6+s.level*4,
+        pierce:1,color:"#72f6ff",angle:a,evolved:false,
+        shotIndex:i,age:0
+      });
+    }
+  }
+}
+
+function orbitShield(dt){
+  const s=active("orbitShield");if(!s.level)return;
+  const n=s.level>=5?5:1+s.level;
+  const rad=54+s.level*7;
+  for(let i=bossShots.length-1;i>=0;i--){
+    const p=bossShots[i];
+    for(let j=0;j<n;j++){
+      const ox=player.x+Math.cos(elapsed*2.8+j*Math.PI*2/n)*rad;
+      const oy=player.y+Math.sin(elapsed*2.8+j*Math.PI*2/n)*rad;
+      if(Math.hypot(p.x-ox,p.y-oy)<(p.r||8)+13){bossShots.splice(i,1);break}
+    }
+  }
+  for(const e of enemies){
+    for(let j=0;j<n;j++){
+      const ox=player.x+Math.cos(elapsed*2.8+j*Math.PI*2/n)*rad;
+      const oy=player.y+Math.sin(elapsed*2.8+j*Math.PI*2/n)*rad;
+      if(Math.hypot(e.x-ox,e.y-oy)<e.r+13&&e.hit<=0){
+        e.hp-=9+s.level*4;
+        e.hit=.22;
+      }
+    }
+  }
+}
+
+function fireLittleDragon(){
+  const s=active("littleDragon");if(!s.level||s.t>0)return;
+  s.t=activeCooldown(s,Math.max(.85,s.cd-s.level*.22));
+  const target=nearest(820);
+  const a=target?angle(player,target):rnd(0,Math.PI*2);
+  const n=s.level>=5?3:1;
+  for(let i=0;i<n;i++){
+    const spread=(i-(n-1)/2)*.18;
+    shots.push({kind:"paper",x:player.x-34,y:player.y-42,vx:Math.cos(a+spread)*(430+s.level*28),vy:Math.sin(a+spread)*(430+s.level*28),r:11+s.level,life:1.8,dmg:16+s.level*8,pierce:s.level>=5?2:1,color:"#ff7a3d"});
+  }
+}
+
+function fireFreezerBird(){
+  const s=active("freezerBird");if(!s.level||s.t>0)return;
+  s.t=activeCooldown(s,Math.max(1.35,s.cd-s.level*.25));
+  const target=nearest(760);
+  const a=target?angle(player,target):rnd(0,Math.PI*2);
+  const x=player.x+Math.cos(a)*rnd(150,330);
+  const y=player.y+Math.sin(a)*rnd(150,330);
+  effects.push({kind:"zone",x,y,r:56+s.level*9,t:1.25+s.level*.16,boom:false,dmg:4+s.level*3,color:"#8fdcff",slow:1.6+s.level*.25});
+  for(const e of enemies)if(Math.hypot(e.x-x,e.y-y)<70+s.level*12){e.slow=Math.max(e.slow||0,1.8+s.level*.25)}
+}
+
+function fireSatelliteBeam(){
+  const s=active("satelliteBeam");if(!s.level||s.t>0)return;
+  s.t=activeCooldown(s,Math.max(2.4,s.cd-s.level*.36));
+  const n=s.level>=5?3:1+Math.floor(s.level/3);
+  for(let i=0;i<n;i++){
+    const target=nearest(1200);
+    const x=target?target.x+rnd(-130,130):rnd(120,world.w-120);
+    const y=target?target.y+rnd(-130,130):rnd(120,world.h-120);
+    effects.push({kind:"zone",x,y,r:62+s.level*10,t:.8,boom:false,dmg:34+s.level*18,color:"#fff18a"});
+  }
+}
+
+function updateDamageAura(dt){
+  const s=active("damageAura");if(!s.level)return;
+  const r=58+s.level*18;
+  for(const e of enemies){
+    if(dist(e,player)<r+e.r){
+      e.auraTick=(e.auraTick||0)-dt;
+      if(e.auraTick<=0){
+        e.auraTick=.28;
+        e.hp-=5+s.level*3;
+        e.hit=.12;
+      }
+    }
+  }
+}
+
+function fireXClaw(){
+  const s=active("xClaw");if(!s.level||s.t>0)return;
+  s.t=activeCooldown(s,Math.max(.48,s.cd-s.level*.08));
+  const d=directionVector();
+  const a=Math.atan2(d.y,d.x);
+  const offset=48;
+  pushSangilSlash(a+.38,offset,s.level,0);
+  pushSangilSlash(a-.38,offset,s.level,0);
 }
 
 function firePaper(){
@@ -3461,6 +3957,8 @@ function orbitCharts(dt){
 function updateShots(dt){
   for(let i=shots.length-1;i>=0;i--){
     const p=shots[i];p.life-=dt;
+    if(p.delay>0){p.delay-=dt;continue}
+    if(p.kind==="droneLaser")p.age=(p.age||0)+dt;
     if(p.kind==="golf"){
       p.age+=dt;
       if(p.phase==="out"){
@@ -3557,6 +4055,25 @@ function updateBossShots(dt){
 }
 
 function updateEffects(dt){
+  for(const beam of effects){
+    if(beam.kind!=="droneBeam")continue;
+    syncDroneEffect(beam);
+    if(beam.delay>0)continue;
+    beam.tick=(beam.tick||0)-dt;
+    if(beam.tick>0)continue;
+    beam.tick=.08;
+    const ca=Math.cos(beam.angle),sa=Math.sin(beam.angle);
+    for(const e of enemies){
+      if((e.inv||0)>0)continue;
+      const dx=e.x-beam.x,dy=e.y-beam.y;
+      const forward=dx*ca+dy*sa;
+      const side=Math.abs(-dx*sa+dy*ca);
+      if(forward>-e.r&&forward<(beam.len||1600)+e.r&&side<(beam.wide||38)+e.r){
+        e.hp-=beam.dmg;
+        e.hit=.12;
+      }
+    }
+  }
   if((player.poisonT||0)>0){
     player.poisonT=Math.max(0,player.poisonT-dt);
     player.poisonTick=(player.poisonTick||0)-dt;
@@ -3646,7 +4163,7 @@ function updateEffects(dt){
         floaters.push({x:player.x,y:player.y-30,t:.65,text:"모함 프레임",color:"#ff6b78"});
       }
     }
-    if(e.kind==="zone"&&e.t<.22&&!e.boom){e.boom=true;for(const m of enemies)if((m.inv||0)<=0&&Math.hypot(m.x-e.x,m.y-e.y)<e.r){m.hp-=e.dmg;m.hit=.2;m.slow=.4}shake=4}
+    if(e.kind==="zone"&&e.t<.22&&!e.boom){e.boom=true;for(const m of enemies)if((m.inv||0)<=0&&Math.hypot(m.x-e.x,m.y-e.y)<e.r){m.hp-=e.dmg;m.hit=.2;m.slow=Math.max(m.slow||0,e.slow||.4)}shake=4}
     if(e.kind==="sangilSlash"&&!e.hit&&e.t<e.maxT*.62){
       e.hit=true;
       for(const m of enemies){
@@ -3741,7 +4258,7 @@ function collectGems(){
         player.hp=Math.min(player.maxHp,player.hp+g.value);
         if(player.hp>before)floaters.push({x:player.x,y:player.y-34,t:.75,text:"회복",color:"#77ffb2"});
       }else{
-        player.xp+=g.value;
+        player.xp+=Math.ceil(g.value*(1+skillLevel("xpGain")*.12));
         if(player.xp>=player.next)levelUp();
       }
       gems.splice(i,1);
@@ -3828,6 +4345,7 @@ function draw(){
   for(const p of shots)drawShot(p);
   for(const p of bossShots)if(!p.delay||p.delay<=0)drawBossShot(p);
   for(const e of enemies)drawEnemy(e);
+  drawDroneBots();
   drawPlayer();
   drawUltimateQuote();
   for(const f of floaters)drawText(f);
@@ -5027,8 +5545,92 @@ function drawCultObject(e){
   ctx.fillRect(-e.r,barY,e.r*2*clamp(e.hp/e.maxHp,0,1),5);
 }
 
+function drawDroneBots(){
+  const s=active("droneBot");
+  if(!s.level)return;
+  const target=nearest(780);
+  const bots=droneBotSlots(s.level,target);
+  const evolveFx=effects.find(e=>e.kind==="droneEvolve");
+  for(const bot of bots){
+    ctx.save();
+    ctx.translate(bot.x,bot.y);
+    ctx.imageSmoothingEnabled=false;
+    const bob=Math.sin(elapsed*5+bot.x*.01)*2.5;
+    const evolved=!!s.evolved;
+    const row=droneRowFromVector(bot.aim);
+    const col=Math.floor(elapsed*8)%4;
+    const drawBotSheet=(sheet,size,alpha=1,scale=1)=>{
+      if(!sheet.complete||!sheet.naturalWidth)return false;
+      const fw=Math.floor(sheet.naturalWidth/4);
+      const fh=Math.floor(sheet.naturalHeight/4);
+      ctx.save();
+      ctx.globalAlpha*=alpha;
+      ctx.scale(scale,scale);
+      ctx.drawImage(sheet,fw*col,fh*row,fw,fh,-size/2,-size/2-2+bob,size,size);
+      ctx.restore();
+      return true;
+    };
+    if(evolveFx&&laserBotEvolvedSprite.complete&&laserBotEvolvedSprite.naturalWidth&&laserBotSprite.complete&&laserBotSprite.naturalWidth){
+      const p=clamp(1-evolveFx.t/evolveFx.maxT,0,1);
+      const flash=Math.sin(p*Math.PI);
+      drawBotSheet(laserBotSprite,68,1-p*.92,1+.06*flash);
+      ctx.globalCompositeOperation="lighter";
+      drawBotSheet(laserBotEvolvedSprite,82,clamp((p-.18)/.72,0,1),.82+p*.18+.08*flash);
+      ctx.globalCompositeOperation="source-over";
+    }else{
+      const sheet=evolved&&laserBotEvolvedSprite.complete&&laserBotEvolvedSprite.naturalWidth?laserBotEvolvedSprite:laserBotSprite;
+      const size=evolved?82:68;
+      if(!drawBotSheet(sheet,size)){
+        ctx.fillStyle="#1b2732";
+        ctx.beginPath();ctx.ellipse(0,bob,22,14,0,0,Math.PI*2);ctx.fill();
+        ctx.fillStyle="#60efff";
+        ctx.beginPath();ctx.arc(0,bob,6,0,Math.PI*2);ctx.fill();
+      }
+    }
+    ctx.restore();
+  }
+}
+
 function drawShot(p){
+  if(p.delay>0)return;
   if(p.kind==="golf"){drawGolfClub(p);return}
+  if(p.kind==="droneLaser"){
+    const a=Math.atan2(p.vy,p.vx);
+    const flicker=.85+Math.sin(elapsed*48+p.x*.03)*.15;
+    const len=16+p.r*1.35;
+    ctx.save();
+    ctx.translate(p.x,p.y);
+    ctx.rotate(a);
+    ctx.globalAlpha=1;
+    ctx.shadowColor="#5df8ff";
+    ctx.shadowBlur=5*flicker;
+    const grad=ctx.createLinearGradient(-8,0,len,0);
+    grad.addColorStop(0,"rgba(86,255,255,.1)");
+    grad.addColorStop(.18,"rgba(86,255,255,.95)");
+    grad.addColorStop(.72,"rgba(170,255,255,.95)");
+    grad.addColorStop(1,"rgba(255,255,255,.05)");
+    ctx.strokeStyle=grad;
+    ctx.lineCap="round";
+    ctx.lineWidth=3.2*flicker;
+    ctx.beginPath();
+    ctx.moveTo(-7,0);
+    ctx.lineTo(len,0);
+    ctx.stroke();
+    ctx.shadowBlur=3;
+    ctx.strokeStyle="rgba(255,255,255,.98)";
+    ctx.lineWidth=1.4;
+    ctx.beginPath();
+    ctx.moveTo(-4,0);
+    ctx.lineTo(len-3,0);
+    ctx.stroke();
+    ctx.shadowBlur=0;
+    ctx.fillStyle="rgba(116,245,255,.95)";
+    ctx.beginPath();
+    ctx.arc(0,0,3.2*flicker,0,Math.PI*2);
+    ctx.fill();
+    ctx.restore();
+    return;
+  }
   ctx.fillStyle=p.color;ctx.save();ctx.translate(p.x,p.y);ctx.rotate(Math.atan2(p.vy,p.vx));ctx.fillRect(-p.r,-p.r/2,p.r*3,p.r);ctx.restore()
 }
 
@@ -5325,6 +5927,96 @@ function drawGem(g){
 }
 function drawEffect(e){
   ctx.save();ctx.globalAlpha=Math.max(.15,e.t);
+  if(e.delay>0){ctx.restore();return}
+  if(e.kind==="droneCharge"){
+    syncDroneEffect(e);
+    const p=1-e.t/e.maxT;
+    const pulse=Math.sin(p*Math.PI);
+    ctx.translate(e.x,e.y);
+    ctx.rotate(e.angle);
+    ctx.globalAlpha=.35+.55*pulse;
+    ctx.shadowColor=e.color||"#72f6ff";
+    ctx.shadowBlur=16*pulse;
+    ctx.strokeStyle="rgba(130,255,255,.9)";
+    ctx.lineWidth=2;
+    ctx.beginPath();
+    ctx.arc(0,0,(e.r||18)*(1-p*.35),0,Math.PI*2);
+    ctx.stroke();
+    ctx.fillStyle="rgba(220,255,255,.85)";
+    ctx.beginPath();
+    ctx.arc(10+12*p,0,4+6*pulse,0,Math.PI*2);
+    ctx.fill();
+    ctx.restore();return;
+  }
+  if(e.kind==="droneEvolve"){
+    syncDroneEffect(e);
+    const p=1-e.t/e.maxT;
+    const pulse=Math.sin(p*Math.PI);
+    ctx.translate(e.x,e.y);
+    ctx.globalAlpha=.18+.5*pulse;
+    ctx.shadowColor=e.color||"#72f6ff";
+    ctx.shadowBlur=22*pulse;
+    const core=18+22*pulse;
+    const grad=ctx.createRadialGradient(0,0,4,0,0,core);
+    grad.addColorStop(0,"rgba(255,255,255,.9)");
+    grad.addColorStop(.38,"rgba(105,240,255,.42)");
+    grad.addColorStop(1,"rgba(105,240,255,0)");
+    ctx.fillStyle=grad;
+    ctx.beginPath();ctx.arc(0,0,core,0,Math.PI*2);ctx.fill();
+    ctx.strokeStyle=`rgba(156,250,255,${.42*pulse})`;
+    ctx.lineWidth=2;
+    ctx.beginPath();
+    ctx.arc(0,0,34+18*pulse,0,Math.PI*2);
+    ctx.stroke();
+    ctx.fillStyle="rgba(225,255,255,.82)";
+    for(let i=0;i<10;i++){
+      const a=i*Math.PI*2/10-p*2.6;
+      const r=24+p*44+(i%3)*5;
+      ctx.beginPath();
+      ctx.arc(Math.cos(a)*r,Math.sin(a)*r,1.4+2.2*pulse,0,Math.PI*2);
+      ctx.fill();
+    }
+    ctx.restore();return;
+  }
+  if(e.kind==="droneBeam"){
+    syncDroneEffect(e);
+    const p=1-e.t/e.maxT;
+    const alpha=e.t<.16?e.t/.16:e.t>.18?1:e.t/.18;
+    const flicker=.92+Math.sin(elapsed*42)*.08;
+    ctx.translate(e.x,e.y);
+    ctx.rotate(e.angle);
+    ctx.globalAlpha=alpha;
+    ctx.shadowColor="#63f7ff";
+    ctx.shadowBlur=16*flicker;
+    ctx.lineCap="round";
+    ctx.strokeStyle="rgba(54,205,255,.32)";
+    ctx.lineWidth=(e.wide||42)*.9*flicker;
+    ctx.beginPath();
+    ctx.moveTo(-12,0);
+    ctx.lineTo(e.len||1600,0);
+    ctx.stroke();
+    ctx.shadowBlur=10;
+    ctx.strokeStyle="rgba(126,246,255,.78)";
+    ctx.lineWidth=(e.wide||42)*.38;
+    ctx.beginPath();
+    ctx.moveTo(-8,0);
+    ctx.lineTo((e.len||1600)-20,0);
+    ctx.stroke();
+    ctx.shadowBlur=5;
+    ctx.strokeStyle="rgba(255,255,255,.94)";
+    ctx.lineWidth=Math.max(4,(e.wide||42)*.12);
+    ctx.beginPath();
+    ctx.moveTo(0,0);
+    ctx.lineTo((e.len||1600)-34,0);
+    ctx.stroke();
+    ctx.shadowBlur=0;
+    ctx.fillStyle="rgba(198,255,255,.78)";
+    ctx.beginPath();ctx.arc(-10,0,(e.wide||42)*.22,0,Math.PI*2);ctx.fill();
+    ctx.strokeStyle="rgba(93,238,255,.28)";
+    ctx.lineWidth=2;
+    ctx.beginPath();ctx.arc(-10,0,(e.wide||42)*(.34+.04*Math.sin(p*Math.PI*6)),0,Math.PI*2);ctx.stroke();
+    ctx.restore();return;
+  }
   if(e.kind==="emotionPullField"){
     const p=1-e.t/e.maxT;
     ctx.globalAlpha=.16+.14*Math.sin(p*Math.PI*5)**2;
@@ -5797,6 +6489,87 @@ function drawEffect(e){
   ctx.restore();
 }
 function drawText(f){ctx.fillStyle=f.color;ctx.font="13px Malgun Gothic";ctx.textAlign="center";ctx.fillText(f.text,f.x,f.y)}
+const activeSkillIconIndex={droneBot:0,orbitShield:1,barrier:2,littleDragon:3,freezerBird:4,satelliteBeam:5,damageAura:6,xClaw:7};
+const passiveSkillIconIndex={moveSpeed:0,xpGain:1,maxHealth:2,cooldownDown:3,attackSpeed:4,defenseUp:5,basicDamage:6,ultimateDodge:7};
+function skillIconHtml(s){
+  const isPassive=s.type==="passive";
+  const idx=isPassive?passiveSkillIconIndex[s.id]:activeSkillIconIndex[s.id];
+  if(idx===undefined)return `<b>${s.icon}</b>`;
+  const col=idx%4,row=Math.floor(idx/4);
+  return `<b class="skill-icon${isPassive?" passive":""}" style="background-position:${col*100/3}% ${row*100}%">${s.icon}</b>`;
+}
+
+levelUp=function(){
+  player.xp-=player.next;
+  player.level++;
+  player.next=Math.floor(player.next*1.28+8);
+  paused=true;
+  const activeOwned=ownedActiveSkills().length;
+  const passiveOwned=skills.filter(s=>s.type==="passive"&&s.level>0).length;
+  const available=skills.filter(s=>{
+    if(s.type==="basic")return false;
+    if(s.type==="active"&&s.level<=0&&activeOwned>=3)return false;
+    if(s.type==="passive"&&s.level<=0&&passiveOwned>=3)return false;
+    if(s.level<s.max)return true;
+    return s.level>=s.max&&!s.evolved;
+  });
+  const picks=[];
+  while(picks.length<3&&available.length){
+    const s=available.splice(Math.floor(Math.random()*available.length),1)[0];
+    picks.push(s);
+  }
+  levelChoices=picks;
+  selectedChoice=0;
+  choicesEl.innerHTML=picks.map((s,i)=>{
+    const isEvolve=s.level>=s.max&&!s.evolved;
+    const next=isEvolve?"진화":s.level?`Lv.${s.level+1}`:"";
+    const cardClass=isEvolve?"evolve-card":s.type==="active"?"active-card":"passive-card";
+    return `<button class="choice ${cardClass}" data-index="${i}" data-id="${s.id}"><div class="choice-art">${skillIconHtml(s)}</div><strong>${skillDisplayName(s)}${next?` ${next}`:""}</strong><p>${skillDisplayDesc(s)}</p></button>`;
+  }).join("");
+  updateChoiceSelection();
+  levelOverlay.classList.remove("hidden");
+};
+confirmLevelChoice=function(){
+  const s=levelChoices[selectedChoice];
+  if(!s)return;
+  if(s.level>=s.max&&!s.evolved){
+    s.evolved=true;
+    if(s.id==="droneBot")effects.push({kind:"droneEvolve",x:player.x,y:player.y-48,t:1.55,maxT:1.55,r:78,color:"#72f6ff",followDrone:true});
+  }else{
+    s.level++;
+    if(s.id==="maxHealth"){
+      const before=player.maxHp;
+      updatePassiveSystems(0);
+      player.hp=Math.min(player.maxHp,player.hp+Math.max(8,player.maxHp-before));
+    }
+  }
+  levelChoices=[];
+  levelOverlay.classList.add("hidden");
+  paused=false;
+  last=performance.now();
+};
+skillDisplayName=function(s){
+  return player.characterId==="sangil"&&s.id==="golf"?"등산 스틱 난타":s.name;
+};
+skillDisplayDesc=function(s){
+  if(player.characterId==="sangil"&&s.id==="golf")return "투사체 없이 전방 근접 범위만 공격합니다.";
+  return s.desc;
+};
+renderSkillHud=function(){
+  const renderGroup=(type)=>{
+    const owned=skills.filter(s=>s.type===type&&s.level>0).slice(0,3);
+    const slots=[];
+    for(let i=0;i<3;i++){
+      const s=owned[i];
+      slots.push(s
+        ?`<div class="slot skill-mini">${skillIconHtml(s)}<small>${s.evolved?"E":s.level}</small></div>`
+        :`<div class="slot empty"></div>`);
+    }
+    return `<div class="skill-group ${type}">${slots.join("")}</div>`;
+  };
+  skillHud.innerHTML=renderGroup("active")+renderGroup("passive");
+};
+
 const __mobileUltimateIconCache={};
 const __mobileUltimateIconPending={};
 let __mobileUltimateLastCharacter="";
