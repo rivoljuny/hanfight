@@ -5798,13 +5798,21 @@ function drawEffect(e){
 }
 function drawText(f){ctx.fillStyle=f.color;ctx.font="13px Malgun Gothic";ctx.textAlign="center";ctx.fillText(f.text,f.x,f.y)}
 const __mobileUltimateIconCache={};
+const __mobileUltimateIconPending={};
+let __mobileUltimateLastCharacter="";
+let __mobileUltimateLastAngle=-1;
+let __mobileUltimateLastCooling=false;
 function __setMobileUltimateIcon(characterId){
   if(typeof mobileUltimateBtn==="undefined"||!mobileUltimateBtn)return;
   const src=characterId==="sangil"?"assets/ultimate_icon_sangil_chroma.png":"assets/ultimate_icon_geontaek_chroma.png";
+  if(__mobileUltimateLastCharacter===characterId)return;
+  __mobileUltimateLastCharacter=characterId;
   if(__mobileUltimateIconCache[src]){
     mobileUltimateBtn.style.setProperty("--ultimate-icon-url",`url("${__mobileUltimateIconCache[src]}")`);
     return;
   }
+  if(__mobileUltimateIconPending[src])return;
+  __mobileUltimateIconPending[src]=true;
   const img=new Image();
   img.onload=()=>{
     try{
@@ -5825,8 +5833,11 @@ function __setMobileUltimateIcon(characterId){
       if(mobileUltimateBtn.dataset.character===characterId){
         mobileUltimateBtn.style.setProperty("--ultimate-icon-url",`url("${__mobileUltimateIconCache[src]}")`);
       }
-    }catch(err){}
+    }catch(err){}finally{
+      __mobileUltimateIconPending[src]=false;
+    }
   };
+  img.onerror=()=>{__mobileUltimateIconPending[src]=false;};
   img.src=src;
 }
 const __hanFightUpdateUltimateButton=updateUltimateButton;
@@ -5843,9 +5854,17 @@ updateUltimateButton=function(){
   mobileUltimateBtn.textContent="";
   mobileUltimateBtn.setAttribute("aria-label","필살기");
   __setMobileUltimateIcon(characterId);
-  mobileUltimateBtn.style.setProperty("--cooldown-angle",`${cooling*360}deg`);
-  mobileUltimateBtn.style.setProperty("--cooldown-opacity",cooling>.01?"1":"0");
-  mobileUltimateBtn.classList.toggle("is-cooling",cooling>.01);
+  const angle=Math.ceil(cooling*360);
+  const isCooling=cooling>.01;
+  if(angle!==__mobileUltimateLastAngle){
+    __mobileUltimateLastAngle=angle;
+    mobileUltimateBtn.style.setProperty("--cooldown-angle",`${angle}deg`);
+  }
+  if(isCooling!==__mobileUltimateLastCooling){
+    __mobileUltimateLastCooling=isCooling;
+    mobileUltimateBtn.style.setProperty("--cooldown-opacity",isCooling?"1":"0");
+    mobileUltimateBtn.classList.toggle("is-cooling",isCooling);
+  }
 };
 </script>
 </body>
