@@ -1,5 +1,5 @@
-const CACHE_NAME = "han-fight-assets-v1";
-const ASSET_PATTERN = /\.(?:png|jpg|jpeg|webp|gif|mp3|wav|ogg)$/i;
+const CACHE_NAME = "han-fight-assets-v2";
+const ASSET_PATTERN = /\.(?:png|jpg|jpeg|webp|gif|mp3|wav|ogg|css|js)$/i;
 
 self.addEventListener("install", event => {
   self.skipWaiting();
