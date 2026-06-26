@@ -82,6 +82,10 @@ const seunggwanSonsUltimateSprite=new Image();
 seunggwanSonsUltimateSprite.src="assets/seunggwan_sons_ultimate.png";
 const seunggwanIronBallSprite=new Image();
 seunggwanIronBallSprite.src="assets/seunggwan_iron_ball.png";
+const jiinSprite=new Image();
+jiinSprite.src="assets/jiin_love_walk_aligned.png";
+const seoyulSprite=new Image();
+seoyulSprite.src="assets/seoyul_companion.png";
 const ultimateSprite=new Image();
 ultimateSprite.src="assets/geontaek_ultimate_golf_swing.png";
 const ultimateBallSprite=new Image();
@@ -329,7 +333,7 @@ const playerUltimateQuote="노~~오력이 부족해 !!!!";
 const playableCharacters=[
   {id:"geontaek",name:"건택",trait:"골프를 즐겨 하는 계획맨",portrait:"assets/character_portraits_small/geontaek.png",top:"#f8f8f0",hair:"#17191f",skin:"#f0c8bc",playable:true,ultimateQuote:"노~~오력이 부족해 !!!!"},
   {id:"sangil",name:"상일",trait:"노는게 제일 좋은 재력가",portrait:"assets/character_portraits_small/sangil.png",top:"#d5b77a",hair:"#15171d",skin:"#f0c8bc",playable:true,ultimateQuote:"가고 싶은대로 간다~!!"},
-  {id:"jiin",name:"지인",trait:"몸짱이 되고 싶은 사랑꾼",portrait:"assets/character_portraits_small/jiin.png",top:"#63c7d0",hair:"#1f2024",skin:"#f2c9bf",playable:false,ultimateQuote:"사랑도 근육도 풀파워!"},
+  {id:"jiin",name:"지인",trait:"요즘 스타 감성의 사랑꾼",portrait:"assets/character_portraits_small/jiin.png",top:"#f5ead8",hair:"#1f2024",skin:"#f2c9bf",playable:true,ultimateQuote:"서율이가~ 있잖아요~!!"},
   {id:"seunggwan",name:"승관",trait:"철공을 던지는 고독한 승부사",portrait:"assets/character_portraits_small/seunggwan.png",top:"#22242a",hair:"#191b20",skin:"#f3c6bd",playable:true,ultimateQuote:"정훈, 재훈! 가즈아~~~!!"},
   {id:"homin",name:"호민",trait:"자유로운 영혼, 소울맨",portrait:"assets/character_portraits_small/homin.png",top:"#3a2d2a",hair:"#14161b",skin:"#f0c8bc",playable:false,ultimateQuote:"소울은 멈추지 않아!"},
   {id:"seungjun",name:"승준",trait:"자존심만 센 술주정꾼",portrait:"assets/character_portraits_small/seungjun.png",top:"#20242b",hair:"#16181e",skin:"#f0c8bc",playable:false,ultimateQuote:"자존심으로 버틴다!"}
@@ -363,7 +367,6 @@ skills.splice(0,skills.length,
   {id:"freezerBird",type:"active",icon:"I",name:"얼음 새",level:0,max:5,desc:"얼음 장판을 쏘아 적의 이동과 공격 속도를 늦춥니다.",cd:4.2,t:2.2},
   {id:"satelliteBeam",type:"active",icon:"S",name:"위성 광선포",level:0,max:5,desc:"맵 어딘가에 강력한 광선 폭격을 떨어뜨립니다.",cd:6.2,t:3.2},
   {id:"damageAura",type:"active",icon:"A",name:"오오라",level:0,max:5,desc:"캐릭터 주변 오오라에 닿은 적에게 지속 피해를 줍니다.",cd:0,t:0},
-  {id:"xClaw",type:"active",icon:"X",name:"X자 클로",level:0,max:5,desc:"정면 아주 짧은 거리로 X자 베기를 날립니다.",cd:1.35,t:.8},
   {id:"moveSpeed",type:"passive",icon:">",name:"이동속도 증가",level:0,max:5,desc:"이동속도가 증가합니다."},
   {id:"xpGain",type:"passive",icon:"+",name:"경험치 획득량 증가",level:0,max:5,desc:"경험치 구슬의 획득량이 증가합니다."},
   {id:"maxHealth",type:"passive",icon:"H",name:"최대 체력 증가",level:0,max:5,desc:"최대 체력이 증가하고 일부 체력을 회복합니다."},
@@ -396,6 +399,7 @@ const enemyTypes=[
 function basePlayerMaxHp(){
   if(player.characterId==="sangil")return 82;
   if(player.characterId==="seunggwan")return 68;
+  if(player.characterId==="jiin")return 58;
   return 54;
 }
 
@@ -695,6 +699,7 @@ function startGame(){
 function applyCharacterStats(){
   const sangil=player.characterId==="sangil";
   const seunggwan=player.characterId==="seunggwan";
+  const jiin=player.characterId==="jiin";
   player.x=world.w/2;
   player.y=world.h/2;
   for(const s of skills){
@@ -708,7 +713,7 @@ function applyCharacterStats(){
   }
   player.maxHp=basePlayerMaxHp();
   player.hp=player.maxHp;
-  player.speed=sangil?178:seunggwan?176:184;
+  player.speed=jiin?206:sangil?178:seunggwan?176:184;
   player.r=sangil?20:seunggwan?19:18;
   player.skillBarrier=0;
   player.skillBarrierMax=0;
@@ -1196,7 +1201,8 @@ function rnd(a,b){return a+Math.random()*(b-a)}
 function clamp(v,a,b){return Math.max(a,Math.min(b,v))}
 function smoothstep(v){v=clamp(v,0,1);return v*v*(3-2*v)}
 function gainSp(amount){}
-function getUltimateCooldown(id=player.characterId){return id==="sangil"?8:id==="seunggwan"?12:15}
+function getUltimateCooldown(id=player.characterId){return id==="sangil"?8:id==="seunggwan"?12:id==="jiin"?10:15}
+function getUltimateDuration(id=player.characterId){return id==="sangil"?5:id==="seunggwan"?1.18:id==="jiin"?7:.9}
 function ultimateChargeRatio(){
   const cd=player.ultimateCdMax||getUltimateCooldown();
   if(testMode||cd<=0)return 1;
@@ -1739,7 +1745,7 @@ function updateBossVsCutscene(dt){
 function movePlayer(dt){
   let x=(keys.d||keys.arrowright?1:0)-(keys.a||keys.arrowleft?1:0)+(mobileInput.x||0);
   let y=(keys.s||keys.arrowdown?1:0)-(keys.w||keys.arrowup?1:0)+(mobileInput.y||0);
-  if(player.ultimateTimer>0&&player.characterId!=="sangil"){player.moving=false;player.vx=0;player.vy=0;return}
+  if(player.ultimateTimer>0&&player.characterId!=="sangil"&&player.characterId!=="jiin"){player.moving=false;player.vx=0;player.vy=0;return}
   if(player.action==="clear"&&player.actionTimer>0){player.moving=false;player.vx=0;player.vy=0;return}
   if(player.action&&player.actionTimer>0&&!(x||y)){player.moving=false;player.vx=0;player.vy=0;return}
   if((x||y)&&player.action){player.action=null;player.actionTimer=0}
@@ -2406,9 +2412,9 @@ function useUltimate(){
     show(`필살기 대기 중 ${Math.ceil(player.ultimateCd)}초`);
     return;
   }
-  const d=player.characterId==="seunggwan"?{x:0,y:0}:directionVector();
+  const d=player.characterId==="seunggwan"||player.characterId==="jiin"?{x:0,y:0}:directionVector();
   player.ultimateCdMax=getUltimateCooldown();
-  player.ultimateTimer=player.characterId==="sangil"?5:player.characterId==="seunggwan"?1.18:.9;
+  player.ultimateTimer=getUltimateDuration();
   player.ultimateFired=false;
   player.ultimateDir=d;
   if(player.characterId==="seunggwan"){const mx=player.vx||0,my=player.vy||0,ml=Math.hypot(mx,my)||1;const drift=player.moving?45:0;player.ultimateStartX=player.x;player.ultimateStartY=player.y;player.ultimateTargetX=player.x+mx/ml*drift;player.ultimateTargetY=player.y+my/ml*drift;}
@@ -2416,6 +2422,10 @@ function useUltimate(){
     player.ultimateFired=true;
     fireUltimateSwing();
   }else if(player.characterId==="seunggwan"){
+    player.ultimateFired=true;
+    fireUltimateSwing();
+    player.ultimateCd=testMode?0:player.ultimateCdMax;
+  }else if(player.characterId==="jiin"){
     player.ultimateFired=true;
     fireUltimateSwing();
     player.ultimateCd=testMode?0:player.ultimateCdMax;
@@ -2465,6 +2475,13 @@ function fireUltimateSwing(){
     effects.push({kind:"sangilWhirlwind",x:player.x,y:player.y,t:5,maxT:5,r:118,dmg:46,hit:new Map(),soundT:.34,color:"#f7d889"});
     shake=12;
     show("필살기: 등산스틱 휠윈드");
+    return;
+  }
+  if(player.characterId==="jiin"){
+    playVoiceYell();
+    playSfx("selectConfirm");
+    effects.push({kind:"seoyulCompanion",x:player.x-46,y:player.y+36,t:getUltimateDuration("jiin"),maxT:getUltimateDuration("jiin"),dir:"down",color:"#ff7ab6"});
+    show("필살기: 서율이 에너지 충전");
     return;
   }
   if(player.characterId==="seunggwan"){
@@ -3522,6 +3539,7 @@ function updateSkills(dt){
     if(player.ultimateTimer<=0)fireSangilMelee();
   }
   else if(player.characterId==="seunggwan"){if(player.ultimateTimer<=0)fireSeunggwanIronBall();}
+  else if(player.characterId==="jiin")fireJiinHeartBurst();
   else fireGolfClub();
   fireDroneBot();
   orbitShield(dt);
@@ -3529,7 +3547,6 @@ function updateSkills(dt){
   fireFreezerBird();
   fireSatelliteBeam();
   updateDamageAura(dt);
-  fireXClaw();
 }
 
 function visibleEnemies(pad=24){
@@ -3596,6 +3613,31 @@ function explodeSeunggwanIronBall(p){
       e.slow=Math.max(e.slow||0,.28);
       floaters.push({x:e.x,y:e.y-e.r,t:.45,text:Math.round(dmg),color:"#d8d2c2"});
     }
+  }
+}
+
+function fireJiinHeartBurst(){
+  const s=active("golf");if(s.t>0)return;
+  const level=s.level||1;
+  const count=s.evolved?8:Math.min(6,level+1);
+  const target=nearest(820);
+  if(!target)return;
+  const baseAngle=angle(player,target);
+  s.t=(s.evolved?.22:Math.max(.42,.9-level*.07))*attackSpeedMul();
+  player.attackTimer=.34;
+  player.attackDuration=.34;
+  playSfx("selectMove");
+  for(let i=0;i<count;i++){
+    const spread=(i-(count-1)/2)*.08;
+    const a=baseAngle+spread+rnd(-.04,.04);
+    shots.push({
+      kind:"jiinHeart",
+      x:player.x+Math.cos(a)*18,
+      y:player.y-20+Math.sin(a)*18,
+      vx:Math.cos(a)*(250+level*18),vy:Math.sin(a)*(250+level*18),
+      r:5.5+s.level*.35,life:2.65,age:0,dmg:(3.2+level*1.25)*basicDamageMul(),pierce:1,
+      color:"#ff6fa8",target,homingRange:880,wobble:rnd(0,Math.PI*2),delay:i*.055
+    });
   }
 }
 
@@ -3992,17 +4034,6 @@ function updateDamageAura(dt){
     }
   }
 }
-
-function fireXClaw(){
-  const s=active("xClaw");if(!s.level||s.t>0)return;
-  s.t=activeCooldown(s,Math.max(.48,s.cd-s.level*.08));
-  const d=directionVector();
-  const a=Math.atan2(d.y,d.x);
-  const offset=48;
-  pushSangilSlash(a+.38,offset,s.level,0);
-  pushSangilSlash(a-.38,offset,s.level,0);
-}
-
 function firePaper(){
   const s=active("paper");if(!s.level||s.t>0)return;s.t=Math.max(.55,s.cd-s.level*.18);
   const n=s.level>=5?12:3+s.level;
@@ -4063,6 +4094,19 @@ function updateShots(dt){
       continue;
     }
     if(p.kind==="droneLaser")p.age=(p.age||0)+dt;
+    if(p.kind==="jiinHeart"){
+      p.age=(p.age||0)+dt;
+      if(!p.target||p.target.dead||p.target.object||(p.target.inv||0)>0||Math.hypot(p.target.x-p.x,p.target.y-p.y)>(p.homingRange||820))p.target=nearest(p.homingRange||820);
+      if(p.target){
+        const dx=p.target.x-p.x,dy=p.target.y-p.y,len=Math.hypot(dx,dy)||1;
+        const nx=dx/len,ny=dy/len,w=Math.sin((p.age||0)*15+(p.wobble||0))*.42;
+        const tx=nx-w*ny,ty=ny+w*nx,tl=Math.hypot(tx,ty)||1;
+        const spd=310+active("golf").level*22+(active("golf").evolved?70:0);
+        const turn=clamp(dt*7.5,0,1);
+        p.vx=p.vx*(1-turn)+(tx/tl)*spd*turn;
+        p.vy=p.vy*(1-turn)+(ty/tl)*spd*turn;
+      }
+    }
     if(p.kind==="seunggwanIronBall"){
       p.age=(p.age||0)+dt;
       const q=clamp(p.age/(p.airT||.72),0,1);
@@ -4229,6 +4273,15 @@ function updateEffects(dt){
         player.poisonT=Math.max(player.poisonT||0,e.poisonT||2.2);
         player.poisonTick=Math.min(player.poisonTick||0,.08);
       }
+    }
+    if(e.kind==="seoyulCompanion"){
+      const side=player.face<0?1:-1;
+      const tx=player.x+side*44;
+      const ty=player.y+34;
+      e.x+=(tx-e.x)*clamp(dt*5.5,0,1);
+      e.y+=(ty-e.y)*clamp(dt*5.5,0,1);
+      player.ultimateCd=Math.max(0,player.ultimateCd-dt*1.8);
+      e.dir=Math.abs(tx-e.x)>Math.abs(ty-e.y)?(tx<e.x?"sideL":"sideR"):(ty<e.y?"up":"down");
     }
     if(e.kind==="iceSpike"){
       if(e.landed){
@@ -5058,15 +5111,16 @@ function drawPlayer(){
   if(player.inv>0&&player.action!=="clear"&&Math.floor(elapsed*18)%2){ctx.globalAlpha=.45}
   const isSangil=player.characterId==="sangil";
   const isSeunggwan=player.characterId==="seunggwan";
-  const runSheet=isSangil?sangilSprite:isSeunggwan?seunggwanSprite:sprite;
-  const idleSheet=isSangil?sangilSprite:isSeunggwan?seunggwanSprite:idleSprite;
-  const clearSheet=isSangil?sangilClearSprite:isSeunggwan?seunggwanClearSprite:clearSprite;
+  const isJiin=player.characterId==="jiin";
+  const runSheet=isSangil?sangilSprite:isSeunggwan?seunggwanSprite:isJiin?jiinSprite:sprite;
+  const idleSheet=isSangil?sangilSprite:isSeunggwan?seunggwanSprite:isJiin?jiinSprite:idleSprite;
+  const clearSheet=isSangil?sangilClearSprite:isSeunggwan?seunggwanClearSprite:isJiin?jiinSprite:clearSprite;
   if(player.action==="clear"&&clearSheet.complete&&clearSheet.naturalWidth){
     const fw=Math.floor(clearSheet.naturalWidth/4),fh=clearSheet.naturalHeight;
     const progress=player.actionDuration>0?clamp(1-player.actionTimer/player.actionDuration,0,.999):0;
     const col=Math.floor(progress*4);
     ctx.imageSmoothingEnabled=false;
-    const size=isSangil?96:isSeunggwan?104:84;
+    const size=isSangil?96:isSeunggwan?104:isJiin?88:84;
     ctx.drawImage(clearSheet,fw*col,0,fw,fh,-size/2,-size*.64,size,size);
     ctx.restore();
     return;
@@ -5085,7 +5139,7 @@ function drawPlayer(){
     ctx.restore();
     return;
   }
-  if(player.ultimateTimer>0&&ultimateSprite.complete&&ultimateSprite.naturalWidth){
+  if(player.ultimateTimer>0&&!isJiin&&ultimateSprite.complete&&ultimateSprite.naturalWidth){
     const fw=Math.floor(ultimateSprite.naturalWidth/4),fh=Math.floor(ultimateSprite.naturalHeight/4);
     const progress=clamp(1-player.ultimateTimer/.9,0,.999);
     const col=Math.floor(progress*4);
@@ -5112,8 +5166,8 @@ function drawPlayer(){
   if(!isSangil&&!player.moving&&idleSheet.complete&&idleSheet.naturalWidth){
     const fw=Math.floor(idleSheet.naturalWidth/4),fh=Math.floor(idleSheet.naturalHeight/4);
     const col=Math.floor(elapsed*2)%4;
-    const idleSize=isSeunggwan?84:84;
-    const idleY=isSangil?(row===3?-36:-53):isSeunggwan?-55:(row===3?-43:-53);
+    const idleSize=isJiin?88:isSeunggwan?84:84;
+    const idleY=isSangil?(row===3?-36:-53):isSeunggwan?-55:isJiin?-57:(row===3?-43:-53);
     ctx.imageSmoothingEnabled=false;
     ctx.drawImage(idleSheet,fw*col,fh*row,fw,fh,-idleSize/2,idleY,idleSize,idleSize);
     ctx.restore();
@@ -5128,9 +5182,9 @@ function drawPlayer(){
     ctx.imageSmoothingEnabled=false;
     ctx.save();
     ctx.rotate(lean);
-    const drawSize=isSangil?98:isSeunggwan?84:84;
+    const drawSize=isSangil?98:isSeunggwan?84:isJiin?88:84;
     const drawX=-drawSize/2;
-    const drawY=isSangil?-63-bob:isSeunggwan?-55-bob:-53-bob;
+    const drawY=isSangil?-63-bob:isSeunggwan?-55-bob:isJiin?-57-bob:-53-bob;
     ctx.drawImage(runSheet,fw*col,fh*row,fw,fh,drawX,drawY,drawSize,drawSize);
     ctx.restore();
   }else{
@@ -5143,7 +5197,7 @@ function drawPlayerStatusBars(){
   if(player.action==="clear"||bossVsCutscene.active)return;
   const barW=58,barH=5,gap=3;
   const x=Math.round(player.x-barW/2);
-  const y=Math.round(player.y-(player.characterId==="sangil"?82:player.characterId==="seunggwan"?76:72));
+  const y=Math.round(player.y-(player.characterId==="sangil"?82:player.characterId==="seunggwan"?76:player.characterId==="jiin"?78:72));
   const hp=clamp(player.hp/player.maxHp,0,1);
   const sp=ultimateChargeRatio();
   ctx.save();
@@ -5166,8 +5220,7 @@ function drawPlayerStatusBars(){
 
 function drawUltimateQuote(){
   if(player.ultimateTimer<=0)return;
-  const isSangil=player.characterId==="sangil";
-  const quoteDuration=isSangil?5:player.characterId==="seunggwan"?1.18:.9;
+  const quoteDuration=getUltimateDuration(player.characterId);
   const quoteText=getPlayableUltimateQuote(player.characterId);
   const progress=clamp(1-player.ultimateTimer/quoteDuration,0,1);
   const alpha=progress<.08?progress/.08:player.ultimateTimer<.25?player.ultimateTimer/.25:1;
@@ -5387,6 +5440,10 @@ function drawVsPlayer(x,y,scale){
     const fw=Math.floor(seunggwanUltimateSprite.naturalWidth/4),fh=seunggwanUltimateSprite.naturalHeight;
     ctx.imageSmoothingEnabled=false;
     ctx.drawImage(seunggwanUltimateSprite,fw*2,0,fw,fh,-54,-74,108,108);
+  }else if(id==="jiin"&&jiinSprite.complete&&jiinSprite.naturalWidth){
+    const fw=Math.floor(jiinSprite.naturalWidth/4),fh=Math.floor(jiinSprite.naturalHeight/4);
+    ctx.imageSmoothingEnabled=false;
+    ctx.drawImage(jiinSprite,fw*0,fh*0,fw,fh,-46,-64,92,92);
   }else if(id==="geontaek"&&ultimateSprite.complete&&ultimateSprite.naturalWidth){
     const fw=Math.floor(ultimateSprite.naturalWidth/4),fh=Math.floor(ultimateSprite.naturalHeight/4);
     ctx.imageSmoothingEnabled=false;
@@ -6229,6 +6286,28 @@ function drawShot(p){
     ctx.restore();
     return;
   }
+  if(p.kind==="jiinHeart"){
+    const a=Math.atan2(p.vy,p.vx);
+    const pulse=1+Math.sin((p.age||0)*18+(p.wobble||0))*.1;
+    ctx.save();
+    ctx.translate(p.x,p.y);
+    ctx.rotate(a+Math.PI/2);
+    ctx.scale(pulse*.62,pulse*.62);
+    ctx.shadowColor="#ff7ab6";
+    ctx.shadowBlur=8;
+    ctx.fillStyle="#ff6fa8";
+    ctx.beginPath();
+    ctx.moveTo(0,9);
+    ctx.bezierCurveTo(-18,-6,-8,-20,0,-11);
+    ctx.bezierCurveTo(8,-20,18,-6,0,9);
+    ctx.fill();
+    ctx.shadowBlur=0;
+    ctx.strokeStyle="#fff1f7";
+    ctx.lineWidth=2;
+    ctx.stroke();
+    ctx.restore();
+    return;
+  }
   if(p.kind==="droneLaser"){
     const a=Math.atan2(p.vy,p.vx);
     const flicker=.85+Math.sin(elapsed*48+p.x*.03)*.15;
@@ -6638,6 +6717,48 @@ function drawGem(g){
 function drawEffect(e){
   ctx.save();ctx.globalAlpha=Math.max(.15,e.t);
   if(e.delay>0){ctx.restore();return}
+  if(e.kind==="seoyulCompanion"){
+    const rowMap={down:0,sideL:1,sideR:2,up:3};
+    const row=rowMap[e.dir]??0;
+    const col=Math.floor(elapsed*5)%4;
+    const fade=clamp(e.t/.35,0,1);
+    ctx.globalAlpha=fade;
+    ctx.save();
+    ctx.translate(e.x,e.y);
+    ctx.imageSmoothingEnabled=false;
+    if(seoyulSprite.complete&&seoyulSprite.naturalWidth){
+      const fw=Math.floor(seoyulSprite.naturalWidth/4),fh=Math.floor(seoyulSprite.naturalHeight/4);
+      ctx.drawImage(seoyulSprite,fw*col,fh*row,fw,fh,-25,-48,50,50);
+    }else{
+      ctx.fillStyle="#f6bfd8";ctx.fillRect(-12,-30,24,30);ctx.fillStyle="#1f2024";ctx.fillRect(-16,-42,32,14);
+    }
+    ctx.restore();
+    ctx.font='700 18px "Malgun Gothic",sans-serif';
+    ctx.textAlign="center";ctx.textBaseline="middle";
+    ctx.shadowColor="#64ff82";
+    for(let i=0;i<9;i++){
+      const p=(elapsed*.82+i/9)%1;
+      const a0=i*Math.PI*2/9+elapsed*.9;
+      const radius=18+30*p;
+      const x=player.x+Math.cos(a0)*radius;
+      const y=player.y-28+Math.sin(a0)*radius*.42-p*42;
+      const alpha=fade*Math.sin(p*Math.PI)*.9;
+      const size=16+8*(1-p);
+      ctx.globalAlpha=alpha*.55;
+      const grad=ctx.createRadialGradient(x,y,1,x,y,18);
+      grad.addColorStop(0,"rgba(120,255,145,.55)");
+      grad.addColorStop(1,"rgba(120,255,145,0)");
+      ctx.fillStyle=grad;
+      ctx.beginPath();ctx.arc(x,y,18*(1-p*.35),0,Math.PI*2);ctx.fill();
+      ctx.globalAlpha=alpha;
+      ctx.shadowBlur=10*(1-p);
+      ctx.font=`700 ${size}px "Malgun Gothic",sans-serif`;
+      ctx.strokeStyle="rgba(5,45,18,.72)";ctx.lineWidth=4;ctx.strokeText("+",x,y);
+      ctx.fillStyle=`rgba(104,255,132,${.82+.18*(1-p)})`;ctx.fillText("+",x,y);
+    }
+    ctx.shadowBlur=0;
+    ctx.restore();return;
+  }
   if(e.kind==="droneCharge"){
     syncDroneEffect(e);
     const p=1-e.t/e.maxT;
@@ -7658,11 +7779,12 @@ function drawEffect(e){
   ctx.restore();
 }
 function drawText(f){ctx.fillStyle=f.color;ctx.font="13px Malgun Gothic";ctx.textAlign="center";ctx.fillText(f.text,f.x,f.y)}
-const activeSkillIconIndex={droneBot:0,orbitShield:1,barrier:2,littleDragon:3,freezerBird:4,satelliteBeam:5,damageAura:6,xClaw:7};
+const activeSkillIconIndex={droneBot:0,orbitShield:1,barrier:2,littleDragon:3,freezerBird:4,satelliteBeam:5,damageAura:6};
 const passiveSkillIconIndex={moveSpeed:0,xpGain:1,maxHealth:2,cooldownDown:3,attackSpeed:4,defenseUp:5,basicDamage:6,ultimateDodge:7};
 function skillIconHtml(s){
   const isPassive=s.type==="passive";
   if(s.id==="golf"||s.id==="magnetRange"){
+    if(s.id==="golf"&&player.characterId==="jiin")return `<b class="skill-symbol">♥</b>`;
     if(s.id==="golf"&&player.characterId==="seunggwan"){
       return `<b class="skill-icon basic" style="background-image:url('assets/seunggwan_iron_ball_icon.png');background-size:contain;background-position:center;background-repeat:no-repeat">${s.icon}</b>`;
     }
@@ -7729,7 +7851,7 @@ confirmLevelChoice=function(){
     if(s.id==="orbitShield"){s.shieldMaxSeen=undefined;ensureOrbitShieldState(s);effects.push({kind:"orbitShieldEvolve",x:player.x,y:player.y,t:1.35,maxT:1.35,r:88,color:"#8fffff"});}
     if(s.id==="damageAura")effects.push({kind:"basicEvolve",x:player.x,y:player.y-38,t:1.25,maxT:1.25,r:96,color:"#ffe47a"});
     if(s.id==="barrier"){player.skillBarrierMax=barrierMaxValue(s);player.skillBarrier=player.skillBarrierMax;player.barrierRegenT=0;effects.push({kind:"barrierRestore",x:player.x,y:player.y,t:.75,maxT:.75,r:76,color:"#9ee9ff"});}
-    if(s.id==="golf")effects.push({kind:"basicEvolve",x:player.x,y:player.y-48,t:1.35,maxT:1.35,r:76,color:player.characterId==="seunggwan"?"#d8d2c2":player.characterId==="sangil"?"#f7d889":"#d7e0e8"});
+    if(s.id==="golf")effects.push({kind:"basicEvolve",x:player.x,y:player.y-48,t:1.35,maxT:1.35,r:76,color:player.characterId==="jiin"?"#ff7ab6":player.characterId==="seunggwan"?"#d8d2c2":player.characterId==="sangil"?"#f7d889":"#d7e0e8"});
   }else{
     s.level++;
     if(s.id==="barrier"){
@@ -7753,11 +7875,13 @@ confirmLevelChoice=function(){
 skillDisplayName=function(s){
   if(s.id==="golf"&&player.characterId==="sangil")return "등산스틱 클로";
   if(s.id==="golf"&&player.characterId==="seunggwan")return "철공 포환";
+  if(s.id==="golf"&&player.characterId==="jiin")return "하트 연발";
   return s.name;
 };
 skillDisplayDesc=function(s){
   if(player.characterId==="sangil"&&s.id==="golf")return "투사체 없이 전방 근접 범위만 공격합니다.";
   if(player.characterId==="seunggwan"&&s.id==="golf")return "철공을 포물선으로 던져 낙하지점 주변에 스플래시 피해를 줍니다.";
+  if(player.characterId==="jiin"&&s.id==="golf")return "가까운 적에게 지그재그로 휘어지는 약한 하트 유도탄을 연발합니다. 진화하면 거의 끊기지 않습니다.";
   return s.desc;
 };
 renderSkillHud=function(){
@@ -7786,7 +7910,7 @@ function __setMobileUltimateIcon(characterId){
   const hasMobile=typeof mobileUltimateBtn!=="undefined"&&mobileUltimateBtn;
   const hasPc=typeof ultimateBtn!=="undefined"&&ultimateBtn;
   if(!hasMobile&&!hasPc)return;
-  const src=characterId==="sangil"?"assets/ultimate_icon_sangil.png":characterId==="seunggwan"?"assets/ultimate_icon_seunggwan_chroma.png":"assets/ultimate_icon_geontaek_chroma.png";
+  const src=characterId==="sangil"?"assets/ultimate_icon_sangil.png":characterId==="seunggwan"?"assets/ultimate_icon_seunggwan_chroma.png":characterId==="jiin"?"assets/character_portraits_small/jiin.png":"assets/ultimate_icon_geontaek_chroma.png";
   const rawUrl=`url("${src}")`;
   if(hasMobile)mobileUltimateBtn.style.setProperty("--ultimate-icon-url",rawUrl);
   if(hasPc)ultimateBtn.style.setProperty("--ultimate-icon-url",rawUrl);
@@ -7856,7 +7980,7 @@ const __hanFightUpdateUltimateButton=updateUltimateButton;
 updateUltimateButton=function(){
   __hanFightUpdateUltimateButton();
   if(typeof mobileUltimateBtn==="undefined"||!mobileUltimateBtn)return;
-  const characterId=typeof player!=="undefined"&&player&&player.characterId==="sangil"?"sangil":typeof player!=="undefined"&&player&&player.characterId==="seunggwan"?"seunggwan":"geontaek";
+  const characterId=typeof player!=="undefined"&&player&&player.characterId==="sangil"?"sangil":typeof player!=="undefined"&&player&&player.characterId==="seunggwan"?"seunggwan":typeof player!=="undefined"&&player&&player.characterId==="jiin"?"jiin":"geontaek";
   let ratio=1;
   if(typeof ultimateChargeRatio==="function"){
     ratio=Math.max(0,Math.min(1,ultimateChargeRatio()));
@@ -7877,10 +8001,10 @@ const __hanFightUpdateUltimateButtonPc=updateUltimateButton;
 updateUltimateButton=function(){
   __hanFightUpdateUltimateButtonPc();
   if(typeof ultimateBtn==="undefined"||!ultimateBtn)return;
-  const characterId=typeof player!=="undefined"&&player&&player.characterId==="sangil"?"sangil":typeof player!=="undefined"&&player&&player.characterId==="seunggwan"?"seunggwan":"geontaek";
+  const characterId=typeof player!=="undefined"&&player&&player.characterId==="sangil"?"sangil":typeof player!=="undefined"&&player&&player.characterId==="seunggwan"?"seunggwan":typeof player!=="undefined"&&player&&player.characterId==="jiin"?"jiin":"geontaek";
   const ratio=typeof ultimateChargeRatio==="function"?Math.max(0,Math.min(1,ultimateChargeRatio())):1;
   const isCooling=1-ratio>.01;
-  const src=characterId==="sangil"?"assets/ultimate_icon_sangil.png":characterId==="seunggwan"?"assets/ultimate_icon_seunggwan_chroma.png":"assets/ultimate_icon_geontaek_chroma.png";
+  const src=characterId==="sangil"?"assets/ultimate_icon_sangil.png":characterId==="seunggwan"?"assets/ultimate_icon_seunggwan_chroma.png":characterId==="jiin"?"assets/character_portraits_small/jiin.png":"assets/ultimate_icon_geontaek_chroma.png";
   const rawUrl=`url("${src}")`;
   ultimateBtn.style.setProperty("--ultimate-icon-url",rawUrl);
   ultimateBtn.dataset.character=characterId;
