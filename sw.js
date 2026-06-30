@@ -1,5 +1,6 @@
-const CACHE_NAME = "han-fight-assets-v2";
+const CACHE_NAME = "han-fight-assets-v3";
 const ASSET_PATTERN = /\.(?:png|jpg|jpeg|webp|gif|mp3|wav|ogg|css|js)$/i;
+const FRESH_PATTERN = /\.(?:css|js)$/i;
 
 self.addEventListener("install", event => {
   self.skipWaiting();
@@ -19,6 +20,17 @@ self.addEventListener("fetch", event => {
   if (event.request.method !== "GET" || url.origin !== self.location.origin || !ASSET_PATTERN.test(url.pathname)) return;
   event.respondWith((async () => {
     const cache = await caches.open(CACHE_NAME);
+    if (FRESH_PATTERN.test(url.pathname)) {
+      try {
+        const response = await fetch(event.request, {cache:"no-store"});
+        if (response && response.ok) cache.put(event.request, response.clone());
+        return response;
+      } catch (error) {
+        const cached = await cache.match(event.request);
+        if (cached) return cached;
+        throw error;
+      }
+    }
     const cached = await cache.match(event.request);
     if (cached) return cached;
     const response = await fetch(event.request);

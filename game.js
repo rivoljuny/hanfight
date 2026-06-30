@@ -11,6 +11,7 @@ const stageHudText=document.getElementById("stageHudText");
 const mapHudText=document.getElementById("mapHudText");
 const skillHud=document.getElementById("skillHud");
 const startOverlay=document.getElementById("startOverlay");
+const gameOverTitle=document.getElementById("gameOverTitle");
 const levelOverlay=document.getElementById("levelOverlay");
 const pauseOverlay=document.getElementById("pauseOverlay");
 const choicesEl=document.getElementById("choices");
@@ -438,6 +439,7 @@ function resize(){
   }
   ctx.setTransform(dpr,0,0,dpr,0,0);
   ctx.imageSmoothingEnabled=false;
+  if(startOverlay)updateStartPrompt(gameOver?"restart":"start");
 }
 addEventListener("resize",resize);resize();
 addEventListener("keydown",e=>{
@@ -521,6 +523,7 @@ if(pauseTestModeBtn)pauseTestModeBtn.onclick=()=>{
   show(testMode?"테스트 모드 ON":"테스트 모드 OFF");
 };
 renderCharacterCarousel();
+updateStartPrompt("start");
 applyTestModeUi();
 applySoundUi();
 updateUltimateButton();
@@ -621,8 +624,28 @@ function activatePauseMenu(){
 }
 
 function setupMobileControls(){
-  if(!mobileStick||!mobileStickKnob)return;
+  if(!mobileControls||!mobileStick||!mobileStickKnob||!canvas)return;
   const max=30;
+  const placeControls=(clientX,clientY)=>{
+    const rect=mobileControls.getBoundingClientRect();
+    const stickRadius=50,buttonRadius=28,gap=15,edge=8;
+    const localX=clamp(clientX-rect.left,stickRadius+edge,rect.width-stickRadius-edge);
+    const localY=clamp(clientY-rect.top,stickRadius+edge,rect.height-stickRadius-edge);
+    const sideOffset=stickRadius+gap+buttonRadius;
+    let ultimateX=localX+sideOffset;
+    if(ultimateX+buttonRadius+edge>rect.width)ultimateX=localX-sideOffset;
+    ultimateX=clamp(ultimateX,buttonRadius+edge,rect.width-buttonRadius-edge);
+    const ultimateY=clamp(localY,buttonRadius+edge,rect.height-buttonRadius-edge);
+    mobileStick.style.left=`${Math.round(localX)}px`;
+    mobileStick.style.top=`${Math.round(localY)}px`;
+    if(mobileUltimateBtn){
+      mobileUltimateBtn.style.left=`${Math.round(ultimateX)}px`;
+      mobileUltimateBtn.style.top=`${Math.round(ultimateY)}px`;
+    }
+    mobileControls.classList.add("has-pad");
+    mobileInput.baseX=rect.left+localX;
+    mobileInput.baseY=rect.top+localY;
+  };
   const setStick=(clientX,clientY)=>{
     const dx=clientX-mobileInput.baseX;
     const dy=clientY-mobileInput.baseY;
@@ -639,26 +662,27 @@ function setupMobileControls(){
     mobileInput.pointerId=null;
     mobileInput.x=0;
     mobileInput.y=0;
-    if(mobileStickKnob)mobileStickKnob.style.transform="translate(0,0)";
+    mobileStickKnob.style.transform="translate(0,0)";
+    mobileControls.classList.remove("has-pad");
   };
-  mobileStick.addEventListener("pointerdown",e=>{
+  canvas.addEventListener("pointerdown",e=>{
+    if(!mobileControlsAvailable()||mobileControls.classList.contains("is-hidden")||mobileInput.active)return;
+    if(e.button!==undefined&&e.button!==0)return;
     e.preventDefault();
     unlockAudio();
+    placeControls(e.clientX,e.clientY);
     mobileInput.active=true;
     mobileInput.pointerId=e.pointerId;
-    const rect=mobileStick.getBoundingClientRect();
-    mobileInput.baseX=rect.left+rect.width/2;
-    mobileInput.baseY=rect.top+rect.height/2;
-    mobileStick.setPointerCapture(e.pointerId);
+    canvas.setPointerCapture(e.pointerId);
     setStick(e.clientX,e.clientY);
   });
-  mobileStick.addEventListener("pointermove",e=>{
+  canvas.addEventListener("pointermove",e=>{
     if(!mobileInput.active||e.pointerId!==mobileInput.pointerId)return;
     e.preventDefault();
     setStick(e.clientX,e.clientY);
   });
   ["pointerup","pointercancel","lostpointercapture"].forEach(type=>{
-    mobileStick.addEventListener(type,e=>{
+    canvas.addEventListener(type,e=>{
       if(mobileInput.pointerId!==null&&e.pointerId!==mobileInput.pointerId)return;
       resetStick();
     });
@@ -680,6 +704,7 @@ function updateMobileControlsUi(){
     mobileInput.x=0;
     mobileInput.y=0;
     if(mobileStickKnob)mobileStickKnob.style.transform="translate(0,0)";
+    mobileControls.classList.remove("has-pad");
   }
 }
 
@@ -1078,6 +1103,7 @@ function renderCharacterCarousel(){
         selectedCharacterIndex=next;
         selectedCharacter=characterSelectList[selectedCharacterIndex];
         renderCharacterCarousel();
+        if(selectedCharacter.playable)startGame();
       };
       drawCharacterCardArt(card.querySelector("canvas"),characterSelectList[Number(card.dataset.index)]);
     });
@@ -1209,7 +1235,7 @@ function rnd(a,b){return a+Math.random()*(b-a)}
 function clamp(v,a,b){return Math.max(a,Math.min(b,v))}
 function smoothstep(v){v=clamp(v,0,1);return v*v*(3-2*v)}
 function gainSp(amount){}
-function getUltimateCooldown(id=player.characterId){return id==="sangil"?8:id==="seunggwan"?12:id==="jiin"?10:15}
+function getUltimateCooldown(id=player.characterId){return id==="sangil"?8:id==="seunggwan"?12:id==="jiin"?22:15}
 function getUltimateDuration(id=player.characterId){return id==="sangil"?5:id==="seunggwan"?1.18:id==="jiin"?7:.9}
 function ultimateChargeRatio(){
   const cd=player.ultimateCdMax||getUltimateCooldown();
@@ -1766,7 +1792,7 @@ function movePlayer(dt){
     else{player.dir=y>0?"down":"up"}
   }
   const slowMul=player.slowT>0?.46:1;
-  const moveSpeed=player.speed+playerMoveBonus();
+  const moveSpeed=(player.speed+playerMoveBonus())*(player.characterId==="jiin"&&player.ultimateTimer>0?1.75:1);
   player.x=clamp(player.x+x*moveSpeed*slowMul*dt,20,world.w-20);
   player.y=clamp(player.y+y*moveSpeed*slowMul*dt,20,world.h-20);
   if(arenaFence){
@@ -3599,8 +3625,17 @@ function updateSkills(dt){
   updateDamageAura(dt);
 }
 
+function isAttackableEnemyObject(e){
+  return !!e&&e.object&&(e.id==="cultCoffin"||e.id==="cultTotem");
+}
+function canTargetEnemy(e){
+  return !!e&&!e.dead&&e.hp>0&&(!e.object||isAttackableEnemyObject(e))&&(isAttackableEnemyObject(e)||(e.inv||0)<=0);
+}
+function canDamageEnemy(e){
+  return canTargetEnemy(e)&&(e.inv||0)<=0;
+}
 function visibleEnemies(pad=24){
-  return enemies.filter(e=>!e.dead&&e.hp>0&&!e.object&&(e.inv||0)<=0&&isVisibleWorld(e.x,e.y,(e.r||24)+pad));
+  return enemies.filter(e=>canTargetEnemy(e)&&isVisibleWorld(e.x,e.y,(e.r||24)+pad));
 }
 function nearest(range=900){
   let best=null,bd=range;
@@ -3609,6 +3644,14 @@ function nearest(range=900){
     if(d<bd){bd=d;best=e}
   }
   return best;
+}
+function nearestTargets(range=900,count=1){
+  return visibleEnemies(32)
+    .map(e=>({e,d:dist(player,e)}))
+    .filter(item=>item.d<range)
+    .sort((a,b)=>a.d-b.d)
+    .slice(0,count)
+    .map(item=>item.e);
 }
 function visiblePoint(index=0,count=1,pad=96){
   const c=cam(),vw=viewW(),vh=viewH();
@@ -3669,25 +3712,32 @@ function explodeSeunggwanIronBall(p){
 function fireJiinHeartBurst(){
   const s=active("golf");if(s.t>0)return;
   const level=s.level||1;
-  const count=s.evolved?8:Math.min(6,level+1);
-  const target=nearest(820);
-  if(!target)return;
-  const baseAngle=angle(player,target);
-  s.t=(s.evolved?.22:Math.max(.42,.9-level*.07))*attackSpeedMul();
-  player.attackTimer=.34;
-  player.attackDuration=.34;
-  playSfx("selectMove");
-  for(let i=0;i<count;i++){
-    const spread=(i-(count-1)/2)*.08;
-    const a=baseAngle+spread+rnd(-.04,.04);
-    shots.push({
-      kind:"jiinHeart",
-      x:player.x+Math.cos(a)*18,
-      y:player.y-20+Math.sin(a)*18,
-      vx:Math.cos(a)*(250+level*18),vy:Math.sin(a)*(250+level*18),
-      r:5.5+s.level*.35,life:2.65,age:0,dmg:(3.2+level*1.25)*basicDamageMul(),pierce:1,
-      color:"#ff6fa8",target,homingRange:880,wobble:rnd(0,Math.PI*2),delay:i*.055
-    });
+  const rapid=!!s.evolved||player.ultimateTimer>0;
+  const targetCount=rapid?3:level>=5?3:level>=3?2:1;
+  const heartsPerTarget=rapid?1:level>=4?7:level>=2?6:5;
+  const targets=nearestTargets(820,targetCount);
+  if(!targets.length)return;
+  s.t=(rapid?.09:Math.max(.42,.9-level*.07))*attackSpeedMul();
+  player.attackTimer=rapid?.16:.34;
+  player.attackDuration=rapid?.16:.34;
+  const rapidIndex=player.jiinRapidIndex||0;
+  player.jiinRapidIndex=rapidIndex+1;
+  if(!rapid||rapidIndex%4===0)playSfx("selectMove");
+  for(let targetIndex=0;targetIndex<targets.length;targetIndex++){
+    const target=targets[targetIndex];
+    const baseAngle=angle(player,target);
+    for(let i=0;i<heartsPerTarget;i++){
+      const spread=rapid?Math.sin(rapidIndex*.82+targetIndex*1.7)*.055:(i-(heartsPerTarget-1)/2)*.08;
+      const a=baseAngle+spread+rnd(-.04,.04);
+      shots.push({
+        kind:"jiinHeart",
+        x:player.x+Math.cos(a)*18,
+        y:player.y-20+Math.sin(a)*18,
+        vx:Math.cos(a)*(250+level*18),vy:Math.sin(a)*(250+level*18),
+        r:5.5+s.level*.35,life:2.65,age:0,dmg:(4+level*1.4)*basicDamageMul(),pierce:1,
+        color:"#ff6fa8",target,homingRange:880,wobble:rnd(0,Math.PI*2),delay:rapid?0:i*.045
+      });
+    }
   }
 }
 
@@ -3954,7 +4004,7 @@ function orbitShield(dt){
   if(s.shields<=0)return;
   for(const e of enemies){
     if(s.shields<=0)break;
-    if(e.dead||e.object||e.boss||e.inv>0)continue;
+    if(!canDamageEnemy(e)||e.boss)continue;
     if((e.shieldHitAt||0)+.22>elapsed)continue;
     const hit=slots.find(o=>Math.hypot(e.x-o.x,e.y-o.y)<(e.r||14)+shieldR);
     if(!hit)continue;
@@ -4070,7 +4120,7 @@ function updateDamageAura(dt){
   const tick=damageAuraTickDelay(s);
   const dmg=damageAuraDamage(s);
   for(const e of enemies){
-    if(e.dead||e.object||(e.inv||0)>0)continue;
+    if(!canDamageEnemy(e))continue;
     if(Math.hypot(e.x-player.x,e.y-player.y)<r+e.r){
       e.auraTick=(e.auraTick||0)-dt;
       if(e.auraTick<=0){
@@ -4146,19 +4196,27 @@ function updateShots(dt){
     if(p.kind==="droneLaser")p.age=(p.age||0)+dt;
     if(p.kind==="jiinHeart"){
       p.age=(p.age||0)+dt;
-      const invalidTarget=!p.target||p.target.dead||p.target.hp<=0||p.target.object||(p.target.inv||0)>0||!enemies.includes(p.target)||Math.hypot(p.target.x-p.x,p.target.y-p.y)>(p.homingRange||820);
-      if(invalidTarget)p.target=nearest(p.homingRange||820);
-      if(!p.target){
-        shots.splice(i,1);
-        continue;
+      if(p.fading){
+        p.fadeT-=dt;
+        const drag=Math.max(0,1-dt*7);
+        p.vx*=drag;p.vy*=drag;
+        if(p.fadeT<=0){shots.splice(i,1);continue}
+      }else{
+        const invalidTarget=!canTargetEnemy(p.target)||!enemies.includes(p.target)||Math.hypot(p.target.x-p.x,p.target.y-p.y)>(p.homingRange||820);
+        if(invalidTarget){
+          p.target=null;
+          p.fading=true;
+          p.fadeT=.18;
+        }else{
+          const dx=p.target.x-p.x,dy=p.target.y-p.y,len=Math.hypot(dx,dy)||1;
+          const nx=dx/len,ny=dy/len,w=Math.sin((p.age||0)*15+(p.wobble||0))*.42;
+          const tx=nx-w*ny,ty=ny+w*nx,tl=Math.hypot(tx,ty)||1;
+          const spd=310+active("golf").level*22+(active("golf").evolved?70:0);
+          const turn=clamp(dt*7.5,0,1);
+          p.vx=p.vx*(1-turn)+(tx/tl)*spd*turn;
+          p.vy=p.vy*(1-turn)+(ty/tl)*spd*turn;
+        }
       }
-      const dx=p.target.x-p.x,dy=p.target.y-p.y,len=Math.hypot(dx,dy)||1;
-      const nx=dx/len,ny=dy/len,w=Math.sin((p.age||0)*15+(p.wobble||0))*.42;
-      const tx=nx-w*ny,ty=ny+w*nx,tl=Math.hypot(tx,ty)||1;
-      const spd=310+active("golf").level*22+(active("golf").evolved?70:0);
-      const turn=clamp(dt*7.5,0,1);
-      p.vx=p.vx*(1-turn)+(tx/tl)*spd*turn;
-      p.vy=p.vy*(1-turn)+(ty/tl)*spd*turn;
     }
     if(p.kind==="seunggwanIronBall"){
       p.age=(p.age||0)+dt;
@@ -4211,7 +4269,7 @@ function updateShots(dt){
         ?(p.phase==="hold"?lastHit!==undefined&&p.age-lastHit<.18:lastHit!==undefined)
         :false;
       const hitRadius=p.kind==="golf"&&p.phase==="hold"?42+active("golf").level*4:p.r;
-      if(p.pierce>0&&!already&&(e.inv||0)<=0&&dist(p,e)<hitRadius+e.r){
+      if(p.pierce>0&&!p.fading&&!already&&(e.inv||0)<=0&&dist(p,e)<hitRadius+e.r){
         if(p.kind==="dragonFireball"){
           explodeDragonFireball(p);
           p.life=0;
@@ -4333,7 +4391,7 @@ function updateEffects(dt){
       const ty=player.y+34;
       e.x+=(tx-e.x)*clamp(dt*5.5,0,1);
       e.y+=(ty-e.y)*clamp(dt*5.5,0,1);
-      const energyRate=(player.ultimateCdMax||getUltimateCooldown("jiin"))/Math.max(1,e.maxT||7)*1.2;
+      const energyRate=1.35;
       player.ultimateCd=Math.max(0,player.ultimateCd-dt*energyRate);
       player.hp=Math.min(player.maxHp,player.hp+dt*2);
       e.energyTick=(e.energyTick||0)-dt;
@@ -4741,23 +4799,37 @@ function renderSkillHud(){
   skillHud.innerHTML=skills.filter(s=>s.level>0).map(s=>`<div class="slot"><b>${s.icon}</b><span>${skillDisplayName(s)}</span><small>Lv.${s.level}${s.level>=s.max?" MAX":""}</small></div>`).join("");
 }
 
+function updateStartPrompt(mode="start"){
+  const btn=document.getElementById("startBtn");
+  if(!btn)return;
+  const action=mode==="restart"?"RESTART":"START";
+  btn.classList.add("press-space");
+  btn.classList.remove("end-retry");
+  if(mobileControlsAvailable()){
+    btn.innerHTML=`<span>TOUCH TO ${action}</span>`;
+  }else{
+    btn.innerHTML=`<span>PRESS</span><span class="space-key" aria-label="spacebar"></span><span>TO ${action}</span>`;
+  }
+}
+
 function openEnd(){
   stopGameBgm();
   startOverlay.classList.remove("hidden");
+  const card=startOverlay.querySelector(".start-card");
   const characterSelect=startOverlay.querySelector(".character-select");
+  const heading=startOverlay.querySelector("h1");
   if(characterSelect)characterSelect.classList.add("hidden");
-  startOverlay.querySelector("h1").textContent="퇴근 실패";
-  startOverlay.querySelector("h1").classList.remove("select-title");
+  if(heading)heading.classList.add("hidden");
+  if(gameOverTitle)gameOverTitle.classList.remove("hidden");
+  if(card)card.classList.add("game-over-card");
   let lead=startOverlay.querySelector(".lead");
   if(!lead){
     lead=document.createElement("p");
     lead.className="lead";
-    startOverlay.querySelector(".card").insertBefore(lead,startOverlay.querySelector(".start-row"));
+    card.insertBefore(lead,startOverlay.querySelector(".start-row"));
   }
-  lead.textContent=`${Math.floor(elapsed)}초 동안 버티고 ${kills}건의 업무 압박을 처리했습니다. 스페이스바로 다시 계획을 세우세요.`;
-  document.getElementById("startBtn").textContent="다시 시작";
-  document.getElementById("startBtn").classList.remove("press-space");
-  document.getElementById("startBtn").classList.add("end-retry");
+  lead.textContent=`${Math.floor(elapsed)}초 생존 · 사회 진상 ${kills}명 처치`;
+  updateStartPrompt("restart");
   document.getElementById("startBtn").onclick=restart;
 }
 
@@ -4777,6 +4849,7 @@ function draw(){
   drawDragonCompanion();
   drawIceBirdCompanion();
   drawOrbitShields();
+  drawJiinUltimateAura();
   drawPlayer();
   drawPlayerBarrier();
   drawPlayerStatusBars();
@@ -5163,6 +5236,31 @@ function drawStageOverlay(){
   ctx.lineWidth=Math.max(3,7*scale);
   ctx.strokeText(theme.name,0,76*scale);
   ctx.fillText(theme.name,0,76*scale);
+  ctx.restore();
+}
+
+function drawJiinUltimateAura(){
+  if(player.characterId!=="jiin"||player.ultimateTimer<=0||!jiinSprite.complete||!jiinSprite.naturalWidth)return;
+  const rowByDir={down:0,side:player.face<0?1:2,up:3};
+  const row=rowByDir[player.dir]??0;
+  const col=player.moving?Math.floor(player.frame)%4:Math.floor(elapsed*2)%4;
+  const fw=Math.floor(jiinSprite.naturalWidth/4),fh=Math.floor(jiinSprite.naturalHeight/4);
+  const walk=player.moving?Math.sin(player.frame*1.45):0;
+  const bob=player.moving?Math.abs(walk)*.6:0;
+  const lean=player.moving&&player.dir==="side"?player.face*walk*.018:0;
+  const size=88,drawX=-size/2,drawY=-57-bob;
+  ctx.save();
+  ctx.translate(Math.round(player.x),Math.round(player.y));
+  ctx.rotate(lean);
+  ctx.imageSmoothingEnabled=false;
+  ctx.globalCompositeOperation="lighter";
+  for(let i=0;i<3;i++){
+    const phase=elapsed*2.8+i*Math.PI*2/3;
+    ctx.globalAlpha=.2+.05*Math.sin(phase*1.7);
+    ctx.shadowColor=`hsl(${(elapsed*95+i*112)%360} 95% 67%)`;
+    ctx.shadowBlur=10+3*Math.sin(phase);
+    ctx.drawImage(jiinSprite,fw*col,fh*row,fw,fh,drawX+Math.cos(phase)*1.8,drawY+Math.sin(phase)*1.8,size,size);
+  }
   ctx.restore();
 }
 
@@ -6357,6 +6455,7 @@ function drawShot(p){
     const a=Math.atan2(p.vy,p.vx);
     const pulse=1+Math.sin((p.age||0)*18+(p.wobble||0))*.1;
     ctx.save();
+    ctx.globalAlpha=p.fading?clamp((p.fadeT||0)/.18,0,1):1;
     ctx.translate(p.x,p.y);
     ctx.rotate(a+Math.PI/2);
     ctx.scale(pulse*.62,pulse*.62);
@@ -7864,7 +7963,7 @@ const passiveSkillIconIndex={moveSpeed:0,xpGain:1,maxHealth:2,cooldownDown:3,att
 function skillIconHtml(s){
   const isPassive=s.type==="passive";
   if(s.id==="golf"||s.id==="magnetRange"){
-    if(s.id==="golf"&&player.characterId==="jiin")return `<b class="skill-symbol">♥</b>`;
+    if(s.id==="golf"&&player.characterId==="jiin")return `<b class="skill-icon basic" style="background-image:url('assets/skill_icon_jiin_heart.png?v=20260630-5');background-size:cover;background-position:center;background-repeat:no-repeat">${s.icon}</b>`;
     if(s.id==="golf"&&player.characterId==="seunggwan"){
       return `<b class="skill-icon basic" style="background-image:url('assets/seunggwan_iron_ball_icon.png');background-size:contain;background-position:center;background-repeat:no-repeat">${s.icon}</b>`;
     }
@@ -7961,7 +8060,7 @@ skillDisplayName=function(s){
 skillDisplayDesc=function(s){
   if(player.characterId==="sangil"&&s.id==="golf")return "투사체 없이 전방 근접 범위만 공격합니다.";
   if(player.characterId==="seunggwan"&&s.id==="golf")return "철공을 포물선으로 던져 낙하지점 주변에 스플래시 피해를 줍니다.";
-  if(player.characterId==="jiin"&&s.id==="golf")return "가까운 적에게 지그재그로 휘어지는 약한 하트 유도탄을 연발합니다. 진화하면 거의 끊기지 않습니다.";
+  if(player.characterId==="jiin"&&s.id==="golf")return "레벨에 따라 최대 3명의 적에게 하트를 다중 연발합니다. 진화하면 3명을 향해 끊임없이 발사합니다.";
   return s.desc;
 };
 renderSkillHud=function(){
@@ -7990,7 +8089,7 @@ function __setMobileUltimateIcon(characterId){
   const hasMobile=typeof mobileUltimateBtn!=="undefined"&&mobileUltimateBtn;
   const hasPc=typeof ultimateBtn!=="undefined"&&ultimateBtn;
   if(!hasMobile&&!hasPc)return;
-  const src=characterId==="sangil"?"assets/ultimate_icon_sangil.png":characterId==="seunggwan"?"assets/ultimate_icon_seunggwan_chroma.png":characterId==="jiin"?"assets/character_portraits_small/jiin.png":"assets/ultimate_icon_geontaek_chroma.png";
+  const src=characterId==="sangil"?"assets/ultimate_icon_sangil.png":characterId==="seunggwan"?"assets/ultimate_icon_seunggwan_chroma.png":characterId==="jiin"?"assets/ultimate_icon_jiin.png?v=20260630-5":"assets/ultimate_icon_geontaek_chroma.png";
   const rawUrl=`url("${src}")`;
   if(hasMobile)mobileUltimateBtn.style.setProperty("--ultimate-icon-url",rawUrl);
   if(hasPc)ultimateBtn.style.setProperty("--ultimate-icon-url",rawUrl);
@@ -8023,7 +8122,7 @@ function __setMobileUltimateIcon(characterId){
       let minX=srcCanvas.width,minY=srcCanvas.height,maxX=0,maxY=0;
       for(let i=0;i<data.length;i+=4){
         const r=data[i],g=data[i+1],b=data[i+2];
-        if(g>140&&r<125&&b<125)data[i+3]=0;
+        if(src!=="assets/ultimate_icon_jiin.png?v=20260630-5"&&g>140&&r<125&&b<125)data[i+3]=0;
         if(data[i+3]>8){
           const px=(i/4)%srcCanvas.width;
           const py=Math.floor((i/4)/srcCanvas.width);
@@ -8084,7 +8183,7 @@ updateUltimateButton=function(){
   const characterId=typeof player!=="undefined"&&player&&player.characterId==="sangil"?"sangil":typeof player!=="undefined"&&player&&player.characterId==="seunggwan"?"seunggwan":typeof player!=="undefined"&&player&&player.characterId==="jiin"?"jiin":"geontaek";
   const ratio=typeof ultimateChargeRatio==="function"?Math.max(0,Math.min(1,ultimateChargeRatio())):1;
   const isCooling=1-ratio>.01;
-  const src=characterId==="sangil"?"assets/ultimate_icon_sangil.png":characterId==="seunggwan"?"assets/ultimate_icon_seunggwan_chroma.png":characterId==="jiin"?"assets/character_portraits_small/jiin.png":"assets/ultimate_icon_geontaek_chroma.png";
+  const src=characterId==="sangil"?"assets/ultimate_icon_sangil.png":characterId==="seunggwan"?"assets/ultimate_icon_seunggwan_chroma.png":characterId==="jiin"?"assets/ultimate_icon_jiin.png?v=20260630-5":"assets/ultimate_icon_geontaek_chroma.png";
   const rawUrl=`url("${src}")`;
   ultimateBtn.style.setProperty("--ultimate-icon-url",rawUrl);
   ultimateBtn.dataset.character=characterId;
@@ -8584,5 +8683,5 @@ updateUltimateButton=function(){
   }
 })();
 if("serviceWorker" in navigator && location.protocol.startsWith("http")){
-  window.addEventListener("load",()=>navigator.serviceWorker.register("sw.js").catch(()=>{}));
+  window.addEventListener("load",()=>navigator.serviceWorker.register("sw.js?v=20260630-5",{updateViaCache:"none"}).catch(()=>{}));
 }

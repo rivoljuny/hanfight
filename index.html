@@ -4,7 +4,8 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
   <title>HAN-SERVIVE</title>
-  <link rel="stylesheet" href="style.css">
+  <!-- Cache version: increment whenever game files change -->
+  <link rel="stylesheet" href="style.css?v=20260630-5">
 </head>
 <body>
   <div class="app">
@@ -56,6 +57,7 @@
     <div id="startOverlay" class="overlay">
       <div class="card start-card">
         <h1 class="select-title">SELECT PLAYER</h1>
+        <img id="gameOverTitle" class="game-over-title hidden" src="assets/game_over_title.png?v=20260630-5" alt="GAME OVER">
         <div class="character-select">
           <div class="carousel" id="characterCarousel">
             <button class="carousel-btn prev" id="characterPrev" type="button" aria-label="이전 캐릭터">‹</button>
@@ -72,7 +74,7 @@
 
     <div id="levelOverlay" class="overlay hidden">
       <div class="card">
-        <h2>레벨업: 다음 계획을 선택</h2>
+        <h2>LEVEL UP</h2>
         <div id="choices" class="choices"></div>
       </div>
     </div>
@@ -91,6 +93,6 @@
     </div>
   </div>
 
-<script src="game.js"></script>
+<script src="game.js?v=20260630-5"></script>
 </body>
 </html>

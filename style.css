@@ -832,3 +832,102 @@
   .choices.test-all-choices .choice strong{font-size:10.5px !important;min-height:24px !important}
   .choices.test-all-choices .choice p{display:none !important}
 }
+
+/* Floating mobile touch controls */
+@media (pointer:coarse),(max-width:760px){
+  .mobile-controls{
+    top:var(--game-top) !important;
+    bottom:auto !important;
+    height:var(--game-h) !important;
+    padding:0 !important;
+    display:block;
+    overflow:visible;
+  }
+  .mobile-stick{
+    position:absolute !important;
+    left:0;
+    top:0;
+    transform:translate(-50%,-50%);
+    opacity:0;
+    visibility:hidden;
+    pointer-events:none !important;
+    transition:opacity .1s linear;
+  }
+  .mobile-stick-knob{pointer-events:none}
+  .mobile-actions{display:contents !important}
+  .mobile-action.ultimate{
+    position:absolute !important;
+    left:0;
+    top:0;
+    width:56px !important;
+    min-width:56px !important;
+    height:56px !important;
+    border-radius:50% !important;
+    transform:translate(-50%,-50%) !important;
+    opacity:0;
+    visibility:hidden;
+    pointer-events:none;
+    transition:opacity .1s linear,filter .12s linear !important;
+  }
+  .mobile-action.ultimate::after{border-radius:50% !important}
+  .mobile-controls.has-pad .mobile-stick,
+  .mobile-controls.has-pad .mobile-action.ultimate{
+    opacity:1;
+    visibility:visible;
+  }
+  .mobile-controls.has-pad .mobile-action.ultimate{pointer-events:auto}
+}
+
+/* Softer floating mobile controls */
+@media (pointer:coarse),(max-width:760px){
+  .mobile-stick{
+    border-color:rgba(182,231,238,.38) !important;
+    background:rgba(9,17,24,.18) !important;
+    box-shadow:0 5px 14px rgba(0,0,0,.16),inset 0 0 0 1px rgba(210,248,255,.08) !important;
+    backdrop-filter:blur(1px);
+  }
+  .mobile-stick::before{border-color:rgba(139,225,235,.18) !important}
+  .mobile-stick-knob{
+    background:rgba(177,224,229,.66) !important;
+    border-color:rgba(8,18,24,.62) !important;
+    box-shadow:0 2px 7px rgba(0,0,0,.22),inset 0 1px 0 rgba(255,255,255,.28) !important;
+  }
+  .mobile-action.ultimate{
+    background:rgba(14,24,34,.72) !important;
+    border-color:rgba(158,225,231,.56) !important;
+    box-shadow:0 3px 0 rgba(5,10,15,.62),0 0 0 2px rgba(255,111,168,.18) inset,0 6px 15px rgba(0,0,0,.22) !important;
+  }
+  .mobile-action.ultimate.ready{
+    box-shadow:0 3px 0 rgba(5,10,15,.62),0 0 0 2px rgba(99,230,218,.42) inset,0 0 13px rgba(255,111,168,.3),0 6px 15px rgba(0,0,0,.22) !important;
+  }
+  .mobile-action.ultimate::before{opacity:.9}
+  .mobile-controls.has-pad .mobile-stick{opacity:.6}
+  .mobile-controls.has-pad .mobile-action.ultimate{opacity:.78}
+}
+
+/* Game over presentation */
+.game-over-card{text-align:center}
+.game-over-title{
+  display:block;
+  width:min(820px,88vw);
+  max-width:100%;
+  max-height:38vh;
+  margin:0 auto;
+  object-fit:contain;
+  image-rendering:pixelated;
+  filter:drop-shadow(0 9px 0 rgba(5,8,12,.82)) drop-shadow(0 0 22px rgba(255,70,82,.34));
+}
+.game-over-title.hidden{display:none !important}
+.game-over-card .lead{
+  margin:18px 0 4px;
+  color:#d9e9f1;
+  font-weight:800;
+  text-align:center;
+}
+@media (pointer:coarse),(max-width:760px){
+  .select-hint{display:none !important}
+  .game-over-card{width:min(430px,100%) !important}
+  .game-over-title{width:94%;max-height:30vh}
+  .game-over-card .lead{margin-top:12px;font-size:13px}
+  .game-over-card .press-space{font-size:18px !important;letter-spacing:1px !important}
+}
