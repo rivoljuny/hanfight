@@ -49,6 +49,11 @@ const bgmVolumeValue=document.getElementById("bgmVolumeValue");
 const sfxVolumeBtn=document.getElementById("sfxVolumeBtn");
 const sfxVolumeValue=document.getElementById("sfxVolumeValue");
 const pauseTestModeBtn=document.getElementById("pauseTestModeBtn");
+const pauseLevelUpBtn=document.getElementById("pauseLevelUpBtn");
+const pauseInvincibleBtn=document.getElementById("pauseInvincibleBtn");
+const testSelectOverlay=document.getElementById("testSelectOverlay");
+const testSelectChoices=document.getElementById("testSelectChoices");
+const testSelectCloseBtn=document.getElementById("testSelectCloseBtn");
 const characterCarousel=document.getElementById("characterCarousel");
 const characterCardsEl=document.getElementById("characterCards");
 const characterPrevBtn=document.getElementById("characterPrev");
@@ -129,6 +134,8 @@ const golfClubSpinSprite=new Image();
 golfClubSpinSprite.src="assets/golf_club_spin_sheet.png";
 const bgTile=new Image();
 bgTile.src="assets/office_floor_tile_life.png";
+const estechTile=new Image();
+estechTile.src="assets/estech_factory_tile.png";
 const bikeRoadTile=new Image();
 bikeRoadTile.src="assets/bike_road_tile.png";
 const factoryTapeTile=new Image();
@@ -260,6 +267,16 @@ const emotionSlamImpactSprite=new Image();
 emotionSlamImpactSprite.src="assets/boss_emotion_slam_impact.png";
 const emotionRoarWaveSprite=new Image();
 emotionRoarWaveSprite.src="assets/boss_emotion_roar_wave.png";
+const estechEnemyAtlas=new Image();
+estechEnemyAtlas.src="assets/enemy_estech_atlas.png";
+const parkSejunFamilySprite=new Image();
+parkSejunFamilySprite.src="assets/boss_park_sejun_family.png";
+const parkSejunPhase2Sprite=new Image();
+parkSejunPhase2Sprite.src="assets/boss_park_sejun_phase2.png";
+const seoroSpinSprite=new Image();
+seoroSpinSprite.src="assets/boss_seoro_spin_return.png";
+const parkSejunElectricFxSprite=new Image();
+parkSejunElectricFxSprite.src="assets/boss_park_sejun_electric_fx.png";
 const BOSS_NAG_SKILL={range:320,arc:Math.PI*.42,imgX:16,imgY:-120,imgW:330,imgH:240};
 const BOSS_KICK_SKILL={castT:.62,len:620,wide:74,dashT:.62,dashSpeed:920};
 const BOSS_STAMP_WAVE_DELAY=.28;
@@ -304,7 +321,8 @@ const stageBgmSources={
   factory:{normal:"assets/bgm/tape_factory_normal.mp3",boss:"assets/bgm/tape_factory_boss.mp3"},
   bike:{normal:"assets/bgm/cycle_normal.mp3",boss:"assets/bgm/cycle_boss.mp3"},
   logistics:{normal:"assets/bgm/box_factory_normal.mp3",boss:"assets/bgm/box_factory_boss.mp3"},
-  gym:{normal:"assets/bgm/cross_gym_normal.mp3",boss:"assets/bgm/cross_gym_boss.mp3"}
+  gym:{normal:"assets/bgm/cross_gym_normal.mp3",boss:"assets/bgm/cross_gym_boss.mp3"},
+  estech:{normal:"assets/bgm/tape_factory_normal.mp3",boss:"assets/bgm/tape_factory_boss.mp3"}
 };
 const sfxLast={};
 let keys={},mouse={x:0,y:0};
@@ -314,7 +332,7 @@ let spawnTimer=0,elapsed=0,kills=0,shake=0;
 let stageClearMode=false,stageClearBanner={t:0,maxT:0,text:""};
 let stageClearTimer=0,postBossPower=0,currentStage=1,stageBanner={t:0,maxT:0,stage:1};
 let stage2Start=0,stage3Start=0;
-let outdoorBlend=0,factoryBlend=0,logisticsBlend=0,gymBlend=0;
+let outdoorBlend=0,factoryBlend=0,logisticsBlend=0,gymBlend=0,estechBlend=0;
 let currentThemeId="office",stageThemeIds={},stageThemeBag=[];
 let bossVsCutscene={active:false,t:0,maxT:0,bossId:"juDaeri",stage:1};
 let pendingBossVs=false;
@@ -328,7 +346,8 @@ const stageThemes=[
   {id:"factory",name:"테이프 공장",bossId:"juDaeri"},
   {id:"bike",name:"자전거도로",bossId:"cultFanatic"},
   {id:"logistics",name:"물류센터",bossId:"gossipGroup"},
-  {id:"gym",name:"강호 크로스핏 센터",bossId:"emotionCeo"}
+  {id:"gym",name:"강호 크로스핏 센터",bossId:"emotionCeo"},
+  {id:"estech",name:"에스테크",bossId:"parkSejunFamily"}
 ];
 let boss1Spawned=false;
 let boss2Spawned=false;
@@ -403,7 +422,12 @@ const enemyTypes=[
   {id:"gymBodybuilder",name:"덤벨 헬창",hp:68,spd:92,dmg:13,xp:13,color:"#1f2024",tie:"#c84c4c",size:25,drawSize:86,ranged:true,range:410,shootCd:2.55,projectileDmg:11,projectileSpeed:430,attackKind:"dumbbellBoomerang"},
   {id:"doubleScooterStudents",name:"네임드: 노헬멧 2인승 킥보드",hp:220,spd:250,dmg:18,xp:28,color:"#243a63",tie:"#d74b4b",size:28,drawSize:112,spriteRows:4,namedEnemy:true},
   {id:"pigeonFlock",name:"도심 비둘기",hp:8,spd:185,dmg:6,xp:1,color:"#8e98a8",tie:"#55b99a",size:14,drawSize:54,spriteRows:4,hideHp:true},
-  {id:"cultMinion",name:"좀비 광신도",hp:20,spd:118,dmg:8,xp:3,color:"#8a6d86",tie:"#d5b34d",size:22,drawSize:76}
+  {id:"cultMinion",name:"좀비 광신도",hp:20,spd:118,dmg:8,xp:3,color:"#8a6d86",tie:"#d5b34d",size:22,drawSize:76},
+  {id:"wireWorker",name:"전선 둘둘 작업자",hp:46,spd:118,dmg:11,xp:8,size:21,drawSize:78,estechAtlasRow:0},
+  {id:"powerStripOctopus",name:"멀티탭 문어",hp:40,spd:92,dmg:8,xp:10,size:22,drawSize:80,estechAtlasRow:1,ranged:true,range:390,shootCd:2.25,projectileDmg:9,projectileSpeed:420,attackKind:"electricPlug"},
+  {id:"breakerShield",name:"차단기 딸깍맨",hp:92,spd:72,dmg:15,xp:15,size:26,drawSize:88,estechAtlasRow:2,ranged:true,range:310,shootCd:3.1,projectileDmg:12,projectileSpeed:350,attackKind:"breakerBolt"},
+  {id:"wiringRookie",name:"배선도 거꾸로 본 신입",hp:34,spd:158,dmg:9,xp:9,size:20,drawSize:76,estechAtlasRow:3,zigzag:true},
+  {id:"liveWireMan",name:"절연장갑 안 낀 활선맨",hp:52,spd:134,dmg:13,xp:12,size:22,drawSize:82,estechAtlasRow:4,volatile:true}
 ];
 function basePlayerMaxHp(){
   if(player.characterId==="sangil")return 82;
@@ -444,6 +468,7 @@ function resize(){
 addEventListener("resize",resize);resize();
 addEventListener("keydown",e=>{
   keys[e.key.toLowerCase()]=true;
+  if(e.key==="Escape"&&overlayVisible(testSelectOverlay)){e.preventDefault();closeTestSelect();return}
   if(e.key==="Escape"&&!overlayVisible(startOverlay)&&!overlayVisible(levelOverlay)&&!gameOver){e.preventDefault();pauseMenuOpen?closePauseMenu():openPauseMenu();return}
   if(handleMenuKey(e))return;
   try{unlockAudio()}catch(err){}
@@ -518,9 +543,18 @@ if(homeBtn)homeBtn.onclick=()=>restart();
 if(soundToggleBtn)soundToggleBtn.onclick=()=>setSoundOn(!soundOn);
 if(bgmVolumeBtn)bgmVolumeBtn.onclick=e=>setBgmVolumeLevel(bgmVolumeLevel+(Number(e.target?.dataset?.dir)||1));
 if(sfxVolumeBtn)sfxVolumeBtn.onclick=e=>setSfxVolumeLevel(sfxVolumeLevel+(Number(e.target?.dataset?.dir)||1));
-if(pauseTestModeBtn)pauseTestModeBtn.onclick=()=>{
-  setTestMode(!testMode);
-  show(testMode?"테스트 모드 ON":"테스트 모드 OFF");
+if(pauseTestModeBtn)pauseTestModeBtn.onclick=()=>openTestSelect();
+if(pauseLevelUpBtn)pauseLevelUpBtn.onclick=()=>openTestLevelUp();
+if(pauseInvincibleBtn)pauseInvincibleBtn.onclick=()=>{
+  setTestMode(true);
+  testInvincible=!testInvincible;
+  applyTestModeUi();
+};
+if(testSelectCloseBtn)testSelectCloseBtn.onclick=()=>closeTestSelect();
+if(testSelectChoices)testSelectChoices.onclick=e=>{
+  const button=e.target.closest("button[data-test-stage]");
+  if(!button)return;
+  enterTestDestination(Number(button.dataset.testStage),button.dataset.testBoss==="1");
 };
 renderCharacterCarousel();
 updateStartPrompt("start");
@@ -537,14 +571,14 @@ function setTestMode(on){
   if(testMode){player.ultimateCd=0;updateUltimateButton()}
 }
 function applyTestModeUi(){
-  testTools.classList.toggle("on",testMode);
-  testModeBtn.classList.toggle("on",testMode);
-  testModeBtn.textContent=testMode?"테스트 ON":"테스트 OFF";
+  if(testTools)testTools.classList.toggle("on",testMode);
+  if(testModeBtn){testModeBtn.classList.toggle("on",testMode);testModeBtn.textContent=testMode?"테스트 ON":"테스트 OFF";}
   if(invincibleTestBtn){
     invincibleTestBtn.classList.toggle("on",testInvincible);
     invincibleTestBtn.textContent=testInvincible?"무적 ON":"무적 OFF";
   }
-  if(pauseTestModeBtn)pauseTestModeBtn.textContent=testMode?"테스트모드 ON":"테스트모드 OFF";
+  if(pauseTestModeBtn)pauseTestModeBtn.textContent="테스트 선택";
+  if(pauseInvincibleBtn){pauseInvincibleBtn.classList.toggle("on",testInvincible);pauseInvincibleBtn.textContent=testInvincible?"무적 ON":"무적 OFF";}
 }
 function bgmVolume(){
   return soundOn?BGM_VOLUME*(bgmVolumeLevel/10):0;
@@ -605,7 +639,7 @@ function closePauseMenu(){
   startGameBgm();
 }
 function pauseMenuButtons(){
-  return [resumeBtn,homeBtn,soundToggleBtn,bgmVolumeBtn,sfxVolumeBtn,pauseTestModeBtn].filter(Boolean);
+  return [resumeBtn,homeBtn,soundToggleBtn,bgmVolumeBtn,sfxVolumeBtn,pauseTestModeBtn,pauseLevelUpBtn,pauseInvincibleBtn].filter(Boolean);
 }
 function updatePauseMenuSelection(){
   const buttons=pauseMenuButtons();
@@ -621,6 +655,66 @@ function movePauseMenu(delta){
 function activatePauseMenu(){
   const buttons=pauseMenuButtons();
   if(buttons[pauseMenuIndex])buttons[pauseMenuIndex].click();
+}
+
+function renderTestDestinations(){
+  if(!testSelectChoices)return;
+  testSelectChoices.innerHTML=stageThemes.map((theme,index)=>{
+    const stage=index+1;
+    return `<article class="test-destination">
+      <small>${stage} STAGE</small>
+      <div><strong>${theme.name}</strong><span>스테이지 시작 또는 ${theme.bossId?"보스전 직행":"스테이지 테스트"}</span></div>
+      <div class="test-destination-actions">
+        <button type="button" data-test-stage="${stage}">스테이지</button>
+        <button type="button" data-test-stage="${stage}" data-test-boss="1"${theme.bossId?"":" disabled"}>보스</button>
+      </div>
+    </article>`;
+  }).join("");
+}
+
+function openTestSelect(){
+  if(gameOver||mobileControlsAvailable())return;
+  setTestMode(true);
+  renderTestDestinations();
+  pauseMenuOpen=false;
+  pauseOverlay.classList.add("hidden");
+  testSelectOverlay.classList.remove("hidden");
+  paused=true;
+}
+
+function closeTestSelect(){
+  if(!overlayVisible(testSelectOverlay))return;
+  testSelectOverlay.classList.add("hidden");
+  openPauseMenu();
+}
+
+function openTestLevelUp(){
+  if(gameOver||mobileControlsAvailable())return;
+  setTestMode(true);
+  pauseMenuOpen=false;
+  pauseOverlay.classList.add("hidden");
+  testLevelAllChoices=true;
+  player.xp=player.next;
+  levelUp();
+}
+
+function enterTestDestination(stage,boss=false){
+  const theme=stageThemes[stage-1];
+  if(!theme)return;
+  setTestMode(true);
+  startFromTest();
+  if(testSelectOverlay)testSelectOverlay.classList.add("hidden");
+  enemies.length=0;shots.length=0;bossShots.length=0;effects.length=0;floaters.length=0;gems.length=0;
+  stageClearMode=false;stageClearTimer=0;stageClearBanner={t:0,maxT:0,text:""};pendingBossVs=false;arenaFence=null;
+  currentStage=stage;stageThemeIds[stage]=theme.id;currentThemeId=theme.id;
+  elapsed=stage===1?0:1000+stage*120;stage2Start=stage===2?elapsed:elapsed-180;stage3Start=stage>=3?elapsed:0;
+  wave1.started=stage>1||boss;wave1.active=false;wave1.done=stage>1||boss;wave1.start=0;wave1.banner=0;
+  wave2.started=stage>2||boss;wave2.active=false;wave2.done=stage>2||boss;wave2.start=0;wave2.banner=0;
+  wave3.started=boss;wave3.active=false;wave3.done=boss;wave3.start=0;wave3.banner=0;
+  bossStageSpawned={};boss1Spawned=false;boss2Spawned=false;postBossPower=stage>1?1:0;spawnTimer=boss?9999:0;
+  showStageBanner(stage);syncThemeBlend(true);player.inv=Math.max(player.inv,1);
+  if(boss){createArenaFence();bossVsCutscene={active:false,t:0,maxT:0,bossId:theme.bossId,stage};pendingBossVs=true}
+  show(`테스트: ${stage} STAGE ${theme.name}${boss?" 보스":""} 진입`);
 }
 
 function setupMobileControls(){
@@ -787,13 +881,14 @@ function resetStageThemes(){
   stageThemeIds={};
   stageThemeBag=shuffledThemeBag();
   for(let stage=1;stage<=5;stage++){
-    if(!stageThemeBag.length)stageThemeBag=shuffledThemeBag(stageThemeIds[stage-1]);
+    if(!stageThemeBag.length)stageThemeBag=shuffledThemeBag(stageThemeIds[stage-1],stage>6);
     stageThemeIds[stage]=stageThemeBag.shift();
   }
+  stageThemeIds[6]="estech";
   currentThemeId=stageThemeIds[1]||"office";
 }
-function shuffledThemeBag(avoidFirst=null){
-  const bag=stageThemes.map(t=>t.id);
+function shuffledThemeBag(avoidFirst=null,includeEstech=false){
+  const bag=stageThemes.filter(t=>includeEstech||t.id!=="estech").map(t=>t.id);
   for(let i=bag.length-1;i>0;i--){
     const j=Math.floor(Math.random()*(i+1));
     [bag[i],bag[j]]=[bag[j],bag[i]];
@@ -806,8 +901,9 @@ function shuffledThemeBag(avoidFirst=null){
 }
 function themeForStage(stage=currentStage){
   stage=Math.max(1,stage||1);
+  if(stage===6)stageThemeIds[stage]="estech";
   if(!stageThemeIds[stage]){
-    if(!stageThemeBag.length)stageThemeBag=shuffledThemeBag(stageThemeIds[stage-1]);
+    if(!stageThemeBag.length)stageThemeBag=shuffledThemeBag(stageThemeIds[stage-1],stage>6);
     stageThemeIds[stage]=stageThemeBag.shift();
   }
   return stageThemes.find(t=>t.id===stageThemeIds[stage])||stageThemes[0];
@@ -826,15 +922,16 @@ function stageAge(stage=currentStage){
   return Math.max(0,elapsed-stage3Start);
 }
 function themeBlendTarget(theme=activeTheme()){
-  if(theme.id==="bike")return {outdoor:1,factory:0,logistics:0,gym:0};
-  if(theme.id==="factory")return {outdoor:0,factory:1,logistics:0,gym:0};
-  if(theme.id==="logistics")return {outdoor:0,factory:0,logistics:1,gym:0};
-  if(theme.id==="gym")return {outdoor:0,factory:0,logistics:0,gym:1};
-  return {outdoor:0,factory:0,logistics:0,gym:0};
+  if(theme.id==="estech")return {outdoor:0,factory:0,logistics:0,gym:0,estech:1};
+  if(theme.id==="bike")return {outdoor:1,factory:0,logistics:0,gym:0,estech:0};
+  if(theme.id==="factory")return {outdoor:0,factory:1,logistics:0,gym:0,estech:0};
+  if(theme.id==="logistics")return {outdoor:0,factory:0,logistics:1,gym:0,estech:0};
+  if(theme.id==="gym")return {outdoor:0,factory:0,logistics:0,gym:1,estech:0};
+  return {outdoor:0,factory:0,logistics:0,gym:0,estech:0};
 }
 function syncThemeBlend(instant=false){
   const target=themeBlendTarget();
-  if(instant){outdoorBlend=target.outdoor;factoryBlend=target.factory;logisticsBlend=target.logistics;gymBlend=target.gym}
+  if(instant){outdoorBlend=target.outdoor;factoryBlend=target.factory;logisticsBlend=target.logistics;gymBlend=target.gym;estechBlend=target.estech}
 }
 function approach(value,target,step){
   if(value<target)return Math.min(target,value+step);
@@ -1708,6 +1805,7 @@ function updateStageClear(dt){
   factoryBlend=approach(factoryBlend,target.factory,dt*OUTDOOR_BLEND_SPEED);
   logisticsBlend=approach(logisticsBlend,target.logistics,dt*OUTDOOR_BLEND_SPEED);
   gymBlend=approach(gymBlend,target.gym,dt*OUTDOOR_BLEND_SPEED);
+  estechBlend=approach(estechBlend,target.estech,dt*OUTDOOR_BLEND_SPEED);
   if(stageClearMode&&stageClearTimer>0){
     stageClearTimer=Math.max(0,stageClearTimer-dt);
     if(stageClearTimer<=0)finishBossClear();
@@ -1716,7 +1814,7 @@ function updateStageClear(dt){
 
 function finishBossClear(){
   stageClearMode=false;
-  const nextStage=Math.min(5,(currentStage||1)+1);
+  const nextStage=(currentStage||1)+1;
   showStageBanner(nextStage);
   postBossPower=nextStage>=2?1:0;
   if(nextStage===2){
@@ -1768,7 +1866,8 @@ function updateBossVsCutscene(dt){
   bossVsCutscene.t=Math.max(0,bossVsCutscene.t-dt);
   if(bossVsCutscene.t<=0){
     bossVsCutscene.active=false;
-    if(bossVsCutscene.bossId==="emotionCeo")spawnBoss5(bossVsCutscene.stage);
+    if(bossVsCutscene.bossId==="parkSejunFamily")spawnBoss6(bossVsCutscene.stage);
+    else if(bossVsCutscene.bossId==="emotionCeo")spawnBoss5(bossVsCutscene.stage);
     else if(bossVsCutscene.bossId==="cultFanatic")spawnBoss3(bossVsCutscene.stage);
     else if(bossVsCutscene.bossId==="cheonSangmu")spawnBoss2(bossVsCutscene.stage);
     else if(bossVsCutscene.bossId==="gossipGroup")spawnBoss4(bossVsCutscene.stage);
@@ -1835,8 +1934,8 @@ function triggerStageClearPose(){
 
 function beginBossClear(b){
   stageClearMode=true;
-  const clearText=b.id==="emotionCeo"?"사장님~~~ 컷 !!!":b.id==="gossipGroup"?"뒷담화꾼~~~ 컷 !!!":b.id==="cultFanatic"?"광신도~~~ 컷 !!!":b.id==="cheonSangmu"?"천상무~~~ 컷 !!!":"주대리~~~ 컷 !!!";
-  const clearColor=b.id==="emotionCeo"?"#69d7ff":b.id==="gossipGroup"?"#ff7ad8":b.id==="cultFanatic"?"#b56cff":b.id==="cheonSangmu"?"#ffd15a":"#ff5c78";
+  const clearText=b.id==="parkSejunFamily"?"박세준과 서호서로~~~ 컷 !!!":b.id==="emotionCeo"?"사장님~~~ 컷 !!!":b.id==="gossipGroup"?"뒷담화꾼~~~ 컷 !!!":b.id==="cultFanatic"?"광신도~~~ 컷 !!!":b.id==="cheonSangmu"?"천상무~~~ 컷 !!!":"주대리~~~ 컷 !!!";
+  const clearColor=b.id==="parkSejunFamily"?"#55d9ff":b.id==="emotionCeo"?"#69d7ff":b.id==="gossipGroup"?"#ff7ad8":b.id==="cultFanatic"?"#b56cff":b.id==="cheonSangmu"?"#ffd15a":"#ff5c78";
   stageClearBanner={t:1.65,maxT:1.65,text:clearText};
   playSfx("bossDeath");
   shots.length=0;
@@ -1861,7 +1960,7 @@ function beginBossClear(b){
 }
 
 function waveTargetCount(stage=currentStage){
-  const s=clamp(stage||1,1,5);
+  const s=clamp(stage||1,1,20);
   return Math.round(18+s*9+Math.max(0,s-2)*5);
 }
 function prepareWave(wave,stage=currentStage){
@@ -1933,7 +2032,7 @@ function updateWaveState(dt){
     wave3.banner=2.4;
     spawnTimer=0;
     shake=12;
-    show("3 WAVE: 광신도 공장 난입");
+    show(activeTheme().id==="estech"?"6 WAVE: 배전반 과부하 발생":"3 WAVE: 광신도 공장 난입");
   }
   if(wave3.active&&elapsed-wave3.start>=9&&waveCanFinish(wave3)){
     wave3.active=false;
@@ -2059,6 +2158,83 @@ function spawnBoss5(stage=currentStage){
   shake=14;
 }
 
+function spawnBoss6(stage=currentStage){
+  if(bossStageSpawned[stage])return;
+  bossStageSpawned[stage]=true;
+  const scale=bossStageScale(stage),cx=arenaFence?arenaFence.x+arenaFence.w/2:player.x+260,cy=arenaFence?arenaFence.y+arenaFence.h*.34:player.y-250;
+  const group={id:"parkSejunFamily",cx,cy,guardAlive:true,phase:1};
+  const shieldHp=Math.floor(1850*scale.hp),bodyHp=Math.floor(1250*scale.hp);
+  enemies.push({id:"parkSejunGuard",name:"박세준 쉴드",object:true,familyRole:"father",group,x:cx,y:cy,r:38,size:38,drawSize:126,hp:shieldHp,maxHp:shieldHp,shieldMax:shieldHp,bodyHp,spd:78*scale.spd,dmg:Math.floor(18*scale.dmg),cdScale:scale.cd,inv:1.1,hit:0,state:"shield",dir:{x:0,y:1}});
+  const defs=[
+    {id:"sejunArtistSon",name:"첫째 서호",familyRole:"artist",memberIndex:0,x:cx-90,y:cy+100,hp:1500,dmg:11,color:"#ff69ae"},
+    {id:"sejunTaekwondoSon",name:"둘째 서로",familyRole:"taekwondo",memberIndex:1,x:cx+90,y:cy+100,hp:1750,dmg:18,color:"#55bfff"}
+  ];
+  for(const d of defs){const hp=Math.floor(d.hp*scale.hp);enemies.push({...d,boss:true,bossGroup:"estechFamilyChild",group,stage,r:28,size:28,drawSize:108,hp,maxHp:hp,spd:130*scale.spd,dmg:Math.floor(d.dmg*scale.dmg),xp:40+stage*6,slow:0,hit:0,inv:1.2,attackCd:1.2*scale.cd,state:"idle",stateT:0,cdScale:scale.cd,dir:{x:0,y:1}})}
+  effects.push({kind:"bossIntro",x:cx,y:cy,t:1.55,maxT:1.55,r:150,color:"#55d9ff"});effects.push({kind:"bossQuote",x:cx,y:cy-140,text:"아들들은 아빠가 지킨다!",t:1.7,maxT:1.7,color:"#e9fbff"});shake=14;
+}
+
+function updateParkSejunShield(b,dt){
+  const a=angle(b,player),d=dist(b,player),slow=b.slow>0?.38:1;b.dir={x:Math.cos(a),y:Math.sin(a)};
+  if(d>360){b.x+=Math.cos(a)*b.spd*slow*dt;b.y+=Math.sin(a)*b.spd*slow*dt}else if(d<235){b.x-=Math.cos(a)*b.spd*.7*slow*dt;b.y-=Math.sin(a)*b.spd*.7*slow*dt}
+  b.x+=Math.cos(a+Math.PI/2)*Math.sin(elapsed*.9)*b.spd*.18*dt;b.y+=Math.sin(a+Math.PI/2)*Math.sin(elapsed*.9)*b.spd*.18*dt;
+  b.group.cx=b.x;b.group.cy=b.y;
+  if(arenaFence){b.x=clamp(b.x,arenaFence.x+b.r,arenaFence.x+arenaFence.w-b.r);b.y=clamp(b.y,arenaFence.y+b.r,arenaFence.y+arenaFence.h-b.r)}
+}
+
+function beginEstechKick(b,shortWarn=false){
+  const a=angle(b,player),warn=shortWarn?.28:.58;
+  b.state="kickWarn";b.stateT=warn;b.kickAngle=a;b.attackCd=99;
+  effects.push({kind:"bossLineTelegraph",x:b.x,y:b.y,angle:a,len:360,wide:54,t:warn,maxT:warn,color:"#ff304f"});
+}
+
+function fireEstechArt(b,a){
+  const palette=["#f04f88","#3f9fdb","#f0b83f","#55ad73","#7656bc"],count=2+Math.floor(Math.random()*2);
+  for(let i=0;i<count;i++){const aa=a+(i-(count-1)/2)*.18+rnd(-.035,.035),spd=rnd(310,360),kind=Math.random()<.58?"paintStroke":"colorPencil";bossShots.push({kind,x:b.x+Math.cos(aa)*18,y:b.y-10+Math.sin(aa)*18,vx:Math.cos(aa)*spd,vy:Math.sin(aa)*spd,r:kind==="paintStroke"?10:7,life:4,dmg:b.dmg,spin:rnd(0,Math.PI*2),color:palette[Math.floor(Math.random()*palette.length)],hitText:kind==="paintStroke"?"물감 붓자국":"색연필 낙서"})}
+}
+
+function updateEstechFamilyBoss(b,dt){
+  b.hit=Math.max(0,b.hit-dt);b.slow=Math.max(0,b.slow-dt);b.stateT=Math.max(0,(b.stateT||0)-dt);b.attackCd-=dt;
+  const guard=enemies.find(e=>e.id==="parkSejunGuard"&&e.group===b.group&&e.hp>0);b.group.guardAlive=!!guard;
+  if(guard)b.inv=Math.max(b.inv||0,.14);else b.inv=Math.max(0,(b.inv||0)-dt);
+  const a=angle(b,player),d=dist(b,player),slow=b.slow>0?.38:1;b.dir={x:Math.cos(a),y:Math.sin(a)};
+  if(b.familyRole==="artist"){
+    if(d>360){b.x+=Math.cos(a)*b.spd*.68*slow*dt;b.y+=Math.sin(a)*b.spd*.68*slow*dt}else if(d<225){b.x-=Math.cos(a)*b.spd*.58*slow*dt;b.y-=Math.sin(a)*b.spd*.58*slow*dt}
+    const strafe=Math.sin(elapsed*1.4+b.memberIndex)*b.spd*.28*dt;b.x+=Math.cos(a+Math.PI/2)*strafe;b.y+=Math.sin(a+Math.PI/2)*strafe;
+    if(b.attackCd<=0){fireEstechArt(b,a);b.attackCd=bossCd(b,1.55)}
+  }else{
+    if(b.state==="kickWarn"&&b.stateT<=0){b.state="kickDash";b.stateT=.3;b.dashX=Math.cos(b.kickAngle);b.dashY=Math.sin(b.kickAngle);b.kickHit=false}
+    if(b.state==="kickDash"){
+      b.x+=b.dashX*720*dt;b.y+=b.dashY*720*dt;
+      if(!b.kickHit&&dist(b,player)<b.r+player.r+22&&playerCanTakeDamage()){player.hp-=b.dmg;player.inv=.72;b.kickHit=true;shake=10;floaters.push({x:player.x,y:player.y-30,t:.65,text:`태권도 ${b.kickTotal-b.kicksLeft+1}단`,color:"#ff6b78"})}
+      if(b.stateT<=0){b.kicksLeft--;if(b.kicksLeft>0)beginEstechKick(b,true);else{b.state="spinReturn";b.stateT=.48;b.spinReturnT=.48;b.spinFromX=b.x;b.spinFromY=b.y;b.attackCd=bossCd(b,1.45)}}
+    }else if(b.state==="kickWarn"){
+      // The clean telegraph holds the attack direction.
+    }else if(b.state==="spinReturn"){
+      const p=1-b.stateT/(b.spinReturnT||.48),ease=1-Math.pow(1-clamp(p,0,1),3);
+      b.x=b.spinFromX+(b.returnX-b.spinFromX)*ease;b.y=b.spinFromY+(b.returnY-b.spinFromY)*ease;
+      if(b.stateT<=0){b.x=b.returnX;b.y=b.returnY;b.state="idle"}
+    }else{
+      if(d>250){b.x+=Math.cos(a)*b.spd*.82*slow*dt;b.y+=Math.sin(a)*b.spd*.82*slow*dt}else if(d<150){b.x-=Math.cos(a)*b.spd*.55*slow*dt;b.y-=Math.sin(a)*b.spd*.55*slow*dt}
+      if(b.attackCd<=0){b.returnX=b.x;b.returnY=b.y;b.kickTotal=1+Math.floor(Math.random()*3);b.kicksLeft=b.kickTotal;beginEstechKick(b)}
+    }
+  }
+  if(arenaFence){b.x=clamp(b.x,arenaFence.x+b.r,arenaFence.x+arenaFence.w-b.r);b.y=clamp(b.y,arenaFence.y+b.r,arenaFence.y+arenaFence.h-b.r)}
+}
+
+function updateParkSejunBoss(b,dt){
+  b.hit=Math.max(0,b.hit-dt);b.slow=Math.max(0,b.slow-dt);b.inv=Math.max(0,(b.inv||0)-dt);if(b.stateT>0)b.stateT-=dt;
+  const a=angle(b,player);if(!["nagCast","heatCast","bellyCast","bellyJump"].includes(b.state))b.dir={x:Math.cos(a),y:Math.sin(a)};
+  if(b.state==="shieldBreak"){if(b.stateT<=0){b.state="idle";b.patternCd=bossCd(b,1.1)}return}
+  if(b.state==="nagCast"){if(b.stateT<=0)fireBossNag(b);return}
+  if(b.state==="heatCast"){if(b.stateT<=0)fireCheonHeat(b);return}
+  if(b.state==="bellyCast"){if(b.stateT<=0)startCheonBellyJump(b);return}
+  if(b.state==="bellyJump"){
+    const p=1-b.stateT/(b.bellyJumpT||CHEON_BELLY_SKILL.jumpT),ease=p<.5?2*p*p:1-Math.pow(-2*p+2,2)/2;b.x=b.jumpFromX+(b.jumpX-b.jumpFromX)*ease;b.y=b.jumpFromY+(b.jumpY-b.jumpFromY)*ease;if(b.stateT<=0)landCheonBelly(b);return
+  }
+  const d=dist(b,player),slow=b.slow>0?.38:1;if(d>300){b.x+=Math.cos(a)*b.spd*slow*dt;b.y+=Math.sin(a)*b.spd*slow*dt}else if(d<175){b.x-=Math.cos(a)*b.spd*.55*slow*dt;b.y-=Math.sin(a)*b.spd*.55*slow*dt}
+  if(arenaFence){b.x=clamp(b.x,arenaFence.x+b.r,arenaFence.x+arenaFence.w-b.r);b.y=clamp(b.y,arenaFence.y+b.r,arenaFence.y+arenaFence.h-b.r)}
+  b.patternCd-=dt;if(b.patternCd<=0){const roll=Math.random();if(roll<.34)beginBossNag(b);else if(roll<.67)beginCheonBelly(b,1);else beginCheonHeat(b)}
+}
 function gossipAlive(group){
   return enemies.filter(e=>e.bossGroup==="gossip"&&e.group===group&&e.hp>0).sort((a,b)=>a.memberIndex-b.memberIndex);
 }
@@ -2593,7 +2769,14 @@ function spawn(dt){
   const gymBodybuilder=enemyTypes.find(e=>e.id==="gymBodybuilder");
   const doubleScooterStudents=enemyTypes.find(e=>e.id==="doubleScooterStudents");
   const pigeonFlock=enemyTypes.find(e=>e.id==="pigeonFlock");
-  const roster=theme.id==="bike"
+  const wireWorker=enemyTypes.find(e=>e.id==="wireWorker");
+  const powerStripOctopus=enemyTypes.find(e=>e.id==="powerStripOctopus");
+  const breakerShield=enemyTypes.find(e=>e.id==="breakerShield");
+  const wiringRookie=enemyTypes.find(e=>e.id==="wiringRookie");
+  const liveWireMan=enemyTypes.find(e=>e.id==="liveWireMan");
+  const roster=theme.id==="estech"
+    ?[wireWorker,powerStripOctopus,breakerShield]
+    :theme.id==="bike"
     ?[roadCyclist,fixieShooter,fishermanUncle]
     :theme.id==="factory"
       ?[lazyFactoryWorker,tapeThrower,juCousinWorker]
@@ -2602,7 +2785,7 @@ function spawn(dt){
         :theme.id==="gym"
           ?[gymTattooPig,gymLeggings,gymBodybuilder]
           :[female,male,mzResignation];
-  const stageNo=clamp(currentStage,1,5);
+  const stageNo=clamp(currentStage,1,20);
   const progress=clamp(age/105,0,1);
   const skillCurve=1+Math.max(0,player.level-1)*.028;
   const hpPressure=(.52+stageNo*.14+Math.pow(stageNo-1,1.35)*.045)*(1+age*.0022)*skillCurve;
@@ -2621,6 +2804,7 @@ function spawn(dt){
     return [.66-.13*p,.27+.04*p,.07+.09*p];
   };
   const pickFromRoster=(weights)=>{
+    if(theme.id==="estech"&&age>28&&Math.random()<.3)return Math.random()<.52?wiringRookie:liveWireMan;
     const roll=Math.random();
     const picked=roll<weights[0]?roster[0]:roll<weights[0]+weights[1]?roster[1]:roster[2];
     if(picked?.ranged&&Math.random()>rangedChance)return roster[0];
@@ -2769,6 +2953,7 @@ function updateEnemies(dt){
     if(e.boss){updateBoss(e,dt);continue}
     e.hit=Math.max(0,e.hit-dt);e.slow=Math.max(0,e.slow-dt);e.inv=Math.max(0,(e.inv||0)-dt);
     if(e.object){
+      if(e.id==="parkSejunGuard")updateParkSejunShield(e,dt);
       if(e.id==="cultTotem"){
         e.spawnT=(e.spawnT||1)-dt;
         if(e.spawnT<=0){
@@ -2818,7 +3003,8 @@ function updateEnemies(dt){
         e.attackT=.5;
       }
     }else{
-      e.x+=Math.cos(a)*e.spd*slow*dt;e.y+=Math.sin(a)*e.spd*slow*dt;
+      const weave=e.zigzag?Math.sin(elapsed*8+e.x*.02)*.72:0,ma=a+weave;
+      e.x+=Math.cos(ma)*e.spd*slow*dt;e.y+=Math.sin(ma)*e.spd*slow*dt;
     }
     if(arenaFence&&e.insideArena){
       e.x=clamp(e.x,arenaFence.x+e.r,arenaFence.x+arenaFence.w-e.r);
@@ -2857,7 +3043,16 @@ function fireEnemyAttack(e,a){
   else if(e.attackKind==="boxThrow")fireEnemyBox(e,a);
   else if(e.attackKind==="fartCloud")fireEnemyFartCloud(e,a);
   else if(e.attackKind==="dumbbellBoomerang")fireEnemyDumbbell(e,a);
+  else if(e.attackKind==="electricPlug"||e.attackKind==="breakerBolt")fireEnemyElectric(e,a);
   else fireEnemyBB(e,a);
+}
+
+function fireEnemyElectric(e,a){
+  const count=e.attackKind==="breakerBolt"?3:1,spread=e.attackKind==="breakerBolt"?.18:0;
+  for(let i=0;i<count;i++){
+    const aa=a+(i-(count-1)/2)*spread,spd=e.projectileSpeed||400;
+    bossShots.push({kind:e.attackKind,x:e.x+Math.cos(aa)*26,y:e.y+Math.sin(aa)*26,vx:Math.cos(aa)*spd,vy:Math.sin(aa)*spd,r:e.attackKind==="breakerBolt"?9:7,life:4,dmg:e.projectileDmg||9,spin:0,hitText:e.attackKind==="breakerBolt"?"차단기 과전류":"멀티탭 감전"});
+  }
 }
 
 function fireEnemyBB(e,a){
@@ -3184,6 +3379,8 @@ function updateEmotionCeoV2(b,dt){
 }
 
 function updateBoss(b,dt){
+  if(b.bossGroup==="estechFather"){updateParkSejunBoss(b,dt);return}
+  if(b.bossGroup==="estechFamilyChild"){updateEstechFamilyBoss(b,dt);return}
   if(b.bossGroup==="gossip"){updateGossipBoss(b,dt);return}
   if(b.id==="emotionCeo"){updateEmotionCeoV2(b,dt);return}
   if(b.id==="cultFanatic"){updateCultFanatic(b,dt);return}
@@ -3250,14 +3447,14 @@ function beginBossNag(b){
   b.castAngle=a;
   b.dir={x:Math.cos(a),y:Math.sin(a)};
   effects.push({kind:"bossConeTelegraph",x:b.x,y:b.y,angle:a,range:BOSS_NAG_SKILL.range,arc:BOSS_NAG_SKILL.arc,t:1.35,maxT:1.35,color:"#ff304f"});
-  effects.push({kind:"bossQuote",x:b.x,y:b.y-92,text:"내 말이 곧 법이야 !!!",t:1.35,maxT:1.35,color:"#fff8d6"});
+  effects.push({kind:"bossQuote",x:b.x,y:b.y-92,text:b.id==="parkSejun"?"고압 전류 받아라!":"내 말이 곧 법이야 !!!",t:1.35,maxT:1.35,color:"#fff8d6"});
 }
 
 function fireBossNag(b){
   playSfx("bossNagFire");
   clearBossTelegraphs();
   const a=b.castAngle??Math.atan2(b.dir.y,b.dir.x);
-  launchBossStampCone(b,a);
+  if(b.id==="parkSejun")launchParkElectricCone(b,a);else launchBossStampCone(b,a);
   b.state="idle";b.patternCd=bossCd(b,2.6);b.attackCd=bossCd(b,.9);
   return;
   effects.push({kind:"bossNagBlast",x:b.x,y:b.y,angle:a,range:BOSS_NAG_SKILL.range,arc:BOSS_NAG_SKILL.arc,t:.45,maxT:.45,color:"#ff4865"});
@@ -3352,7 +3549,7 @@ function beginCheonHeat(b){
   playSfx("cheonHeatCast");
   b.state="heatCast";b.stateT=CHEON_HEAT_SKILL.castT;b.patternCd=99;b.attackCd=99;
   effects.push({kind:"cheonHeatTelegraph",x:b.x,y:b.y-8,r:CHEON_HEAT_SKILL.ringRadius,t:CHEON_HEAT_SKILL.castT,maxT:CHEON_HEAT_SKILL.castT,color:"#ff304f"});
-  effects.push({kind:"bossQuote",x:b.x,y:b.y-104,text:"황과장! 너 뭐 돼 ?!",t:CHEON_HEAT_SKILL.castT,maxT:CHEON_HEAT_SKILL.castT,color:"#fff0a8"});
+  effects.push({kind:"bossQuote",x:b.x,y:b.y-104,text:b.id==="parkSejun"?"배전반 열기 맛 좀 봐라!":"황과장! 너 뭐 돼 ?!",t:CHEON_HEAT_SKILL.castT,maxT:CHEON_HEAT_SKILL.castT,color:"#fff0a8"});
 }
 
 function fireCheonHeat(b){
@@ -3365,7 +3562,7 @@ function fireCheonHeat(b){
       const a=i*Math.PI*2/count+offset;
       const delay=wave*CHEON_HEAT_SKILL.waveDelay;
       bossShots.push({
-        kind:"heatCloud",
+        kind:b.id==="parkSejun"?"parkElectricHeat":"heatCloud",
         x:b.x+Math.cos(a)*42,
         y:b.y-8+Math.sin(a)*42,
         ox:b.x,
@@ -3383,7 +3580,7 @@ function fireCheonHeat(b){
         dmg:CHEON_HEAT_SKILL.dmg,
         spin:rnd(0,Math.PI*2),
         delay,
-        hitText:"상무 열기"
+        hitText:b.id==="parkSejun"?"박세준 열기":"상무 열기"
       });
     }
   }
@@ -3403,7 +3600,7 @@ function beginCheonBelly(b,jumps=CHEON_BELLY_SKILL.chainTotal){
   const target=chooseCheonBellyTarget(b);
   b.jumpX=target.x;b.jumpY=target.y;
   effects.push({kind:"bossCircleTelegraph",x:b.jumpX,y:b.jumpY,r:CHEON_BELLY_SKILL.radius,t:castT,maxT:castT,color:"#ff304f"});
-  effects.push({kind:"bossQuote",x:b.x,y:b.y-104,text:"감히 과장 따위가 !!",t:castT,maxT:castT,color:"#fff0a8"});
+  effects.push({kind:"bossQuote",x:b.x,y:b.y-104,text:b.id==="parkSejun"?"위에서 찍어 누른다!":"감히 과장 따위가 !!",t:castT,maxT:castT,color:"#fff0a8"});
 }
 
 function chooseCheonBellyTarget(b){
@@ -3425,7 +3622,7 @@ function landCheonBelly(b){
   effects.push({kind:"cheonBellyImpact",x:b.x,y:b.y,r:CHEON_BELLY_SKILL.radius,t:.55,maxT:.55,color:"#ff304f"});
   if(dist(b,player)<CHEON_BELLY_SKILL.radius+player.r&&playerCanTakeDamage()){
     player.hp-=CHEON_BELLY_SKILL.dmg;player.inv=.9;
-    floaters.push({x:player.x,y:player.y-34,t:.75,text:"배치기",color:"#ff6b78"});
+    floaters.push({x:player.x,y:player.y-34,t:.75,text:b.id==="parkSejun"?"점프 내려찍기":"배치기",color:"#ff6b78"});
   }
   b.bellyJumps=(b.bellyJumps||1)-1;
   if(b.bellyJumps>0)beginCheonBelly(b,b.bellyJumps);
@@ -3552,6 +3749,14 @@ function launchBossStampCone(b,base){
   shake=8;
 }
 
+function launchParkElectricCone(b,base){
+  const waves=3,count=5,arc=BOSS_NAG_SKILL.arc*.9,spd=410;
+  for(let w=0;w<waves;w++)for(let i=0;i<count;i++){
+    const t=count===1?.5:i/(count-1),a=base+(t-.5)*arc+rnd(-.025,.025),delay=w*BOSS_STAMP_WAVE_DELAY+i*BOSS_STAMP_SHOT_DELAY;
+    bossShots.push({kind:"parkElectricArc",x:b.x+Math.cos(a)*30,y:b.y-8+Math.sin(a)*30,vx:Math.cos(a)*(spd+w*28),vy:Math.sin(a)*(spd+w*28),r:14,life:3.35+delay,dmg:9,spin:rnd(0,Math.PI*2),delay,hitText:"고압 전기 아크"});
+  }
+  effects.push({kind:"bossStampBurst",x:b.x,y:b.y,angle:base,t:.55,maxT:.55,color:"#56dfff"});shake=8;
+}
 function pointInCone(px,py,x,y,a,range,arc){
   const dx=px-x,dy=py-y,d=Math.hypot(dx,dy);
   if(d>range)return false;
@@ -3626,7 +3831,7 @@ function updateSkills(dt){
 }
 
 function isAttackableEnemyObject(e){
-  return !!e&&e.object&&(e.id==="cultCoffin"||e.id==="cultTotem");
+  return !!e&&e.object&&(e.id==="cultCoffin"||e.id==="cultTotem"||e.id==="parkSejunGuard");
 }
 function canTargetEnemy(e){
   return !!e&&!e.dead&&e.hp>0&&(!e.object||isAttackableEnemyObject(e))&&(isAttackableEnemyObject(e)||(e.inv||0)<=0);
@@ -4291,7 +4496,7 @@ function updateBossShots(dt){
   for(let i=bossShots.length-1;i>=0;i--){
     const p=bossShots[i];p.life-=dt;p.spin+=dt*9;
     if(p.delay>0){p.delay-=dt;continue}
-    if(p.kind==="heatCloud"){
+    if(p.kind==="heatCloud"||p.kind==="parkElectricHeat"){
       const a=p.angle??Math.atan2(p.vy,p.vx);
       if(p.travel<p.ringRadius){
         if(p.travel>=p.slowAt){
@@ -4621,6 +4826,15 @@ function updateEffects(dt){
 function killEnemy(i){
   const e=enemies[i];
   if(e.boss){
+    if(e.bossGroup==="estechFamilyChild"){
+      kills++;effects.push({kind:"bossDeath",x:e.x,y:e.y,r:78,t:.7,maxT:.7,color:e.color});floaters.push({x:e.x,y:e.y-74,t:.85,text:`${e.name} 퇴장`,color:"#fff8d6"});enemies.splice(i,1);shake=9;return;
+    }
+    if(e.bossGroup==="estechFather"){
+      kills++;const x=e.x,y=e.y,group=e.group;beginBossClear({id:"parkSejunFamily",x,y});
+      for(let j=enemies.length-1;j>=0;j--)if(enemies[j]!==e&&enemies[j].group===group)enemies.splice(j,1);
+      const fatherIndex=enemies.indexOf(e);if(fatherIndex>=0)enemies.splice(fatherIndex,1);
+      for(let j=0;j<12;j++)gems.push({x:x+rnd(-60,60),y:y+rnd(-42,52),r:8,value:12,kind:"purple"});gems.push({x,y:y+45,r:11,value:20,kind:"heal"});floaters.push({x,y:y-110,t:1.2,text:"박세준과 서호서로 클리어",color:"#fff8d6"});shake=18;return;
+    }
     if(e.bossGroup==="gossip"){
       kills++;
       const remaining=enemies.filter((m,idx)=>idx!==i&&m.bossGroup==="gossip"&&m.hp>0);
@@ -4656,6 +4870,7 @@ function killEnemy(i){
     enemies.splice(i,1);shake=16;return;
   }
   if(e.object){
+    if(e.id==="parkSejunGuard"){e.group.guardAlive=false;e.group.phase=2;e.id="parkSejun";e.name="박세준";e.object=false;e.boss=true;e.bossGroup="estechFather";e.hp=e.bodyHp;e.maxHp=e.bodyHp;e.state="shieldBreak";e.stateT=1.05;e.patternCd=99;e.attackCd=99;e.inv=1.15;floaters.push({x:e.x,y:e.y-82,t:1.1,text:"쉴드 파괴 - 2페이즈",color:"#7fe9ff"});effects.push({kind:"bossDeath",x:e.x,y:e.y,r:105,t:1,maxT:1,color:"#55d9ff"});shake=13;return}
     effects.push({kind:"pop",x:e.x,y:e.y,r:e.r+18,t:.35,color:e.id==="cultCoffin"?"#b56cff":"#d7b15f"});
     enemies.splice(i,1);
     shake=Math.max(shake,7);
@@ -4666,8 +4881,9 @@ function killEnemy(i){
     return;
   }
   kills++;
+  if(e.volatile){effects.push({kind:"bossDeath",x:e.x,y:e.y,r:70,t:.48,maxT:.48,color:"#55d9ff"});for(const other of enemies){if(other!==e&&!other.boss&&!other.object&&dist(e,other)<105){other.hp-=24;other.hit=.15}}if(dist(e,player)<90&&playerCanTakeDamage()){player.hp-=7;player.inv=.55;floaters.push({x:player.x,y:player.y-28,t:.55,text:"활선 감전",color:"#65e7ff"})}}
   const xpBase=Math.max(1,Math.ceil(e.xp||1));
-  const stageNo=clamp(currentStage||1,1,5);
+  const stageNo=clamp(currentStage||1,1,20);
   const stageValueScale=.55+stageNo*.14;
   let gemKind="blue";
   let gemValue=Math.max(1,Math.ceil(xpBase*stageValueScale));
@@ -4916,6 +5132,12 @@ function drawBg(c){
     ctx.save();
     ctx.globalAlpha=clamp(gymBlend,0,1);
     drawGymTileLayer(c);
+    ctx.restore();
+  }
+  if(estechBlend>0&&estechTile.complete&&estechTile.naturalWidth){
+    ctx.save();ctx.globalAlpha=clamp(estechBlend,0,1);ctx.imageSmoothingEnabled=false;
+    const tile=512,cx=Math.floor(c.x),cy=Math.floor(c.y),ox=-(cx%tile),oy=-(cy%tile);
+    for(let x=ox-tile;x<viewW()+tile;x+=tile)for(let y=oy-tile;y<viewH()+tile;y+=tile)ctx.drawImage(estechTile,x,y,tile,tile);
     ctx.restore();
   }
   ctx.fillStyle="rgba(58,151,178,.07)";
@@ -5462,7 +5684,7 @@ function drawBossVsCutsceneV2(){
     ctx.fillStyle="rgba(90,96,96,.96)";
     ctx.fillRect(panelX,panelY,panelW,panelH);
   }
-  const bossName=bossId==="emotionCeo"?"감정쓰레기통 찾는 사장":bossId==="gossipGroup"?"모함하는 뒷담화꾼":bossId==="cultFanatic"?"편집비 먹튀한 광신도":bossId==="cheonSangmu"?"\uD6A1\uB839\uC744 \uC77C\uC0BC\uB294 \uCC9C\uC0C1\uBB34":"\uC0AC\uC7A5 \uBD88\uB95C\uB140 \uC8FC\uB300\uB9AC";
+  const bossName=bossId==="parkSejunFamily"?"박세준과 서호서로":bossId==="emotionCeo"?"감정쓰레기통 찾는 사장":bossId==="gossipGroup"?"모함하는 뒷담화꾼":bossId==="cultFanatic"?"편집비 먹튀한 광신도":bossId==="cheonSangmu"?"\uD6A1\uB839\uC744 \uC77C\uC0BC\uB294 \uCC9C\uC0C1\uBB34":"\uC0AC\uC7A5 \uBD88\uB95C\uB140 \uC8FC\uB300\uB9AC";
   drawVsPlayer(playerX,playerY,2.45*fit);
   drawVsBoss(bossX,bossY,(bossId==="emotionCeo"?1.55:bossId==="gossipGroup"?1.55:bossId==="cheonSangmu"?2.05:bossId==="cultFanatic"?2.0:2.2)*fit,bossId);
   drawVsNameV2(bossName,bossX,bossY-178*fit,bossId==="emotionCeo"?"#e7f8ff":bossId==="gossipGroup"?"#ffe1f5":bossId==="cultFanatic"?"#efe0ff":bossId==="cheonSangmu"?"#fff0a8":"#ffe1ec",fit);
@@ -5620,6 +5842,10 @@ function drawVsPlayer(x,y,scale){
 
 function drawVsBoss(x,y,scale,bossId="juDaeri"){
   ctx.save();ctx.translate(x,y);ctx.scale(scale,scale);
+  if(bossId==="parkSejunFamily"){
+    if(parkSejunFamilySprite.complete&&parkSejunFamilySprite.naturalWidth){const fw=parkSejunFamilySprite.naturalWidth/4,fh=parkSejunFamilySprite.naturalHeight/3;ctx.imageSmoothingEnabled=false;ctx.drawImage(parkSejunFamilySprite,0,0,fw,fh,-68,-94,136,136)}
+    ctx.restore();return;
+  }
   if(bossId==="gossipGroup"){
     const sheets=[gossipShortSprite,gossipLongSprite,gossipMaleSprite];
     const poses=[{x:-60,y:14,s:88},{x:60,y:14,s:92},{x:0,y:-4,s:96}];
@@ -5773,6 +5999,9 @@ function drawGeontaekPixel(){
 
 function drawEnemy(e){
   ctx.save();ctx.translate(e.x,e.y);if(e.hit>0)ctx.globalAlpha=.65;
+  if(e.bossGroup==="estechFamilyChild"||e.bossGroup==="estechFather"||e.id==="parkSejunGuard"){
+    drawEstechFamily(e);ctx.restore();return;
+  }
   if(e.boss&&e.id==="juDaeri"){
     drawJuDaeri(e);
     ctx.restore();
@@ -5803,6 +6032,10 @@ function drawEnemy(e){
     ctx.restore();
     return;
   }
+  if(e.estechAtlasRow!==undefined&&estechEnemyAtlas.complete&&estechEnemyAtlas.naturalWidth){
+    const fw=estechEnemyAtlas.naturalWidth/4,fh=estechEnemyAtlas.naturalHeight/5,col=Math.floor(elapsed*7+e.x*.01+e.y*.01)%4,size=e.drawSize||78;
+    ctx.imageSmoothingEnabled=false;ctx.save();if(player.x<e.x)ctx.scale(-1,1);ctx.drawImage(estechEnemyAtlas,fw*col,fh*e.estechAtlasRow,fw,fh,-size/2,-size*.72,size,size);ctx.restore();
+  }else{
   const enemySprite=enemySprites[e.id];
   if(enemySprite&&enemySprite.complete&&enemySprite.naturalWidth){
     const rows=e.spriteRows||2;
@@ -5824,6 +6057,7 @@ function drawEnemy(e){
   else if(e.id==="invite"){ctx.fillStyle=e.color;ctx.fillRect(-16,-13,32,26);ctx.strokeStyle="#4d8fbd";ctx.strokeRect(-16,-13,32,26);ctx.beginPath();ctx.moveTo(-16,-13);ctx.lineTo(0,2);ctx.lineTo(16,-13);ctx.stroke()}
   else if(e.id==="coffee"){ctx.fillStyle=e.color;ctx.fillRect(-11,-15,22,28);ctx.fillStyle="#f7f2e6";ctx.fillRect(-13,-20,26,6);ctx.strokeStyle="#f0d08a";ctx.strokeRect(10,-6,8,12)}
   else{ctx.fillStyle="#f0c8bc";ctx.fillRect(-14,-24,28,25);ctx.fillStyle="#20242c";ctx.fillRect(-16,-32,32,14);ctx.fillStyle=e.color;ctx.fillRect(-17,2,34,34);ctx.fillStyle=e.tie;ctx.fillRect(-4,4,8,24);ctx.fillStyle="#111";ctx.fillRect(-9,-11,6,3);ctx.fillRect(4,-11,6,3)}
+  }
   if(!e.hideHp){
     const barY=e.drawSize?-e.drawSize*.72:-e.r-13;
     const barHalf=e.namedEnemy?e.r*1.3:e.r;
@@ -5833,6 +6067,35 @@ function drawEnemy(e){
   ctx.restore();
 }
 
+function drawEstechFamily(e){
+  const father=e.id==="parkSejunGuard"||e.bossGroup==="estechFather",size=e.drawSize||112,facingLeft=player.x<e.x;
+  ctx.save();
+  if(facingLeft)ctx.scale(-1,1);
+  ctx.imageSmoothingEnabled=false;
+  if(father&&e.bossGroup==="estechFather"&&parkSejunPhase2Sprite.complete&&parkSejunPhase2Sprite.naturalWidth){
+    const fw=parkSejunPhase2Sprite.naturalWidth/4,fh=parkSejunPhase2Sprite.naturalHeight/3;
+    let row=1,col=0;
+    if(e.state==="shieldBreak"){row=0;col=clamp(Math.floor((1-e.stateT/1.05)*4),0,3)}
+    else if(e.state==="bellyJump")col=2;
+    else if(e.state==="bellyCast"||e.state==="heatCast"||e.state==="nagCast")col=3;
+    else if(e.state==="idle")col=Math.floor(elapsed*6)%2;
+    ctx.drawImage(parkSejunPhase2Sprite,fw*col,fh*row,fw,fh,-size/2,-size*.72,size,size);
+  }else if(e.familyRole==="taekwondo"&&e.state==="spinReturn"&&seoroSpinSprite.complete&&seoroSpinSprite.naturalWidth){
+    const fw=seoroSpinSprite.naturalWidth/4,fh=seoroSpinSprite.naturalHeight,col=clamp(Math.floor((1-e.stateT/(e.spinReturnT||.48))*4),0,3);
+    ctx.drawImage(seoroSpinSprite,fw*col,0,fw,fh,-size*.57,-size*.78,size*1.14,size);
+  }else if(parkSejunFamilySprite.complete&&parkSejunFamilySprite.naturalWidth){
+    const row=e.familyRole==="artist"?1:e.familyRole==="taekwondo"?2:0,fw=parkSejunFamilySprite.naturalWidth/4,fh=parkSejunFamilySprite.naturalHeight/3;
+    let col=Math.floor(elapsed*6+(e.memberIndex||0))%4;
+    if(e.state==="kickWarn")col=0;else if(e.state==="kickDash")col=2;else if(e.state==="spinReturn")col=1;
+    ctx.drawImage(parkSejunFamilySprite,fw*col,fh*row,fw,fh,-size/2,-size*.72,size,size);
+  }
+  ctx.restore();
+  if(e.boss&&e.group&&e.group.guardAlive){ctx.strokeStyle="rgba(85,210,255,.8)";ctx.lineWidth=4;ctx.beginPath();ctx.arc(0,-8,e.r+17,0,Math.PI*2);ctx.stroke()}
+  const half=father?52:42,barY=-size*.72;
+  ctx.fillStyle="#101820";ctx.fillRect(-half,barY,half*2,7);
+  ctx.fillStyle=e.id==="parkSejunGuard"?"#55d9ff":father?"#ff596d":e.color||"#ff6875";ctx.fillRect(-half,barY,half*2*clamp(e.hp/e.maxHp,0,1),7);
+  if(father){ctx.font='900 10px "Malgun Gothic",sans-serif';ctx.textAlign="center";ctx.textBaseline="bottom";ctx.fillStyle="#f4fbff";ctx.strokeStyle="#101820";ctx.lineWidth=3;const label=e.id==="parkSejunGuard"?"쉴드":"HP";ctx.strokeText(label,0,barY-2);ctx.fillText(label,0,barY-2)}
+}
 function drawEmotionCeo(e){
   if(!Number.isFinite(e.x)||!Number.isFinite(e.y))return;
   let sheet=emotionCeoSprite,cols=4,rows=4,row=rowFromVector(e.dir||{x:0,y:1});
@@ -6550,6 +6813,23 @@ function drawBossShot(p){
     ctx.restore();
     return;
   }
+  if(p.kind==="paintStroke"){
+    ctx.rotate(Math.atan2(p.vy,p.vx));ctx.fillStyle=p.color||"#f04f88";
+    ctx.globalAlpha=.3;for(let i=1;i<=3;i++){ctx.beginPath();ctx.ellipse(-i*9,Math.sin(p.spin+i)*4,7-i,3,0,0,Math.PI*2);ctx.fill()}
+    ctx.globalAlpha=1;ctx.beginPath();ctx.moveTo(-15,-5);ctx.quadraticCurveTo(0,-11,18,-3);ctx.quadraticCurveTo(8,9,-14,6);ctx.closePath();ctx.fill();
+    ctx.fillStyle="#fff4dc";ctx.globalAlpha=.55;ctx.fillRect(-8,-2,14,2);ctx.restore();return;
+  }
+  if(p.kind==="colorPencil"){
+    ctx.rotate(Math.atan2(p.vy,p.vx));ctx.fillStyle=p.color||"#3f9fdb";ctx.fillRect(-17,-4,27,8);
+    ctx.fillStyle="#f0d0a0";ctx.beginPath();ctx.moveTo(10,-4);ctx.lineTo(20,0);ctx.lineTo(10,4);ctx.closePath();ctx.fill();
+    ctx.fillStyle=p.color||"#3f9fdb";ctx.beginPath();ctx.moveTo(17,-1.5);ctx.lineTo(21,0);ctx.lineTo(17,1.5);ctx.closePath();ctx.fill();
+    ctx.fillStyle="#f6e7c8";ctx.fillRect(-12,-1,17,2);ctx.restore();return;
+  }
+  if(p.kind==="electricPlug"||p.kind==="breakerBolt"){
+    ctx.rotate(Math.atan2(p.vy,p.vx));ctx.fillStyle=p.kind==="breakerBolt"?"#ffe24a":"#55d9ff";
+    ctx.beginPath();ctx.arc(0,0,p.r,0,Math.PI*2);ctx.fill();ctx.strokeStyle="#f8fbff";ctx.lineWidth=2;ctx.stroke();
+    ctx.fillRect(-p.r-7,-2,8,4);ctx.fillRect(p.r-1,-5,5,3);ctx.fillRect(p.r-1,2,5,3);ctx.restore();return;
+  }
   if(p.kind==="bb"){
     const a=Math.atan2(p.vy,p.vx);
     ctx.rotate(a);
@@ -6689,6 +6969,12 @@ function drawBossShot(p){
     ctx.strokeRect(-18,-9,36,18);
     ctx.restore();
     return;
+  }
+  if(p.kind==="parkElectricArc"&&parkSejunElectricFxSprite.complete&&parkSejunElectricFxSprite.naturalWidth){
+    const fw=parkSejunElectricFxSprite.naturalWidth/4,fh=parkSejunElectricFxSprite.naturalHeight/2,frame=Math.floor(elapsed*14+p.spin)%4;ctx.rotate(Math.atan2(p.vy,p.vx));ctx.drawImage(parkSejunElectricFxSprite,fw*frame,0,fw,fh,-30,-22,60,44);ctx.restore();return;
+  }
+  if(p.kind==="parkElectricHeat"&&parkSejunElectricFxSprite.complete&&parkSejunElectricFxSprite.naturalWidth){
+    const fw=parkSejunElectricFxSprite.naturalWidth/4,fh=parkSejunElectricFxSprite.naturalHeight/2,frame=Math.floor(elapsed*12+p.spin)%4,settle=p.ringRadius?clamp((p.travel||0)/p.ringRadius,0,1):1,size=42+settle*20;ctx.drawImage(parkSejunElectricFxSprite,fw*frame,fh,fw,fh,-size/2,-size/2,size,size);ctx.restore();return;
   }
   if(p.kind==="heatCloud"){
     const a=p.angle??Math.atan2(p.vy,p.vx);
@@ -7732,6 +8018,10 @@ function drawEffect(e){
   if(e.kind==="bossFall"){
     const p=1-e.t/e.maxT;
     ctx.translate(e.x,e.y);
+    if(e.bossId==="parkSejunFamily"&&parkSejunPhase2Sprite.complete&&parkSejunPhase2Sprite.naturalWidth){
+      const fw=parkSejunPhase2Sprite.naturalWidth/4,fh=parkSejunPhase2Sprite.naturalHeight/3,col=clamp(Math.floor(p*4),0,3),size=132;
+      ctx.imageSmoothingEnabled=false;ctx.globalAlpha=.98;ctx.drawImage(parkSejunPhase2Sprite,fw*col,fh*2,fw,fh,-size/2,-size*.68,size,size);ctx.restore();return;
+    }
     const deathSprite=e.bossId==="emotionCeo"?emotionCeoSprite:e.bossId==="cultFanatic"?cultFanaticDeathSprite:e.bossId==="cheonSangmu"?cheonSangmuDeathSprite:juDaeriDeathSprite;
     const drawSize=e.bossId==="emotionCeo"?126:e.bossId==="cheonSangmu"?132:e.bossId==="cultFanatic"?156:116;
     if(deathSprite.complete&&deathSprite.naturalWidth){
@@ -7963,7 +8253,7 @@ const passiveSkillIconIndex={moveSpeed:0,xpGain:1,maxHealth:2,cooldownDown:3,att
 function skillIconHtml(s){
   const isPassive=s.type==="passive";
   if(s.id==="golf"||s.id==="magnetRange"){
-    if(s.id==="golf"&&player.characterId==="jiin")return `<b class="skill-icon basic" style="background-image:url('assets/skill_icon_jiin_heart.png?v=20260630-5');background-size:cover;background-position:center;background-repeat:no-repeat">${s.icon}</b>`;
+    if(s.id==="golf"&&player.characterId==="jiin")return `<b class="skill-icon basic" style="background-image:url('assets/skill_icon_jiin_heart.png');background-size:cover;background-position:center;background-repeat:no-repeat">${s.icon}</b>`;
     if(s.id==="golf"&&player.characterId==="seunggwan"){
       return `<b class="skill-icon basic" style="background-image:url('assets/seunggwan_iron_ball_icon.png');background-size:contain;background-position:center;background-repeat:no-repeat">${s.icon}</b>`;
     }
@@ -8089,7 +8379,7 @@ function __setMobileUltimateIcon(characterId){
   const hasMobile=typeof mobileUltimateBtn!=="undefined"&&mobileUltimateBtn;
   const hasPc=typeof ultimateBtn!=="undefined"&&ultimateBtn;
   if(!hasMobile&&!hasPc)return;
-  const src=characterId==="sangil"?"assets/ultimate_icon_sangil.png":characterId==="seunggwan"?"assets/ultimate_icon_seunggwan_chroma.png":characterId==="jiin"?"assets/ultimate_icon_jiin.png?v=20260630-5":"assets/ultimate_icon_geontaek_chroma.png";
+  const src=characterId==="sangil"?"assets/ultimate_icon_sangil.png":characterId==="seunggwan"?"assets/ultimate_icon_seunggwan_chroma.png":characterId==="jiin"?"assets/ultimate_icon_jiin.png":"assets/ultimate_icon_geontaek_chroma.png";
   const rawUrl=`url("${src}")`;
   if(hasMobile)mobileUltimateBtn.style.setProperty("--ultimate-icon-url",rawUrl);
   if(hasPc)ultimateBtn.style.setProperty("--ultimate-icon-url",rawUrl);
@@ -8122,7 +8412,7 @@ function __setMobileUltimateIcon(characterId){
       let minX=srcCanvas.width,minY=srcCanvas.height,maxX=0,maxY=0;
       for(let i=0;i<data.length;i+=4){
         const r=data[i],g=data[i+1],b=data[i+2];
-        if(src!=="assets/ultimate_icon_jiin.png?v=20260630-5"&&g>140&&r<125&&b<125)data[i+3]=0;
+        if(src!=="assets/ultimate_icon_jiin.png"&&g>140&&r<125&&b<125)data[i+3]=0;
         if(data[i+3]>8){
           const px=(i/4)%srcCanvas.width;
           const py=Math.floor((i/4)/srcCanvas.width);
@@ -8183,7 +8473,7 @@ updateUltimateButton=function(){
   const characterId=typeof player!=="undefined"&&player&&player.characterId==="sangil"?"sangil":typeof player!=="undefined"&&player&&player.characterId==="seunggwan"?"seunggwan":typeof player!=="undefined"&&player&&player.characterId==="jiin"?"jiin":"geontaek";
   const ratio=typeof ultimateChargeRatio==="function"?Math.max(0,Math.min(1,ultimateChargeRatio())):1;
   const isCooling=1-ratio>.01;
-  const src=characterId==="sangil"?"assets/ultimate_icon_sangil.png":characterId==="seunggwan"?"assets/ultimate_icon_seunggwan_chroma.png":characterId==="jiin"?"assets/ultimate_icon_jiin.png?v=20260630-5":"assets/ultimate_icon_geontaek_chroma.png";
+  const src=characterId==="sangil"?"assets/ultimate_icon_sangil.png":characterId==="seunggwan"?"assets/ultimate_icon_seunggwan_chroma.png":characterId==="jiin"?"assets/ultimate_icon_jiin.png":"assets/ultimate_icon_geontaek_chroma.png";
   const rawUrl=`url("${src}")`;
   ultimateBtn.style.setProperty("--ultimate-icon-url",rawUrl);
   ultimateBtn.dataset.character=characterId;
@@ -8683,5 +8973,5 @@ updateUltimateButton=function(){
   }
 })();
 if("serviceWorker" in navigator && location.protocol.startsWith("http")){
-  window.addEventListener("load",()=>navigator.serviceWorker.register("sw.js?v=20260630-5",{updateViaCache:"none"}).catch(()=>{}));
+  window.addEventListener("load",()=>navigator.serviceWorker.register("sw.js",{updateViaCache:"none"}).catch(()=>{}));
 }

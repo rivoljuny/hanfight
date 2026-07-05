@@ -5,7 +5,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
   <title>HAN-SERVIVE</title>
   <!-- Cache version: increment whenever game files change -->
-  <link rel="stylesheet" href="style.css?v=20260630-5">
+  <link rel="stylesheet" href="style.css?v=20260705-4">
 </head>
 <body>
   <div class="app">
@@ -32,32 +32,10 @@
         <button id="mobilePauseBtn" class="mobile-action" type="button">일시정지</button>
       </div>
     </div>
-    <div class="test-tools">
-      <button id="testModeBtn" type="button">테스트 OFF</button>
-      <button id="invincibleTestBtn" class="test-only" type="button">무적 OFF</button>
-      <button id="basicLv5TestBtn" class="test-only" type="button">평타 Lv.5</button>
-      <button id="forceLevelUpTestBtn" class="test-only" type="button">LEVEL UP</button>
-      <button id="clearTestBtn" type="button">클리어 테스트</button>
-      <button id="stage1TestBtn" class="test-only" type="button">1 STAGE</button>
-      <button id="waveTestBtn" class="test-only" type="button">1 WAVE</button>
-      <button id="bossTestBtn" class="test-only" type="button">1 BOSS</button>
-      <button id="stage2TestBtn" class="test-only" type="button">2 STAGE</button>
-      <button id="wave2TestBtn" class="test-only" type="button">2 WAVE</button>
-      <button id="boss2TestBtn" class="test-only" type="button">2 BOSS</button>
-      <button id="stage3TestBtn" class="test-only" type="button">3 STAGE</button>
-      <button id="wave3TestBtn" class="test-only" type="button">3 WAVE</button>
-      <button id="boss3TestBtn" class="test-only" type="button">3 BOSS</button>
-      <button id="stage4TestBtn" class="test-only" type="button">4 STAGE</button>
-      <button id="boss4TestBtn" class="test-only" type="button">4 BOSS</button>
-      <button id="stage5TestBtn" class="test-only" type="button">5 STAGE</button>
-      <button id="boss5TestBtn" class="test-only" type="button">5 BOSS</button>
-      <button id="ultimateBtn" type="button">필살기</button>
-    </div>
-
     <div id="startOverlay" class="overlay">
       <div class="card start-card">
         <h1 class="select-title">SELECT PLAYER</h1>
-        <img id="gameOverTitle" class="game-over-title hidden" src="assets/game_over_title.png?v=20260630-5" alt="GAME OVER">
+        <img id="gameOverTitle" class="game-over-title hidden" src="assets/game_over_title.png" alt="GAME OVER">
         <div class="character-select">
           <div class="carousel" id="characterCarousel">
             <button class="carousel-btn prev" id="characterPrev" type="button" aria-label="이전 캐릭터">‹</button>
@@ -87,12 +65,23 @@
           <button id="soundToggleBtn" type="button">소리 ON</button>
           <button id="bgmVolumeBtn" class="volume-row" type="button"><span>배경음</span><span class="volume-control"><span class="volume-arrow" data-dir="-1">‹</span><span class="volume-bars" id="bgmVolumeValue"></span><span class="volume-arrow" data-dir="1">›</span></span></button>
           <button id="sfxVolumeBtn" class="volume-row" type="button"><span>효과음</span><span class="volume-control"><span class="volume-arrow" data-dir="-1">‹</span><span class="volume-bars" id="sfxVolumeValue"></span><span class="volume-arrow" data-dir="1">›</span></span></button>
-          <button id="pauseTestModeBtn" type="button">테스트모드 OFF</button>
+          <button id="pauseTestModeBtn" type="button">테스트 선택</button>
+          <button id="pauseLevelUpBtn" type="button">스킬 레벨업</button>
+          <button id="pauseInvincibleBtn" type="button">무적 OFF</button>
         </div>
+      </div>
+    </div>
+    <div id="testSelectOverlay" class="overlay hidden">
+      <div class="card test-select-card">
+        <div class="test-select-head">
+          <h2>TEST SELECT</h2>
+          <button id="testSelectCloseBtn" type="button" aria-label="테스트 선택 닫기">×</button>
+        </div>
+        <div id="testSelectChoices" class="test-select-choices"></div>
       </div>
     </div>
   </div>
 
-<script src="game.js?v=20260630-5"></script>
+<script src="game.js?v=20260705-4"></script>
 </body>
 </html>
