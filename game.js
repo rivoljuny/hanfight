@@ -90,6 +90,10 @@ const seunggwanIronBallSprite=new Image();
 seunggwanIronBallSprite.src="assets/seunggwan_iron_ball.png";
 const jiinSprite=new Image();
 jiinSprite.src="assets/jiin_love_walk_aligned.png";
+const hominSprite=new Image();
+hominSprite.src="assets/homin_walk.png";
+const hominClearSprite=new Image();
+hominClearSprite.src="assets/homin_clear.png";
 const seoyulSprite=new Image();
 seoyulSprite.src="assets/seoyul_companion.png";
 const ultimateSprite=new Image();
@@ -322,7 +326,7 @@ const stageBgmSources={
   bike:{normal:"assets/bgm/cycle_normal.mp3",boss:"assets/bgm/cycle_boss.mp3"},
   logistics:{normal:"assets/bgm/box_factory_normal.mp3",boss:"assets/bgm/box_factory_boss.mp3"},
   gym:{normal:"assets/bgm/cross_gym_normal.mp3",boss:"assets/bgm/cross_gym_boss.mp3"},
-  estech:{normal:"assets/bgm/tape_factory_normal.mp3",boss:"assets/bgm/tape_factory_boss.mp3"}
+  estech:{normal:"assets/bgm/stech_normal.mp3",boss:"assets/bgm/stech_boss.mp3"}
 };
 const sfxLast={};
 let keys={},mouse={x:0,y:0};
@@ -357,12 +361,12 @@ const world={w:6400,h:4200};
 const player={x:1400,y:1000,r:18,hp:80,maxHp:80,speed:215,level:1,xp:0,next:16,frame:0,face:1,dir:"down",moving:false,vx:0,vy:0,inv:0,action:null,actionTimer:0,actionDuration:0,ultimateTimer:0,ultimateCd:0,ultimateCdMax:15,ultimateFired:false,ultimateDir:{x:0,y:1},skillBarrier:0,skillBarrierMax:0,barrierRegenT:0};
 const playerUltimateQuote="노~~오력이 부족해 !!!!";
 const playableCharacters=[
-  {id:"geontaek",name:"건택",trait:"골프를 즐겨 하는 계획맨",portrait:"assets/character_portraits_small/geontaek.png",top:"#f8f8f0",hair:"#17191f",skin:"#f0c8bc",playable:true,ultimateQuote:"노~~오력이 부족해 !!!!"},
-  {id:"sangil",name:"상일",trait:"노는게 제일 좋은 재력가",portrait:"assets/character_portraits_small/sangil.png",top:"#d5b77a",hair:"#15171d",skin:"#f0c8bc",playable:true,ultimateQuote:"가고 싶은대로 간다~!!"},
-  {id:"jiin",name:"지인",trait:"요즘 스타 감성의 사랑꾼",portrait:"assets/character_portraits_small/jiin.png",top:"#f5ead8",hair:"#1f2024",skin:"#f2c9bf",playable:true,ultimateQuote:"서율이가~ 있잖아요~!!"},
-  {id:"seunggwan",name:"승관",trait:"철공을 던지는 고독한 승부사",portrait:"assets/character_portraits_small/seunggwan.png",top:"#22242a",hair:"#191b20",skin:"#f3c6bd",playable:true,ultimateQuote:"정훈, 재훈! 가즈아~~~!!"},
-  {id:"homin",name:"호민",trait:"자유로운 영혼, 소울맨",portrait:"assets/character_portraits_small/homin.png",top:"#3a2d2a",hair:"#14161b",skin:"#f0c8bc",playable:false,ultimateQuote:"소울은 멈추지 않아!"},
-  {id:"seungjun",name:"승준",trait:"자존심만 센 술주정꾼",portrait:"assets/character_portraits_small/seungjun.png",top:"#20242b",hair:"#16181e",skin:"#f0c8bc",playable:false,ultimateQuote:"자존심으로 버틴다!"}
+  {id:"geontaek",name:"건택",trait:"회전 골프채를 던지는 표준형",portrait:"assets/character_portraits_small/geontaek.png",top:"#f8f8f0",hair:"#17191f",skin:"#f0c8bc",playable:true,ultimateQuote:"노~~오력이 부족해 !!!!"},
+  {id:"sangil",name:"상일",trait:"등산스틱 근접 난타와 빠른 필살기",portrait:"assets/character_portraits_small/sangil.png",top:"#d5b77a",hair:"#15171d",skin:"#f0c8bc",playable:true,ultimateQuote:"가고 싶은대로 간다~!!"},
+  {id:"jiin",name:"지인",trait:"빠른 이동과 유도 하트 연발",portrait:"assets/character_portraits_small/jiin.png",top:"#f5ead8",hair:"#1f2024",skin:"#f2c9bf",playable:true,ultimateQuote:"서율이가~ 있잖아요~!!"},
+  {id:"seunggwan",name:"승관",trait:"철공 포환 스플래시 한방형",portrait:"assets/character_portraits_small/seunggwan.png",top:"#22242a",hair:"#191b20",skin:"#f3c6bd",playable:true,ultimateQuote:"정훈, 재훈! 가즈아~~~!!"},
+  {id:"homin",name:"호민",trait:"풍선껌 폭발과 연쇄 버블",portrait:"assets/character_portraits_small/homin.png",top:"#3a2d2a",hair:"#14161b",skin:"#f0c8bc",playable:true,ultimateQuote:"소울은 멈추지 않아!"},
+  {id:"seungjun",name:"승준",trait:"아직 준비 중인 플레이어블",portrait:"assets/character_portraits_small/seungjun.png",top:"#20242b",hair:"#16181e",skin:"#f0c8bc",playable:false,ultimateQuote:"자존심으로 버틴다!"}
 ];
 const characterSelectList=[...playableCharacters].sort((a,b)=>Number(b.playable)-Number(a.playable));
 let selectedCharacterIndex=0,selectedCharacter=characterSelectList[selectedCharacterIndex];
@@ -1332,8 +1336,8 @@ function rnd(a,b){return a+Math.random()*(b-a)}
 function clamp(v,a,b){return Math.max(a,Math.min(b,v))}
 function smoothstep(v){v=clamp(v,0,1);return v*v*(3-2*v)}
 function gainSp(amount){}
-function getUltimateCooldown(id=player.characterId){return id==="sangil"?8:id==="seunggwan"?12:id==="jiin"?22:15}
-function getUltimateDuration(id=player.characterId){return id==="sangil"?5:id==="seunggwan"?1.18:id==="jiin"?7:.9}
+function getUltimateCooldown(id=player.characterId){return id==="sangil"?8:id==="seunggwan"?12:id==="jiin"?22:id==="homin"?18:15}
+function getUltimateDuration(id=player.characterId){return id==="sangil"?5:id==="seunggwan"?1.18:id==="jiin"?7:id==="homin"?3.2:.9}
 function ultimateChargeRatio(){
   const cd=player.ultimateCdMax||getUltimateCooldown();
   if(testMode||cd<=0)return 1;
@@ -1342,6 +1346,7 @@ function ultimateChargeRatio(){
 function ultimateReady(){return !gameOver&&player.ultimateTimer<=0&&(testMode||player.ultimateCd<=0)}
 function playerCanTakeDamage(){
   if(testInvincible||player.inv>0)return false;
+  if(player.characterId==="homin"&&player.ultimateTimer>0)return false;
   if(passiveUltimateDodgeActive()){
     floaters.push({x:player.x,y:player.y-34,t:.42,text:"회피",color:"#b9f7ff"});
     player.inv=.12;
@@ -2192,30 +2197,48 @@ function fireEstechArt(b,a){
   for(let i=0;i<count;i++){const aa=a+(i-(count-1)/2)*.18+rnd(-.035,.035),spd=rnd(310,360),kind=Math.random()<.58?"paintStroke":"colorPencil";bossShots.push({kind,x:b.x+Math.cos(aa)*18,y:b.y-10+Math.sin(aa)*18,vx:Math.cos(aa)*spd,vy:Math.sin(aa)*spd,r:kind==="paintStroke"?10:7,life:4,dmg:b.dmg,spin:rnd(0,Math.PI*2),color:palette[Math.floor(Math.random()*palette.length)],hitText:kind==="paintStroke"?"물감 붓자국":"색연필 낙서"})}
 }
 
+function estechChildGuardSpot(child,guard){
+  const towardPlayer=angle(guard,player),back=towardPlayer+Math.PI;
+  const side=child.familyRole==="artist"?-1:1,spread=58,backDist=92;
+  return {x:guard.x+Math.cos(back)*backDist+Math.cos(back+Math.PI/2)*spread*side,y:guard.y+Math.sin(back)*backDist+Math.sin(back+Math.PI/2)*spread*side};
+}
+
+function moveEstechChildToGuardSpot(child,guard,dt){
+  const spot=estechChildGuardSpot(child,guard),dx=spot.x-child.x,dy=spot.y-child.y,d=Math.hypot(dx,dy),speed=(child.spd||130)*2.25;
+  child.guardX=spot.x;child.guardY=spot.y;
+  if(d>1){const step=Math.min(d,speed*dt);child.x+=dx/d*step;child.y+=dy/d*step}
+}
+
 function updateEstechFamilyBoss(b,dt){
   b.hit=Math.max(0,b.hit-dt);b.slow=Math.max(0,b.slow-dt);b.stateT=Math.max(0,(b.stateT||0)-dt);b.attackCd-=dt;
   const guard=enemies.find(e=>e.id==="parkSejunGuard"&&e.group===b.group&&e.hp>0);b.group.guardAlive=!!guard;
   if(guard)b.inv=Math.max(b.inv||0,.14);else b.inv=Math.max(0,(b.inv||0)-dt);
   const a=angle(b,player),d=dist(b,player),slow=b.slow>0?.38:1;b.dir={x:Math.cos(a),y:Math.sin(a)};
+  if(guard&&b.state!=="kickDash"&&b.state!=="kickWarn"&&b.state!=="spinReturn")moveEstechChildToGuardSpot(b,guard,dt);
   if(b.familyRole==="artist"){
-    if(d>360){b.x+=Math.cos(a)*b.spd*.68*slow*dt;b.y+=Math.sin(a)*b.spd*.68*slow*dt}else if(d<225){b.x-=Math.cos(a)*b.spd*.58*slow*dt;b.y-=Math.sin(a)*b.spd*.58*slow*dt}
-    const strafe=Math.sin(elapsed*1.4+b.memberIndex)*b.spd*.28*dt;b.x+=Math.cos(a+Math.PI/2)*strafe;b.y+=Math.sin(a+Math.PI/2)*strafe;
-    if(b.attackCd<=0){fireEstechArt(b,a);b.attackCd=bossCd(b,1.55)}
+    if(!guard){
+      if(d>360){b.x+=Math.cos(a)*b.spd*.68*slow*dt;b.y+=Math.sin(a)*b.spd*.68*slow*dt}else if(d<225){b.x-=Math.cos(a)*b.spd*.58*slow*dt;b.y-=Math.sin(a)*b.spd*.58*slow*dt}
+      const strafe=Math.sin(elapsed*1.4+b.memberIndex)*b.spd*.28*dt;b.x+=Math.cos(a+Math.PI/2)*strafe;b.y+=Math.sin(a+Math.PI/2)*strafe;
+    }
+    if(b.attackCd<=0){fireEstechArt(b,a);b.attackCd=bossCd(b,guard?1.75:1.55)}
   }else{
     if(b.state==="kickWarn"&&b.stateT<=0){b.state="kickDash";b.stateT=.3;b.dashX=Math.cos(b.kickAngle);b.dashY=Math.sin(b.kickAngle);b.kickHit=false}
     if(b.state==="kickDash"){
       b.x+=b.dashX*720*dt;b.y+=b.dashY*720*dt;
       if(!b.kickHit&&dist(b,player)<b.r+player.r+22&&playerCanTakeDamage()){player.hp-=b.dmg;player.inv=.72;b.kickHit=true;shake=10;floaters.push({x:player.x,y:player.y-30,t:.65,text:`태권도 ${b.kickTotal-b.kicksLeft+1}단`,color:"#ff6b78"})}
-      if(b.stateT<=0){b.kicksLeft--;if(b.kicksLeft>0)beginEstechKick(b,true);else{b.state="spinReturn";b.stateT=.48;b.spinReturnT=.48;b.spinFromX=b.x;b.spinFromY=b.y;b.attackCd=bossCd(b,1.45)}}
+      if(b.stateT<=0){b.kicksLeft--;if(b.kicksLeft>0)beginEstechKick(b,true);else{const spot=guard?estechChildGuardSpot(b,guard):{x:b.returnX,y:b.returnY};b.returnX=spot.x;b.returnY=spot.y;b.state="spinReturn";b.stateT=.48;b.spinReturnT=.48;b.spinFromX=b.x;b.spinFromY=b.y;b.attackCd=bossCd(b,guard?1.65:1.45)}}
     }else if(b.state==="kickWarn"){
       // The clean telegraph holds the attack direction.
     }else if(b.state==="spinReturn"){
+      if(guard){const spot=estechChildGuardSpot(b,guard);b.returnX=spot.x;b.returnY=spot.y}
       const p=1-b.stateT/(b.spinReturnT||.48),ease=1-Math.pow(1-clamp(p,0,1),3);
       b.x=b.spinFromX+(b.returnX-b.spinFromX)*ease;b.y=b.spinFromY+(b.returnY-b.spinFromY)*ease;
       if(b.stateT<=0){b.x=b.returnX;b.y=b.returnY;b.state="idle"}
     }else{
-      if(d>250){b.x+=Math.cos(a)*b.spd*.82*slow*dt;b.y+=Math.sin(a)*b.spd*.82*slow*dt}else if(d<150){b.x-=Math.cos(a)*b.spd*.55*slow*dt;b.y-=Math.sin(a)*b.spd*.55*slow*dt}
-      if(b.attackCd<=0){b.returnX=b.x;b.returnY=b.y;b.kickTotal=1+Math.floor(Math.random()*3);b.kicksLeft=b.kickTotal;beginEstechKick(b)}
+      if(!guard){
+        if(d>250){b.x+=Math.cos(a)*b.spd*.82*slow*dt;b.y+=Math.sin(a)*b.spd*.82*slow*dt}else if(d<150){b.x-=Math.cos(a)*b.spd*.55*slow*dt;b.y-=Math.sin(a)*b.spd*.55*slow*dt}
+      }
+      if(b.attackCd<=0){const spot=guard?estechChildGuardSpot(b,guard):{x:b.x,y:b.y};b.returnX=spot.x;b.returnY=spot.y;b.kickTotal=1+Math.floor(Math.random()*3);b.kicksLeft=b.kickTotal;beginEstechKick(b)}
     }
   }
   if(arenaFence){b.x=clamp(b.x,arenaFence.x+b.r,arenaFence.x+arenaFence.w-b.r);b.y=clamp(b.y,arenaFence.y+b.r,arenaFence.y+arenaFence.h-b.r)}
@@ -2622,7 +2645,7 @@ function useUltimate(){
     show(`필살기 대기 중 ${Math.ceil(player.ultimateCd)}초`);
     return;
   }
-  const d=player.characterId==="seunggwan"||player.characterId==="jiin"?{x:0,y:0}:directionVector();
+  const d=player.characterId==="seunggwan"||player.characterId==="jiin"||player.characterId==="homin"?{x:0,y:0}:directionVector();
   player.ultimateCdMax=getUltimateCooldown();
   player.ultimateTimer=getUltimateDuration();
   player.ultimateFired=false;
@@ -2639,6 +2662,10 @@ function useUltimate(){
     player.ultimateFired=true;
     fireUltimateSwing();
     player.ultimateCd=testMode?0:player.ultimateCdMax;
+  }else if(player.characterId==="homin"){
+    player.ultimateFired=true;
+    fireUltimateSwing();
+    player.ultimateCd=testMode?0:player.ultimateCdMax;
   }else{
     player.ultimateCd=testMode?0:player.ultimateCdMax;
   }
@@ -2649,6 +2676,7 @@ function useUltimate(){
 function updateUltimate(dt){
   const wasSeunggwanUltimate=player.characterId==="seunggwan"&&player.ultimateTimer>0;
   const wasSangilUltimate=player.characterId==="sangil"&&player.ultimateTimer>0;
+  const wasHominUltimate=player.characterId==="homin"&&player.ultimateTimer>0;
   if(player.ultimateCd>0)player.ultimateCd=Math.max(0,player.ultimateCd-dt);
   if(player.ultimateTimer>0){
     player.ultimateTimer=Math.max(0,player.ultimateTimer-dt);
@@ -2675,6 +2703,7 @@ function updateUltimate(dt){
     player.ultimateCdMax=getUltimateCooldown();
     player.ultimateCd=player.ultimateCdMax;
   }
+  if(wasHominUltimate&&player.ultimateTimer<=0)fireHominUltimateBurst();
   updateUltimateButton();
 }
 
@@ -2692,6 +2721,14 @@ function fireUltimateSwing(){
     playSfx("selectConfirm");
     effects.push({kind:"seoyulCompanion",x:player.x-46,y:player.y+36,t:getUltimateDuration("jiin"),maxT:getUltimateDuration("jiin"),dir:"down",color:"#ff7ab6"});
     show("필살기: 서율이 에너지 충전");
+    return;
+  }
+  if(player.characterId==="homin"){
+    playVoiceYell();
+    playSfx("selectConfirm");
+    effects.push({kind:"hominBubbleShield",x:player.x,y:player.y-30,t:getUltimateDuration("homin"),maxT:getUltimateDuration("homin"),r:74,color:"#ff8fd7"});
+    player.inv=Math.max(player.inv,.25);
+    show("필살기: 풍선껌 버블 세이프");
     return;
   }
   if(player.characterId==="seunggwan"){
@@ -3821,6 +3858,7 @@ function updateSkills(dt){
   }
   else if(player.characterId==="seunggwan"){if(player.ultimateTimer<=0)fireSeunggwanIronBall();}
   else if(player.characterId==="jiin")fireJiinHeartBurst();
+  else if(player.characterId==="homin")fireHominBubblegum();
   else fireGolfClub();
   fireDroneBot();
   orbitShield(dt);
@@ -3946,6 +3984,74 @@ function fireJiinHeartBurst(){
   }
 }
 
+function hominBubbleColor(i=0){
+  const colors=["#ff8fd7","#8fe9ff","#ffe873","#b68dff","#ff9f6e"];
+  return colors[Math.abs(i)%colors.length];
+}
+function damageHominBubbleSplash(x,y,radius,dmg,color="#ff8fd7"){
+  effects.push({kind:"hominBubbleBurst",x,y,r:radius,t:.52,maxT:.52,color,seed:rnd(0,99)});
+  playSfx("bossCoupon");
+  shake=Math.max(shake,5+radius*.035);
+  for(const e of enemies){
+    if(!canDamageEnemy(e))continue;
+    const d=Math.hypot(e.x-x,e.y-y);
+    if(d<radius+(e.r||18)){
+      const falloff=clamp(1-d/(radius+(e.r||18)),.38,1);
+      const hit=dmg*falloff;
+      e.hp-=hit;e.hit=.18;e.slow=Math.max(e.slow||0,.18);
+      floaters.push({x:e.x,y:e.y-e.r,t:.45,text:Math.round(hit),color});
+    }
+  }
+}
+function nearestBubbleTarget(x,y,range=520,exclude=null){
+  let best=null,bd=range;
+  for(const e of visibleEnemies(70)){
+    if(e===exclude||!canTargetEnemy(e))continue;
+    const d=Math.hypot(e.x-x,e.y-y);
+    if(d<bd){bd=d;best=e}
+  }
+  return best;
+}
+function spawnHominBubbleShard(x,y,target,dmg,chain,level,angleSeed=0){
+  const a=target?Math.atan2(target.y-y,target.x-x):angleSeed;
+  const speed=330+level*34+rnd(-24,24);
+  shots.push({kind:"hominBubbleShard",x,y,vx:Math.cos(a)*speed,vy:Math.sin(a)*speed,r:7+level*.45,life:2.2,age:0,dmg,chainLeft:chain,target,hit:new Set(),color:hominBubbleColor(Math.floor(rnd(0,5))),wobble:rnd(0,Math.PI*2),pierce:1});
+}
+function explodeHominBubble(p){
+  if(p.burst)return;
+  p.burst=true;
+  damageHominBubbleSplash(p.x,p.y,p.splash||82,p.dmg,p.color||"#ff8fd7");
+  const count=p.shards||5;
+  for(let i=0;i<count;i++){
+    const target=nearestBubbleTarget(p.x,p.y,620,null);
+    spawnHominBubbleShard(p.x+Math.cos(i)*6,p.y+Math.sin(i)*6,target,(p.shardDmg||p.dmg*.42),p.chain||2,p.level||1,Math.PI*2*i/count+rnd(-.2,.2));
+  }
+}
+function fireHominBubblegum(){
+  const s=active("golf");if(s.t>0)return;
+  const level=s.level||1;
+  const facing=directionVector();
+  const a=Math.atan2(facing.y,facing.x);
+  const evolved=!!s.evolved;
+  const count=evolved?2:1;
+  s.t=Math.max(.58,.98-level*.07-(evolved?.18:0))*attackSpeedMul();
+  player.attackTimer=.34;player.attackDuration=.34;player.attackDir={x:Math.cos(a),y:Math.sin(a)};
+  playSfx("selectMove");
+  for(let i=0;i<count;i++){
+    const spread=count===1?0:(i? .14:-.14);
+    const aa=a+spread;
+    shots.push({kind:"hominBubble",x:player.x+Math.cos(aa)*24,y:player.y-28+Math.sin(aa)*24,vx:Math.cos(aa)*(235+level*22),vy:Math.sin(aa)*(235+level*22),r:20+level*2.7,baseR:20+level*2.7,life:.9+level*.07,age:0,dmg:(13+level*5.2)*basicDamageMul(),splash:66+level*9,shards:(evolved?6:3)+level,shardDmg:(5+level*2.2)*basicDamageMul(),chain:evolved?3:2,level,color:hominBubbleColor(i),wobble:rnd(0,Math.PI*2),pierce:1});
+  }
+}
+function fireHominUltimateBurst(){
+  const level=active("golf").level||1;
+  damageHominBubbleSplash(player.x,player.y-24,168+level*12,(130+level*28)*basicDamageMul(),"#ff8fd7");
+  const count=18+level*3;
+  for(let i=0;i<count;i++)spawnHominBubbleShard(player.x+rnd(-22,22),player.y-24+rnd(-18,18),nearestBubbleTarget(player.x,player.y,720,null),(18+level*4)*basicDamageMul(),4,level,Math.PI*2*i/count);
+  effects.push({kind:"hominBubbleBurst",x:player.x,y:player.y-24,r:210,t:.9,maxT:.9,color:"#8fe9ff",seed:rnd(0,99)});
+  shake=18;
+  playSfx("dragonExplosion");
+}
 function fireSeunggwanIronBall(){
   const s=active("golf");if(s.t>0)return;
   const level=s.level||1;
@@ -4466,10 +4572,48 @@ function updateShots(dt){
     }else{
       p.x+=p.vx*dt;p.y+=p.vy*dt;
     }
+    if(p.kind==="hominBubble"){
+      p.age=(p.age||0)+dt;
+      p.r=(p.baseR||p.r)*(1+Math.sin((p.age||0)*8+(p.wobble||0))*.08);
+      let popped=p.life<=0;
+      if(!popped){
+        for(const e of enemies){
+          if(!canDamageEnemy(e)||!isVisibleWorld(e.x,e.y,(e.r||24)+48))continue;
+          if(dist(p,e)<p.r+(e.r||18)){popped=true;break}
+        }
+      }
+      if(popped){explodeHominBubble(p);shots.splice(i,1);continue}
+      if(!isVisibleWorld(p.x,p.y,120)){shots.splice(i,1);continue}
+      continue;
+    }
+    if(p.kind==="hominBubbleShard"){
+      p.age=(p.age||0)+dt;
+      if(!canTargetEnemy(p.target)||p.hit?.has(p.target))p.target=nearestBubbleTarget(p.x,p.y,560,null);
+      if(p.target){
+        const dx=p.target.x-p.x,dy=p.target.y-p.y,len=Math.hypot(dx,dy)||1,spd=360+(active("golf").level||1)*32;
+        const wob=Math.sin((p.age||0)*16+(p.wobble||0))*.25;
+        const tx=dx/len-wob*dy/len,ty=dy/len+wob*dx/len,tl=Math.hypot(tx,ty)||1,turn=clamp(dt*8,0,1);
+        p.vx=p.vx*(1-turn)+tx/tl*spd*turn;p.vy=p.vy*(1-turn)+ty/tl*spd*turn;
+      }
+      let bounced=false;
+      for(const e of enemies){
+        if(!canDamageEnemy(e)||p.hit?.has(e)||!isVisibleWorld(e.x,e.y,(e.r||24)+36))continue;
+        if(dist(p,e)<p.r+(e.r||18)){
+          e.hp-=p.dmg;e.hit=.14;p.hit.add(e);p.chainLeft--;
+          floaters.push({x:e.x,y:e.y-e.r,t:.42,text:Math.round(p.dmg),color:p.color});
+          const next=nearestBubbleTarget(p.x,p.y,620,e);
+          if(next&&p.chainLeft>=0){p.target=next;bounced=true;break}
+          p.life=0;break;
+        }
+      }
+      if(bounced){const a=angle(p,p.target),spd=390+(active("golf").level||1)*30;p.vx=Math.cos(a)*spd;p.vy=Math.sin(a)*spd}
+      if(p.life<=0||!isVisibleWorld(p.x,p.y,120)){shots.splice(i,1);continue}
+      continue;
+    }
     if(p.kind!=="golf"&&p.kind!=="seunggwanIronBall"&&!isVisibleWorld(p.x,p.y,96)){shots.splice(i,1);continue}
     for(const e of enemies){
       if(!isVisibleWorld(e.x,e.y,(e.r||24)+36))continue;
-      const lastHit=p.hit?p.hit.get(e):undefined;
+      const lastHit=p.hit&&typeof p.hit.get==="function"?p.hit.get(e):undefined;
       const already=p.kind==="golf"
         ?(p.phase==="hold"?lastHit!==undefined&&p.age-lastHit<.18:lastHit!==undefined)
         :false;
@@ -4483,7 +4627,7 @@ function updateShots(dt){
         }
         const dmg=p.kind==="golf"&&p.phase==="hold"?p.dmg*.42:p.dmg;
         e.hp-=dmg;e.hit=.14;p.pierce--;
-        if(p.hit)p.hit.set(e,p.age);
+        if(p.hit&&typeof p.hit.set==="function")p.hit.set(e,p.age);
         floaters.push({x:e.x,y:e.y-e.r,t:.45,text:Math.round(dmg),color:p.color});
       }
     }
@@ -5463,7 +5607,7 @@ function drawStageOverlay(){
 
 function drawJiinUltimateAura(){
   if(player.characterId!=="jiin"||player.ultimateTimer<=0||!jiinSprite.complete||!jiinSprite.naturalWidth)return;
-  const rowByDir={down:0,side:player.face<0?1:2,up:3};
+  const rowByDir=isHomin?{down:0,side:player.face<0?1:2,up:3}:{down:0,side:player.face<0?1:2,up:3};
   const row=rowByDir[player.dir]??0;
   const col=player.moving?Math.floor(player.frame)%4:Math.floor(elapsed*2)%4;
   const fw=Math.floor(jiinSprite.naturalWidth/4),fh=Math.floor(jiinSprite.naturalHeight/4);
@@ -5486,26 +5630,52 @@ function drawJiinUltimateAura(){
   ctx.restore();
 }
 
+function drawTranslucentBubble(x,y,r,color="#ff8fd7",alpha=.68,seed=0){
+  ctx.save();ctx.translate(x,y);
+  const wob=1+Math.sin(elapsed*4+seed)*.025;
+  ctx.scale(wob,1/wob);
+
+  ctx.globalAlpha=alpha;
+  ctx.fillStyle=colorToRgba(color,.28);
+  ctx.beginPath();ctx.arc(0,0,r,0,Math.PI*2);ctx.fill();
+  ctx.strokeStyle=colorToRgba(color,.82);ctx.lineWidth=Math.max(2,r*.08);ctx.stroke();
+  ctx.globalAlpha=alpha*.85;
+  ctx.fillStyle="rgba(255,255,255,.8)";ctx.beginPath();ctx.ellipse(-r*.32,-r*.36,r*.18,r*.1,-.55,0,Math.PI*2);ctx.fill();
+  for(let i=0;i<4;i++){const a=seed+i*1.7+elapsed*.7;ctx.fillStyle=colorToRgba(hominBubbleColor(i),.34);ctx.beginPath();ctx.arc(Math.cos(a)*r*.38,Math.sin(a*1.3)*r*.32,r*(.08+i*.012),0,Math.PI*2);ctx.fill();}
+  ctx.restore();
+}
+function colorToRgba(hex,a){
+  const h=String(hex||"#ff8fd7").replace("#","");
+  const n=parseInt(h.length===3?h.split("").map(c=>c+c).join(""):h,16);
+  return `rgba(${(n>>16)&255},${(n>>8)&255},${n&255},${a})`;
+}
+function drawHominBubbleShield(){
+  const p=clamp(player.ultimateTimer/getUltimateDuration("homin"),0,1);
+  const pulse=1+Math.sin(elapsed*7)*.035;
+  drawTranslucentBubble(0,-35,78*pulse,"#ff8fd7",.72,elapsed);
+  ctx.save();ctx.globalAlpha=.55;ctx.strokeStyle="rgba(143,233,255,.85)";ctx.lineWidth=3;ctx.setLineDash([8,8]);ctx.beginPath();ctx.arc(0,-35,88+Math.sin(elapsed*5)*4,0,Math.PI*2);ctx.stroke();ctx.restore();
+}
 function drawPlayer(){
   ctx.save();ctx.translate(Math.round(player.x),Math.round(player.y));
   if(player.inv>0&&player.action!=="clear"&&Math.floor(elapsed*18)%2){ctx.globalAlpha=.45}
   const isSangil=player.characterId==="sangil";
   const isSeunggwan=player.characterId==="seunggwan";
   const isJiin=player.characterId==="jiin";
-  const runSheet=isSangil?sangilSprite:isSeunggwan?seunggwanSprite:isJiin?jiinSprite:sprite;
-  const idleSheet=isSangil?sangilSprite:isSeunggwan?seunggwanSprite:isJiin?jiinSprite:idleSprite;
-  const clearSheet=isSangil?sangilClearSprite:isSeunggwan?seunggwanClearSprite:isJiin?jiinSprite:clearSprite;
+  const isHomin=player.characterId==="homin";
+  const runSheet=isSangil?sangilSprite:isSeunggwan?seunggwanSprite:isJiin?jiinSprite:isHomin?hominSprite:sprite;
+  const idleSheet=isSangil?sangilSprite:isSeunggwan?seunggwanSprite:isJiin?jiinSprite:isHomin?hominSprite:idleSprite;
+  const clearSheet=isSangil?sangilClearSprite:isSeunggwan?seunggwanClearSprite:isJiin?jiinSprite:isHomin?hominClearSprite:clearSprite;
   if(player.action==="clear"&&clearSheet.complete&&clearSheet.naturalWidth){
     const fw=Math.floor(clearSheet.naturalWidth/4),fh=isJiin?Math.floor(clearSheet.naturalHeight/4):clearSheet.naturalHeight;
     const progress=player.actionDuration>0?clamp(1-player.actionTimer/player.actionDuration,0,.999):0;
     const col=Math.floor(progress*4);
     ctx.imageSmoothingEnabled=false;
-    const size=isSangil?96:isSeunggwan?104:isJiin?88:84;
+    const size=isSangil?96:isSeunggwan?104:isJiin?88:isHomin?92:84;
     ctx.drawImage(clearSheet,fw*col,0,fw,fh,-size/2,-size*.64,size,size);
     ctx.restore();
     return;
   }
-  const rowByDir={down:0,side:player.face<0?1:2,up:3};
+  const rowByDir=isHomin?{down:0,side:player.face<0?1:2,up:3}:{down:0,side:player.face<0?1:2,up:3};
   const row=rowByDir[player.dir]??0;
   if(player.ultimateTimer>0&&isSangil&&sangilWhirlwindSprite.complete&&sangilWhirlwindSprite.naturalWidth){
     const fw=Math.floor(sangilWhirlwindSprite.naturalWidth/6),fh=sangilWhirlwindSprite.naturalHeight;
@@ -5519,7 +5689,10 @@ function drawPlayer(){
     ctx.restore();
     return;
   }
-  if(player.ultimateTimer>0&&!isJiin&&ultimateSprite.complete&&ultimateSprite.naturalWidth){
+  if(player.ultimateTimer>0&&isHomin){
+    drawHominBubbleShield();
+  }
+  if(player.ultimateTimer>0&&!isJiin&&!isHomin&&ultimateSprite.complete&&ultimateSprite.naturalWidth){
     const fw=Math.floor(ultimateSprite.naturalWidth/4),fh=Math.floor(ultimateSprite.naturalHeight/4);
     const progress=clamp(1-player.ultimateTimer/.9,0,.999);
     const col=Math.floor(progress*4);
@@ -5546,8 +5719,8 @@ function drawPlayer(){
   if(!isSangil&&!player.moving&&idleSheet.complete&&idleSheet.naturalWidth){
     const fw=Math.floor(idleSheet.naturalWidth/4),fh=Math.floor(idleSheet.naturalHeight/4);
     const col=Math.floor(elapsed*2)%4;
-    const idleSize=isJiin?88:isSeunggwan?84:84;
-    const idleY=isSangil?(row===3?-36:-53):isSeunggwan?-55:isJiin?-57:(row===3?-43:-53);
+    const idleSize=isJiin?88:isHomin?92:isSeunggwan?84:84;
+    const idleY=isSangil?(row===3?-36:-53):isSeunggwan?-55:isJiin?-57:isHomin?-60:(row===3?-43:-53);
     ctx.imageSmoothingEnabled=false;
     ctx.drawImage(idleSheet,fw*col,fh*row,fw,fh,-idleSize/2,idleY,idleSize,idleSize);
     ctx.restore();
@@ -5562,9 +5735,9 @@ function drawPlayer(){
     ctx.imageSmoothingEnabled=false;
     ctx.save();
     ctx.rotate(lean);
-    const drawSize=isSangil?98:isSeunggwan?84:isJiin?88:84;
+    const drawSize=isSangil?98:isSeunggwan?84:isJiin?88:isHomin?92:84;
     const drawX=-drawSize/2;
-    const drawY=isSangil?-63-bob:isSeunggwan?-55-bob:isJiin?-57-bob:-53-bob;
+    const drawY=isSangil?-63-bob:isSeunggwan?-55-bob:isJiin?-57-bob:isHomin?-60-bob:-53-bob;
     ctx.drawImage(runSheet,fw*col,fh*row,fw,fh,drawX,drawY,drawSize,drawSize);
     ctx.restore();
   }else{
@@ -5577,7 +5750,7 @@ function drawPlayerStatusBars(){
   if(player.action==="clear"||bossVsCutscene.active)return;
   const barW=58,barH=5,gap=3;
   const x=Math.round(player.x-barW/2);
-  const y=Math.round(player.y-(player.characterId==="sangil"?82:player.characterId==="seunggwan"?76:player.characterId==="jiin"?78:72));
+  const y=Math.round(player.y-(player.characterId==="sangil"?82:player.characterId==="seunggwan"?76:player.characterId==="jiin"?78:player.characterId==="homin"?80:72));
   const hp=clamp(player.hp/player.maxHp,0,1);
   const sp=ultimateChargeRatio();
   ctx.save();
@@ -6737,7 +6910,18 @@ function drawShot(p){
     ctx.restore();
     return;
   }
-  if(p.kind==="droneLaser"){
+  if(p.kind==="hominBubble"){
+    ctx.save();ctx.translate(p.x,p.y);
+    drawTranslucentBubble(0,0,p.r||24,p.color||"#ff8fd7",.72,p.wobble||0);
+    ctx.restore();
+    return;
+  }
+  if(p.kind==="hominBubbleShard"){
+    ctx.save();ctx.translate(p.x,p.y);
+    drawTranslucentBubble(0,0,p.r||8,p.color||"#8fe9ff",.82,p.wobble||0);
+    ctx.restore();
+    return;
+  }  if(p.kind==="droneLaser"){
     const a=Math.atan2(p.vy,p.vx);
     const flicker=.85+Math.sin(elapsed*48+p.x*.03)*.15;
     const len=16+p.r*1.35;
@@ -7182,6 +7366,29 @@ function drawGem(g){
 function drawEffect(e){
   ctx.save();ctx.globalAlpha=Math.max(.15,e.t);
   if(e.delay>0){ctx.restore();return}
+  if(e.kind==="hominBubbleShield"){
+    const fade=clamp(e.t/.35,0,1),p=1-e.t/e.maxT;
+    ctx.globalAlpha=.32*fade;
+    for(let i=0;i<7;i++){
+      const a=elapsed*1.4+i*Math.PI*2/7;
+      drawTranslucentBubble(player.x+Math.cos(a)*64,player.y-38+Math.sin(a*1.2)*30,8+3*Math.sin(p*8+i),hominBubbleColor(i),.38,i);
+    }
+    ctx.restore();return;
+  }
+  if(e.kind==="hominBubbleBurst"){
+    const p=1-e.t/e.maxT,alpha=e.t/e.maxT;
+    ctx.translate(e.x,e.y);
+    ctx.globalAlpha=alpha*.72;
+    ctx.strokeStyle=colorToRgba(e.color||"#ff8fd7",.86);
+    ctx.lineWidth=4+10*p;
+    ctx.beginPath();ctx.arc(0,0,(e.r||90)*(.2+.85*p),0,Math.PI*2);ctx.stroke();
+    for(let i=0;i<12;i++){
+      const a=(e.seed||0)+i*Math.PI*2/12+p*.9;
+      const rr=(e.r||90)*(.12+p*.72)*(i%3===0?1.08:.86);
+      drawTranslucentBubble(Math.cos(a)*rr,Math.sin(a)*rr*.86,8+(i%4)*3,hominBubbleColor(i),alpha*.72,i);
+    }
+    ctx.restore();return;
+  }
   if(e.kind==="seoyulCompanion"){
     const rowMap={down:0,sideL:1,sideR:2,up:3};
     const row=rowMap[e.dir]??0;
@@ -8254,6 +8461,7 @@ function skillIconHtml(s){
   const isPassive=s.type==="passive";
   if(s.id==="golf"||s.id==="magnetRange"){
     if(s.id==="golf"&&player.characterId==="jiin")return `<b class="skill-icon basic" style="background-image:url('assets/skill_icon_jiin_heart.png');background-size:cover;background-position:center;background-repeat:no-repeat">${s.icon}</b>`;
+    if(s.id==="golf"&&player.characterId==="homin")return `<b class="skill-icon basic" style="background-image:url('assets/skill_icon_homin_bubble.png');background-size:cover;background-position:center;background-repeat:no-repeat">${s.icon}</b>`;
     if(s.id==="golf"&&player.characterId==="seunggwan"){
       return `<b class="skill-icon basic" style="background-image:url('assets/seunggwan_iron_ball_icon.png');background-size:contain;background-position:center;background-repeat:no-repeat">${s.icon}</b>`;
     }
@@ -8320,7 +8528,7 @@ confirmLevelChoice=function(){
     if(s.id==="orbitShield"){s.shieldMaxSeen=undefined;ensureOrbitShieldState(s);effects.push({kind:"orbitShieldEvolve",x:player.x,y:player.y,t:1.35,maxT:1.35,r:88,color:"#8fffff"});}
     if(s.id==="damageAura")effects.push({kind:"basicEvolve",x:player.x,y:player.y-38,t:1.25,maxT:1.25,r:96,color:"#ffe47a"});
     if(s.id==="barrier"){player.skillBarrierMax=barrierMaxValue(s);player.skillBarrier=player.skillBarrierMax;player.barrierRegenT=0;effects.push({kind:"barrierRestore",x:player.x,y:player.y,t:.75,maxT:.75,r:76,color:"#9ee9ff"});}
-    if(s.id==="golf")effects.push({kind:"basicEvolve",x:player.x,y:player.y-48,t:1.35,maxT:1.35,r:76,color:player.characterId==="jiin"?"#ff7ab6":player.characterId==="seunggwan"?"#d8d2c2":player.characterId==="sangil"?"#f7d889":"#d7e0e8"});
+    if(s.id==="golf")effects.push({kind:"basicEvolve",x:player.x,y:player.y-48,t:1.35,maxT:1.35,r:76,color:player.characterId==="jiin"?"#ff7ab6":player.characterId==="homin"?"#ff8fd7":player.characterId==="seunggwan"?"#d8d2c2":player.characterId==="sangil"?"#f7d889":"#d7e0e8"});
   }else{
     s.level++;
     if(s.id==="barrier"){
@@ -8345,12 +8553,14 @@ skillDisplayName=function(s){
   if(s.id==="golf"&&player.characterId==="sangil")return "등산스틱 클로";
   if(s.id==="golf"&&player.characterId==="seunggwan")return "철공 포환";
   if(s.id==="golf"&&player.characterId==="jiin")return "하트 연발";
+  if(s.id==="golf"&&player.characterId==="homin")return "풍선껌 버블";
   return s.name;
 };
 skillDisplayDesc=function(s){
   if(player.characterId==="sangil"&&s.id==="golf")return "투사체 없이 전방 근접 범위만 공격합니다.";
   if(player.characterId==="seunggwan"&&s.id==="golf")return "철공을 포물선으로 던져 낙하지점 주변에 스플래시 피해를 줍니다.";
   if(player.characterId==="jiin"&&s.id==="golf")return "레벨에 따라 최대 3명의 적에게 하트를 다중 연발합니다. 진화하면 3명을 향해 끊임없이 발사합니다.";
+  if(player.characterId==="homin"&&s.id==="golf")return "전방으로 투명한 풍선껌을 발사합니다. 터지면 범위 피해와 연쇄로 튕기는 작은 버블을 뿌립니다.";
   return s.desc;
 };
 renderSkillHud=function(){
@@ -8379,7 +8589,7 @@ function __setMobileUltimateIcon(characterId){
   const hasMobile=typeof mobileUltimateBtn!=="undefined"&&mobileUltimateBtn;
   const hasPc=typeof ultimateBtn!=="undefined"&&ultimateBtn;
   if(!hasMobile&&!hasPc)return;
-  const src=characterId==="sangil"?"assets/ultimate_icon_sangil.png":characterId==="seunggwan"?"assets/ultimate_icon_seunggwan_chroma.png":characterId==="jiin"?"assets/ultimate_icon_jiin.png":"assets/ultimate_icon_geontaek_chroma.png";
+  const src=characterId==="sangil"?"assets/ultimate_icon_sangil.png":characterId==="seunggwan"?"assets/ultimate_icon_seunggwan_chroma.png":characterId==="jiin"?"assets/ultimate_icon_jiin.png":characterId==="homin"?"assets/ultimate_icon_homin_bubble.png":"assets/ultimate_icon_geontaek_chroma.png";
   const rawUrl=`url("${src}")`;
   if(hasMobile)mobileUltimateBtn.style.setProperty("--ultimate-icon-url",rawUrl);
   if(hasPc)ultimateBtn.style.setProperty("--ultimate-icon-url",rawUrl);
@@ -8449,7 +8659,7 @@ const __hanFightUpdateUltimateButton=updateUltimateButton;
 updateUltimateButton=function(){
   __hanFightUpdateUltimateButton();
   if(typeof mobileUltimateBtn==="undefined"||!mobileUltimateBtn)return;
-  const characterId=typeof player!=="undefined"&&player&&player.characterId==="sangil"?"sangil":typeof player!=="undefined"&&player&&player.characterId==="seunggwan"?"seunggwan":typeof player!=="undefined"&&player&&player.characterId==="jiin"?"jiin":"geontaek";
+  const characterId=typeof player!=="undefined"&&player&&player.characterId==="sangil"?"sangil":typeof player!=="undefined"&&player&&player.characterId==="seunggwan"?"seunggwan":typeof player!=="undefined"&&player&&player.characterId==="jiin"?"jiin":typeof player!=="undefined"&&player&&player.characterId==="homin"?"homin":"geontaek";
   let ratio=1;
   if(typeof ultimateChargeRatio==="function"){
     ratio=Math.max(0,Math.min(1,ultimateChargeRatio()));
@@ -8470,10 +8680,10 @@ const __hanFightUpdateUltimateButtonPc=updateUltimateButton;
 updateUltimateButton=function(){
   __hanFightUpdateUltimateButtonPc();
   if(typeof ultimateBtn==="undefined"||!ultimateBtn)return;
-  const characterId=typeof player!=="undefined"&&player&&player.characterId==="sangil"?"sangil":typeof player!=="undefined"&&player&&player.characterId==="seunggwan"?"seunggwan":typeof player!=="undefined"&&player&&player.characterId==="jiin"?"jiin":"geontaek";
+  const characterId=typeof player!=="undefined"&&player&&player.characterId==="sangil"?"sangil":typeof player!=="undefined"&&player&&player.characterId==="seunggwan"?"seunggwan":typeof player!=="undefined"&&player&&player.characterId==="jiin"?"jiin":typeof player!=="undefined"&&player&&player.characterId==="homin"?"homin":"geontaek";
   const ratio=typeof ultimateChargeRatio==="function"?Math.max(0,Math.min(1,ultimateChargeRatio())):1;
   const isCooling=1-ratio>.01;
-  const src=characterId==="sangil"?"assets/ultimate_icon_sangil.png":characterId==="seunggwan"?"assets/ultimate_icon_seunggwan_chroma.png":characterId==="jiin"?"assets/ultimate_icon_jiin.png":"assets/ultimate_icon_geontaek_chroma.png";
+  const src=characterId==="sangil"?"assets/ultimate_icon_sangil.png":characterId==="seunggwan"?"assets/ultimate_icon_seunggwan_chroma.png":characterId==="jiin"?"assets/ultimate_icon_jiin.png":characterId==="homin"?"assets/ultimate_icon_homin_bubble.png":"assets/ultimate_icon_geontaek_chroma.png";
   const rawUrl=`url("${src}")`;
   ultimateBtn.style.setProperty("--ultimate-icon-url",rawUrl);
   ultimateBtn.dataset.character=characterId;
