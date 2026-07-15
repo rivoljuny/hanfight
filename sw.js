@@ -1,4 +1,4 @@
-const CACHE_NAME = "han-fight-assets-v38";
+const CACHE_NAME = "han-fight-assets-v42";
 const ASSET_PATTERN = /\.(?:png|jpg|jpeg|webp|gif|mp3|wav|ogg|css|js)$/i;
 const FRESH_PATTERN = /\.(?:css|js)$/i;
 
