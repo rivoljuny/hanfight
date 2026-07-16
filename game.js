@@ -111,7 +111,9 @@ laserBotEvolvedSprite.src="assets/laserbot_evolved_4dir.png";
 const babyDragonSprite=new Image();
 babyDragonSprite.src="assets/baby_dragon_basic_4dir.png";
 const adultDragonSprite=new Image();
-adultDragonSprite.src="assets/adult_dragon_4dir_fixed.png";
+adultDragonSprite.src="assets/adult_dragon_4dir.png";
+const adultDragonRightSprite=new Image();
+adultDragonRightSprite.src="assets/adult_dragon_right_4frame.png";
 const dragonFireballSprite=new Image();
 dragonFireballSprite.src="assets/dragon_fireball.png";
 const dragonFireballSplashSprite=new Image();
@@ -360,7 +362,19 @@ let boss2Spawned=false;
 let bossStageSpawned={};
 let arenaFence=null;
 const world={w:6400,h:4200};
-const player={x:1400,y:1000,r:18,hp:80,maxHp:80,speed:215,level:1,xp:0,next:16,frame:0,face:1,dir:"down",moving:false,vx:0,vy:0,inv:0,action:null,actionTimer:0,actionDuration:0,ultimateTimer:0,ultimateCd:0,ultimateCdMax:15,ultimateFired:false,ultimateDir:{x:0,y:1},skillBarrier:0,skillBarrierMax:0,barrierRegenT:0};
+function levelXpRequirement(level){
+  const lv=Math.max(1,level|0);
+  if(lv<=3)return 8+lv*4;
+  if(lv<=8){const x=lv-3;return Math.round(20+x*7+x*x*1.5)}
+  const x=lv-8;
+  return Math.round(93+x*22+Math.pow(x,1.55)*3.2);
+}
+function experienceGainMultiplier(){
+  const lv=Math.max(1,player.level||1);
+  const early=lv<=3?1.45:lv<=6?1.3:lv<=10?1.16:1;
+  return 1.15*early*(1+skillLevel("xpGain")*.12);
+}
+const player={x:1400,y:1000,r:18,hp:80,maxHp:80,speed:215,level:1,xp:0,next:levelXpRequirement(1),frame:0,face:1,dir:"down",moving:false,vx:0,vy:0,inv:0,action:null,actionTimer:0,actionDuration:0,ultimateTimer:0,ultimateCd:0,ultimateCdMax:15,ultimateFired:false,ultimateDir:{x:0,y:1},skillBarrier:0,skillBarrierMax:0,barrierRegenT:0};
 const playerUltimateQuote="노~~오력이 부족해 !!!!";
 const playableCharacters=[
   {id:"geontaek",name:"건택",trait:"회전 골프채를 던지는 표준형",portrait:"assets/character_portraits_small/geontaek.png",top:"#f8f8f0",hair:"#17191f",skin:"#f0c8bc",playable:true,ultimateQuote:"노~~오력이 부족해 !!!!"},
@@ -833,6 +847,9 @@ function applyCharacterStats(){
   const jiin=player.characterId==="jiin";
   player.x=world.w/2;
   player.y=world.h/2;
+  player.level=1;
+  player.xp=0;
+  player.next=levelXpRequirement(1);
   for(const s of skills){
     s.level=s.id==="golf"?1:0;
     s.evolved=false;
@@ -5122,7 +5139,7 @@ function killEnemy(i){
   if(e.volatile){effects.push({kind:"bossDeath",x:e.x,y:e.y,r:70,t:.48,maxT:.48,color:"#55d9ff"});for(const other of enemies){if(other!==e&&!other.boss&&!other.object&&dist(e,other)<105){other.hp-=24;other.hit=.15}}if(dist(e,player)<90&&playerCanTakeDamage()){player.hp-=7;player.inv=.55;floaters.push({x:player.x,y:player.y-28,t:.55,text:"활선 감전",color:"#65e7ff"})}}
   const xpBase=Math.max(1,Math.ceil(e.xp||1));
   const stageNo=clamp(currentStage||1,1,20);
-  const stageValueScale=.55+stageNo*.14;
+  const stageValueScale=.66+stageNo*.16;
   let gemKind="blue";
   let gemValue=Math.max(1,Math.ceil(xpBase*stageValueScale));
   const strong=xpBase>=12,mid=xpBase>=7;
@@ -5154,7 +5171,7 @@ function collectGemReward(g){
     detonateVisibleEnemies();
     floaters.push({x:player.x,y:player.y-42,t:.85,text:"펑!",color:"#ffd45a"});
   }else{
-    player.xp+=Math.ceil(g.value*(1+skillLevel("xpGain")*.12));
+    player.xp+=Math.ceil(g.value*experienceGainMultiplier());
     if(player.xp>=player.next)levelUp();
   }
 }
@@ -5202,7 +5219,7 @@ function collectGems(dt=1/60){
 }
 
 function levelUp(){
-  player.xp-=player.next;player.level++;player.next=Math.floor(player.next*1.28+8);paused=true;
+  player.xp-=player.next;player.level++;player.next=levelXpRequirement(player.level);paused=true;
   const available=skills.filter(s=>s.level<s.max);
   const picks=[];
   while(picks.length<3&&available.length){const s=available.splice(Math.floor(Math.random()*available.length),1)[0];picks.push(s)}
@@ -7054,7 +7071,9 @@ function drawDragonCompanion(){
   const target=nearest(860);
   const evolved=!!s.evolved;
   const dragon=dragonSlot(s.level,evolved,target);
-  const sheet=evolved?adultDragonSprite:babyDragonSprite;
+  const row=dragonRowFromVector(dragon.aim);
+  const adultSheet=row===2?adultDragonRightSprite:adultDragonSprite;
+  const sheet=evolved?adultSheet:babyDragonSprite;
   const evolveFx=effects.find(e=>e.kind==="dragonEvolve");
   ctx.save();
   ctx.translate(dragon.x,dragon.y);
@@ -7062,18 +7081,19 @@ function drawDragonCompanion(){
   const bob=Math.sin(elapsed*(evolved?3.2:4.4))*2.5;
   const drawDragonSheet=(src,size,alpha=1,scale=1)=>{
     if(!src.complete||!src.naturalWidth)return false;
+    const rightOnly=src===adultDragonRightSprite;
     const fw=src.naturalWidth/4;
-    const fh=src.naturalHeight/4;
+    const fh=src.naturalHeight/(rightOnly?1:4);
     const col=Math.floor(elapsed*(evolved?6:8))%4;
-    const row=dragonRowFromVector(dragon.aim);
+    const sourceRow=rightOnly?0:row;
     const draw=size*scale;
     ctx.save();
     ctx.globalAlpha*=alpha;
-    ctx.drawImage(src,fw*col,fh*row,fw,fh,-draw/2,-draw/2+bob,draw,draw);
+    ctx.drawImage(src,fw*col,fh*sourceRow,fw,fh,-draw/2,-draw/2+bob,draw,draw);
     ctx.restore();
     return true;
   };
-  if(evolveFx&&evolved&&babyDragonSprite.complete&&adultDragonSprite.complete){
+  if(evolveFx&&evolved&&babyDragonSprite.complete&&adultSheet.complete){
     const p=clamp(1-evolveFx.t/evolveFx.maxT,0,1);
     const flash=Math.sin(p*Math.PI);
     ctx.save();
@@ -7090,7 +7110,7 @@ function drawDragonCompanion(){
     ctx.restore();
     drawDragonSheet(babyDragonSprite,52,1-p,.9+flash*.1);
     ctx.globalCompositeOperation="lighter";
-    drawDragonSheet(adultDragonSprite,98,clamp((p-.18)/.72,0,1),.72+p*.28+flash*.08);
+    drawDragonSheet(adultSheet,98,clamp((p-.18)/.72,0,1),.72+p*.28+flash*.08);
     ctx.globalCompositeOperation="source-over";
   }else if(sheet.complete&&sheet.naturalWidth){
     drawDragonSheet(sheet,evolved?98:52,1,1);
@@ -8721,7 +8741,7 @@ function skillIconHtml(s){
 levelUp=function(){
   player.xp-=player.next;
   player.level++;
-  player.next=Math.floor(player.next*1.28+8);
+  player.next=levelXpRequirement(player.level);
   paused=true;
   const allChoiceMode=!!testLevelAllChoices;
   testLevelAllChoices=false;
