@@ -350,12 +350,12 @@ const wave1={maleAt:28,triggerAt:60,duration:20,started:false,active:false,done:
 const wave2={triggerAt:55,fishermanAt:25,duration:28,started:false,active:false,done:false,start:0,banner:0};
 const wave3={triggerAt:55,duration:30,started:false,active:false,done:false,start:0,banner:0};
 const stageThemes=[
-  {id:"office",name:"사무실",bossId:"cheonSangmu"},
-  {id:"factory",name:"테이프 공장",bossId:"juDaeri"},
-  {id:"bike",name:"자전거도로",bossId:"cultFanatic"},
-  {id:"logistics",name:"물류센터",bossId:"gossipGroup"},
-  {id:"gym",name:"강호 크로스핏 센터",bossId:"emotionCeo"},
-  {id:"estech",name:"에스테크",bossId:"parkSejunFamily"}
+  {id:"office",nativeStage:1,name:"사무실",bossId:"cheonSangmu"},
+  {id:"factory",nativeStage:2,name:"테이프 공장",bossId:"juDaeri"},
+  {id:"bike",nativeStage:3,name:"자전거도로",bossId:"cultFanatic"},
+  {id:"logistics",nativeStage:4,name:"물류센터",bossId:"gossipGroup"},
+  {id:"gym",nativeStage:5,name:"강호 크로스핏 센터",bossId:"emotionCeo"},
+  {id:"estech",nativeStage:6,name:"에스테크",bossId:"parkSejunFamily"}
 ];
 let boss1Spawned=false;
 let boss2Spawned=false;
@@ -460,7 +460,7 @@ function basePlayerMaxHp(){
 }
 
 function resize(){
-  dpr=Math.min(devicePixelRatio||1,2);
+  dpr=Math.min(devicePixelRatio||1,mobileControlsAvailable()?1.5:2);
   const isMobile=mobileControlsAvailable();
   const fixedW=isMobile?innerWidth:Math.min(innerWidth,1600);
   const fixedH=isMobile?innerHeight:Math.min(innerHeight,900);
@@ -809,6 +809,21 @@ function setupMobileControls(){
 function mobileControlsAvailable(){
   return !!(matchMedia("(pointer: coarse)").matches||innerWidth<=760);
 }
+function trimMobileTransientLoad(){
+  if(!mobileControlsAvailable())return;
+  const trimPreferred=(list,max,predicate,hardLimit=true)=>{
+    if(list.length<=max)return;
+    for(let i=0;i<list.length&&list.length>max;){
+      if(predicate(list[i]))list.splice(i,1);
+      else i++;
+    }
+    if(hardLimit&&list.length>max)list.splice(0,list.length-max);
+  };
+  trimPreferred(shots,170,p=>p.kind==="hominBubbleShard"||p.kind==="jiinHeart"||p.kind==="chart");
+  trimPreferred(effects,170,e=>e.kind==="pop"||e.kind==="hominBubbleBurst"||e.kind==="dragonFireballSplash"||e.kind==="iceBallBurst"||e.kind==="seunggwanIronImpact",false);
+  if(bossShots.length>120)bossShots.splice(0,bossShots.length-120);
+  if(floaters.length>80)floaters.splice(0,floaters.length-80);
+}
 
 function updateMobileControlsUi(){
   if(!mobileControls)return;
@@ -851,6 +866,7 @@ function applyCharacterStats(){
   const sangil=player.characterId==="sangil";
   const seunggwan=player.characterId==="seunggwan";
   const jiin=player.characterId==="jiin";
+  const homin=player.characterId==="homin";
   player.x=world.w/2;
   player.y=world.h/2;
   player.level=1;
@@ -866,7 +882,7 @@ function applyCharacterStats(){
   }
   player.maxHp=basePlayerMaxHp();
   player.hp=player.maxHp;
-  player.speed=jiin?206:sangil?178:seunggwan?176:184;
+  player.speed=jiin?206:sangil?178:seunggwan?176:homin?178:184;
   player.r=sangil?20:seunggwan?19:18;
   player.skillBarrier=0;
   player.skillBarrierMax=0;
@@ -937,6 +953,14 @@ function themeForStage(stage=currentStage){
 }
 function activeTheme(){
   return stageThemes.find(t=>t.id===currentThemeId)||themeForStage(currentStage);
+}
+function themeProgressionScale(stage=currentStage,theme=activeTheme()){
+  const delta=clamp((stage||1)-(theme.nativeStage||stage||1),-5,5);
+  return {
+    hp:clamp(Math.pow(1.16,delta),.55,1.82),
+    dmg:clamp(Math.pow(1.08,delta),.73,1.38),
+    xp:clamp(Math.pow(1.1,delta),.68,1.5)
+  };
 }
 function waveForStage(stage=currentStage){
   if(stage<=1)return wave1;
@@ -1823,7 +1847,7 @@ function update(dt){
     bossShots.length=0;
     updateEffects(dt);
   }else{
-    movePlayer(dt);spawn(dt);updateEnemies(dt);updateBossShots(dt);updateSkills(dt);updateShots(dt);updateEffects(dt);collectGems(dt);
+    movePlayer(dt);spawn(dt);updateEnemies(dt);updateBossShots(dt);updateSkills(dt);updateShots(dt);updateEffects(dt);collectGems(dt);trimMobileTransientLoad();
   }
   hpFill.style.width=clamp(player.hp/player.maxHp*100,0,100)+"%";
   const xpPct=clamp(player.xp/player.next*100,0,100)+"%";
@@ -2865,8 +2889,10 @@ function spawn(dt){
   const progress=clamp(age/105,0,1);
   const levelThreat=Math.max(0,player.level-1);
   const fieldEnemyCount=enemies.reduce((count,e)=>count+(!e.boss&&!e.object?1:0),0);
-  const densityTarget=Math.round(clamp(16+stageNo*9+levelThreat*.8+progress*14,24,150));
-  const enemyCap=Math.round(clamp(48+stageNo*11+levelThreat*1.05,60,190));
+  const mobileLoad=mobileControlsAvailable();
+  const loadScale=mobileLoad ? .62 : 1;
+  const densityTarget=Math.round(clamp((16+stageNo*9+levelThreat*.8+progress*14)*loadScale,mobileLoad?22:24,mobileLoad?78:150));
+  const enemyCap=Math.round(clamp((48+stageNo*11+levelThreat*1.05)*loadScale,mobileLoad?42:60,mobileLoad?96:160));
   const densityRatio=fieldEnemyCount/Math.max(1,densityTarget);
   if(fieldEnemyCount>=enemyCap){
     spawnTimer=.24;
@@ -2877,7 +2903,7 @@ function spawn(dt){
   const speedPressure=clamp(.78+(stageNo-1)*.045+progress*.09+Math.min(.16,levelThreat*.004),.78,1.38);
   const rawInterval=1.42-(stageNo-1)*.12-age*.0022-Math.min(.38,levelThreat*.007);
   const densityIntervalMul=densityRatio<.45?.68:densityRatio<.8?.84:1.05;
-  const baseInterval=Math.max(.26,rawInterval)*densityIntervalMul;
+  const baseInterval=Math.max(.26,rawInterval)*densityIntervalMul*(mobileLoad?1.18:1);
   const unlock2=18+Math.max(0,3-stageNo)*7;
   const unlock3=44+Math.max(0,3-stageNo)*9;
   const rangedChance=clamp(.06+stageNo*.035+progress*.05,.08,.28);
@@ -2910,8 +2936,8 @@ function spawn(dt){
   }
   if(age>5&&Math.random()<clamp(.04+stageNo*.025+progress*.03,.055,.17)){
     const c=cam(),vw=viewW(),vh=viewH(),pad=135;
-    const rows=2+Math.floor(Math.random()*2);
-    const cols=3+Math.floor(Math.random()*Math.min(4,stageNo+1));
+    const rows=mobileLoad?2:2+Math.floor(Math.random()*2);
+    const cols=mobileLoad?3+Math.floor(Math.random()*Math.min(2,stageNo+1)):3+Math.floor(Math.random()*Math.min(4,stageNo+1));
     let centerX,centerY;
     if(specialSide===0){centerX=c.x+rnd(vw*.15,vw*.85);centerY=c.y-pad}
     else if(specialSide===1){centerX=c.x+vw+pad;centerY=c.y+rnd(vh*.15,vh*.85)}
@@ -3018,9 +3044,11 @@ function pickEnemySpawnPoint(preferredSide=0,type=null){
 function spawnEnemy(type,side,pressure=1,speedScale=1){
   if(!type)return;
   const p=pickEnemySpawnPoint(side,type);
-  const hp=type.hp*pressure;
-  const dmg=Math.max(1,Math.round(type.dmg*clamp(.82+pressure*.18,.85,1.38)));
-  enemies.push({...type,x:p.x,y:p.y,r:type.size,hp,maxHp:hp,dmg,spd:type.spd*speedScale,slow:0,hit:0,shootT:rnd(.4,type.shootCd||1.2),attackT:0});
+  const themeScale=themeProgressionScale();
+  const hp=type.hp*pressure*themeScale.hp;
+  const dmg=Math.max(1,Math.round(type.dmg*themeScale.dmg*clamp(.82+pressure*.18,.85,1.38)));
+  const xp=Math.max(1,Math.round(type.xp*themeScale.xp));
+  enemies.push({...type,x:p.x,y:p.y,r:type.size,hp,maxHp:hp,dmg,xp,spd:type.spd*speedScale,slow:0,hit:0,shootT:rnd(.4,type.shootCd||1.2),attackT:0});
 }
 
 function spawnEnemyAt(type,x,y,pressure=1,speedScale=1,extra={}){
@@ -3032,9 +3060,10 @@ function spawnEnemyAt(type,x,y,pressure=1,speedScale=1,extra={}){
   }
   const size=extra.size||type.size;
   const drawSize=extra.drawSize||type.drawSize;
-  const hp=type.hp*pressure*(extra.hpScale||1);
-  const dmg=Math.max(1,Math.round(type.dmg*(extra.dmgScale||1)*clamp(.82+pressure*.18,.85,1.38)));
-  const xp=Math.max(1,Math.round(type.xp*(extra.xpScale||1)));
+  const themeScale=themeProgressionScale();
+  const hp=type.hp*pressure*themeScale.hp*(extra.hpScale||1);
+  const dmg=Math.max(1,Math.round(type.dmg*themeScale.dmg*(extra.dmgScale||1)*clamp(.82+pressure*.18,.85,1.38)));
+  const xp=Math.max(1,Math.round(type.xp*themeScale.xp*(extra.xpScale||1)));
   enemies.push({...type,...extra,x,y,r:size,size,drawSize,hp,maxHp:hp,dmg,xp,spd:type.spd*speedScale,slow:0,hit:0,shootT:rnd(.4,type.shootCd||1.2),attackT:0});
 }
 
@@ -4065,17 +4094,18 @@ function bubbleShardTargetAhead(p,range=260,exclude=null){
   const speed=Math.hypot(p.vx,p.vy)||1;
   const fx=p.vx/speed,fy=p.vy/speed;
   let best=null,bestScore=Infinity;
-  for(const e of visibleEnemies(70)){
+  for(const e of enemies){
+    if(!isVisibleWorld(e.x,e.y,(e.r||24)+70))continue;
     if(e===exclude||!canTargetEnemy(e)||p.hit?.has(e))continue;
     const dx=e.x-p.x,dy=e.y-p.y,d=Math.hypot(dx,dy)||1;
     if(d>range)continue;
     const forward=(dx*fx+dy*fy)/d;
     if(forward<.42)continue;
-    const alreadyClaimed=shots.some(s=>s!==p&&s.kind==="hominBubbleShard"&&s.target===e);
-    if(alreadyClaimed)continue;
+    if((e.hominBubbleClaimUntil||0)>elapsed)continue;
     const score=d+(1-forward)*190;
     if(score<bestScore){bestScore=score;best=e}
   }
+  if(best)best.hominBubbleClaimUntil=elapsed+.14;
   return best;
 }
 function spawnHominBubbleShard(x,y,dmg,chain,level,angleSeed=0){
@@ -4103,7 +4133,7 @@ function fireHominBubblegum(){
   const fallbackAngle=Math.atan2(facing.y,facing.x);
   const firstTarget=targets[0]||null;
   const a=firstTarget?Math.atan2(firstTarget.y-(player.y-28),firstTarget.x-player.x):fallbackAngle;
-  s.t=Math.max(.82,1.38-level*.06-(evolved?.16:0))*attackSpeedMul();
+  s.t=Math.max(1.18,2.35-level*.16-(evolved?.3:0))*attackSpeedMul();
   player.attackTimer=.34;player.attackDuration=.34;player.attackDir={x:Math.cos(a),y:Math.sin(a)};
   playSfx("selectMove");
   for(let i=0;i<count;i++){
@@ -5102,11 +5132,15 @@ function updateEffects(dt){
   for(let i=enemies.length-1;i>=0;i--)if(enemies[i].hp<=0)killEnemy(i);
 }
 
-const EXPERIENCE_GEM_LIMIT=220;
+function experienceGemLimit(){
+  return mobileControlsAvailable()?140:220;
+}
 function isExperienceGem(g){
   return g.kind==="blue"||g.kind==="green"||g.kind==="purple"||g.kind==="gold";
 }
 function experienceGemAppearance(stageNo,value,forceGold=false){
+  if(stageNo<=1)return {kind:"blue",r:6};
+  if(stageNo===2)return value>=12?{kind:"green",r:7}:{kind:"blue",r:6};
   if(forceGold||value>=80)return {kind:"gold",r:9};
   const stageFloor=stageNo>=6?2:stageNo>=3?1:0;
   const valueTier=value>=18?2:value>=6?1:0;
@@ -5124,7 +5158,7 @@ function dropExperienceGem(x,y,value,{forceGold=false}={}){
     const d=Math.hypot(gem.x-player.x,gem.y-player.y);
     if(d>bestDist){bestDist=d;bank=gem}
   }
-  if(xpCount>=EXPERIENCE_GEM_LIMIT&&bank){
+  if(xpCount>=experienceGemLimit()&&bank){
     bank.xpBank=true;
     bank.value+=value;
     const merged=experienceGemAppearance(stageNo,bank.value,forceGold||bank.kind==="gold");
@@ -5200,7 +5234,7 @@ function killEnemy(i){
   const stageNo=clamp(currentStage||1,1,20);
   const stageValueScale=.8+stageNo*.2+Math.pow(stageNo-1,1.1)*.035;
   let gemValue=Math.max(1,Math.ceil(xpBase*stageValueScale));
-  const goldChance=clamp(Math.max(0,stageNo-3)*.025+(xpBase>=12?.05:0),0,.22);
+  const goldChance=stageNo>=3?clamp(Math.max(0,stageNo-3)*.025+(xpBase>=12?.05:0),0,.22):0;
   const forceGold=Math.random()<goldChance;
   if(forceGold)gemValue=Math.ceil(gemValue*1.65);
   const droppedGem=dropExperienceGem(e.x,e.y,gemValue,{forceGold});
@@ -5369,16 +5403,18 @@ function openEnd(){
 
 function draw(){
   const c=cam(),scale=gameplayScale();ctx.save();
+  const vw=viewW(),vh=viewH();
+  const inView=(o,pad=0)=>!Number.isFinite(o?.x)||!Number.isFinite(o?.y)||(o.x>=c.x-pad&&o.x<=c.x+vw+pad&&o.y>=c.y-pad&&o.y<=c.y+vh+pad);
   if(shake)ctx.translate(rnd(-shake,shake),rnd(-shake,shake));
   ctx.scale(scale,scale);
   drawBg(c);ctx.translate(-c.x,-c.y);
   drawArenaFence();
-  for(const g of gems)drawGem(g);
-  for(const e of effects)drawEffect(e);
+  for(const g of gems)if(inView(g,48))drawGem(g);
+  for(const e of effects)if(inView(e,Math.max(180,(e.r||0)+80)))drawEffect(e);
   drawDamageAura();
-  for(const p of shots)drawShot(p);
-  for(const p of bossShots)if(!p.delay||p.delay<=0)drawBossShot(p);
-  for(const e of enemies){drawEnemy(e);drawBurningEnemyStatus(e);drawFrozenEnemyStatus(e)}
+  for(const p of shots)if(inView(p,180))drawShot(p);
+  for(const p of bossShots)if(inView(p,140)&&(!p.delay||p.delay<=0))drawBossShot(p);
+  for(const e of enemies)if(inView(e,(e.drawSize||e.r||40)+100)){drawEnemy(e);drawBurningEnemyStatus(e);drawFrozenEnemyStatus(e)}
   drawDroneBots();
   drawDragonCompanion();
   drawIceBirdCompanion();
@@ -5389,7 +5425,7 @@ function draw(){
   drawPlayerBarrier();
   drawPlayerStatusBars();
   drawUltimateQuote();
-  for(const f of floaters)drawText(f);
+  for(const f of floaters)if(inView(f,100))drawText(f);
   ctx.restore();
   drawWaveOverlay();
   drawStageOverlay();
