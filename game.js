@@ -364,15 +364,18 @@ let arenaFence=null;
 const world={w:6400,h:4200};
 function levelXpRequirement(level){
   const lv=Math.max(1,level|0);
-  if(lv<=3)return 8+lv*4;
-  if(lv<=8){const x=lv-3;return Math.round(20+x*7+x*x*1.5)}
-  const x=lv-8;
-  return Math.round(93+x*22+Math.pow(x,1.55)*3.2);
+  if(lv<=5)return 8+lv*4;
+  if(lv<=15){
+    const x=lv-5;
+    return Math.round(28+x*7+Math.pow(x,1.35)*1.8);
+  }
+  const x=lv-15;
+  return Math.round(138+x*11+Math.pow(x,1.3)*2.4);
 }
 function experienceGainMultiplier(){
   const lv=Math.max(1,player.level||1);
-  const early=lv<=3?1.45:lv<=6?1.3:lv<=10?1.16:1;
-  return 1.15*early*(1+skillLevel("xpGain")*.12);
+  const early=lv<=3?1.42:lv<=8?1.22:lv<=15?1.08:1;
+  return 1.1*early*(1+skillLevel("xpGain")*.12);
 }
 const player={x:1400,y:1000,r:18,hp:80,maxHp:80,speed:215,level:1,xp:0,next:levelXpRequirement(1),frame:0,face:1,dir:"down",moving:false,vx:0,vy:0,inv:0,action:null,actionTimer:0,actionDuration:0,ultimateTimer:0,ultimateCd:0,ultimateCdMax:15,ultimateFired:false,ultimateDir:{x:0,y:1},skillBarrier:0,skillBarrierMax:0,barrierRegenT:0};
 const playerUltimateQuote="노~~오력이 부족해 !!!!";
@@ -756,6 +759,7 @@ function setupMobileControls(){
       mobileUltimateBtn.style.top=`${Math.round(ultimateY)}px`;
     }
     mobileControls.classList.add("has-pad");
+    mobileControls.classList.remove("is-idle");
     mobileInput.baseX=rect.left+localX;
     mobileInput.baseY=rect.top+localY;
   };
@@ -776,7 +780,7 @@ function setupMobileControls(){
     mobileInput.x=0;
     mobileInput.y=0;
     mobileStickKnob.style.transform="translate(0,0)";
-    mobileControls.classList.remove("has-pad");
+    mobileControls.classList.add("is-idle");
   };
   canvas.addEventListener("pointerdown",e=>{
     if(!mobileControlsAvailable()||mobileControls.classList.contains("is-hidden")||mobileInput.active)return;
@@ -817,7 +821,7 @@ function updateMobileControlsUi(){
     mobileInput.x=0;
     mobileInput.y=0;
     if(mobileStickKnob)mobileStickKnob.style.transform="translate(0,0)";
-    mobileControls.classList.remove("has-pad");
+    mobileControls.classList.add("is-idle");
   }
 }
 
@@ -1931,7 +1935,7 @@ function movePlayer(dt){
     else{player.dir=y>0?"down":"up"}
   }
   const slowMul=player.slowT>0?.46:1;
-  const ultimateMoveMul=player.ultimateTimer>0?(player.characterId==="jiin"?1.75:player.characterId==="homin" ? .45 : 1):1;
+  const ultimateMoveMul=player.ultimateTimer>0?(player.characterId==="jiin"?1.75:player.characterId==="sangil"?1.55:player.characterId==="homin"?.45:1):1;
   const moveSpeed=(player.speed+playerMoveBonus())*ultimateMoveMul;
   player.x=clamp(player.x+x*moveSpeed*slowMul*dt,20,world.w-20);
   player.y=clamp(player.y+y*moveSpeed*slowMul*dt,20,world.h-20);
@@ -2859,10 +2863,21 @@ function spawn(dt){
           :[female,male,mzResignation];
   const stageNo=clamp(currentStage,1,20);
   const progress=clamp(age/105,0,1);
-  const skillCurve=1+Math.max(0,player.level-1)*.028;
-  const hpPressure=(.52+stageNo*.14+Math.pow(stageNo-1,1.35)*.045)*(1+age*.0022)*skillCurve;
-  const speedPressure=.66+(stageNo-1)*.035+progress*.045;
-  const baseInterval=Math.max(.48,1.82-(stageNo-1)*.16-age*.00145);
+  const levelThreat=Math.max(0,player.level-1);
+  const fieldEnemyCount=enemies.reduce((count,e)=>count+(!e.boss&&!e.object?1:0),0);
+  const densityTarget=Math.round(clamp(16+stageNo*9+levelThreat*.8+progress*14,24,150));
+  const enemyCap=Math.round(clamp(48+stageNo*11+levelThreat*1.05,60,190));
+  const densityRatio=fieldEnemyCount/Math.max(1,densityTarget);
+  if(fieldEnemyCount>=enemyCap){
+    spawnTimer=.24;
+    return;
+  }
+  const skillCurve=1+levelThreat*.012;
+  const hpPressure=(.58+stageNo*.13+Math.pow(stageNo-1,1.28)*.04)*(1+age*.0017)*skillCurve;
+  const speedPressure=clamp(.78+(stageNo-1)*.045+progress*.09+Math.min(.16,levelThreat*.004),.78,1.38);
+  const rawInterval=1.42-(stageNo-1)*.12-age*.0022-Math.min(.38,levelThreat*.007);
+  const densityIntervalMul=densityRatio<.45?.68:densityRatio<.8?.84:1.05;
+  const baseInterval=Math.max(.26,rawInterval)*densityIntervalMul;
   const unlock2=18+Math.max(0,3-stageNo)*7;
   const unlock3=44+Math.max(0,3-stageNo)*9;
   const rangedChance=clamp(.06+stageNo*.035+progress*.05,.08,.28);
@@ -2931,7 +2946,8 @@ function spawn(dt){
       return;
     }
     const remaining=target-(wave.spawned||0);
-    const waveCount=Math.min(remaining,Math.floor(4+stageNo*1.2+waveProgress*2.4+Math.min(3,age/130)));
+    const waveCount=Math.min(remaining,Math.max(0,enemyCap-fieldEnemyCount),Math.floor(4+stageNo*1.2+waveProgress*2.4+Math.min(3,age/130)));
+    if(waveCount<=0){spawnTimer=.24;return}
     spawnTimer=Math.max(.52,baseInterval*(.9-stageNo*.045));
     const side=Math.floor(Math.random()*4);
     const circleFormation=Math.random()<.86;
@@ -2956,7 +2972,10 @@ function spawn(dt){
   const weights=chooseWeights();
   const type=pickFromRoster(weights);
   const groupChance=clamp(.08+stageNo*.055+progress*.14,.1,.5);
-  const groupSize=type?.ranged?1:(Math.random()<groupChance?2+Math.floor(Math.random()*(1+Math.min(3,stageNo))):1);
+  const baseGroup=Math.random()<groupChance?2+Math.floor(Math.random()*(1+Math.min(3,stageNo))):1;
+  const densityBonus=densityRatio<.45?Math.min(3,1+Math.floor(stageNo/3)):densityRatio<.75?1:0;
+  const desiredGroup=type?.ranged?(stageNo>=5&&densityRatio<.55?2:1):baseGroup+densityBonus;
+  const groupSize=Math.max(1,Math.min(8,enemyCap-fieldEnemyCount,desiredGroup));
   const side=Math.floor(Math.random()*4);
 
   for(let i=0;i<groupSize;i++){
@@ -3992,22 +4011,24 @@ function explodeSeunggwanIronBall(p){
 function fireJiinHeartBurst(){
   const s=active("golf");if(s.t>0)return;
   const level=s.level||1;
-  const rapid=!!s.evolved||player.ultimateTimer>0;
-  const targetCount=rapid?3:level>=5?3:level>=3?2:1;
-  const heartsPerTarget=rapid?1:level>=4?7:level>=2?6:5;
+  const evolved=!!s.evolved;
+  const ultimate=player.ultimateTimer>0;
+  const targetCount=evolved?3:level>=5?3:level>=3?2:1;
+  const heartsPerTarget=evolved?6:level>=4?5:level>=2?4:3;
   const targets=nearestTargets(820,targetCount);
   if(!targets.length)return;
-  s.t=(rapid?.09:Math.max(.42,.9-level*.07))*attackSpeedMul();
-  player.attackTimer=rapid?.16:.34;
-  player.attackDuration=rapid?.16:.34;
+  const normalCooldown=Math.max(.48,.92-level*.07-(evolved?.08:0));
+  s.t=Math.max(.22,normalCooldown*(ultimate?.48:1))*attackSpeedMul();
+  player.attackTimer=ultimate?.2:.34;
+  player.attackDuration=ultimate?.2:.34;
   const rapidIndex=player.jiinRapidIndex||0;
   player.jiinRapidIndex=rapidIndex+1;
-  if(!rapid||rapidIndex%4===0)playSfx("selectMove");
+  if(!ultimate||rapidIndex%2===0)playSfx("selectMove");
   for(let targetIndex=0;targetIndex<targets.length;targetIndex++){
     const target=targets[targetIndex];
     const baseAngle=angle(player,target);
     for(let i=0;i<heartsPerTarget;i++){
-      const spread=rapid?Math.sin(rapidIndex*.82+targetIndex*1.7)*.055:(i-(heartsPerTarget-1)/2)*.08;
+      const spread=(i-(heartsPerTarget-1)/2)*.075;
       const a=baseAngle+spread+rnd(-.04,.04);
       shots.push({
         kind:"jiinHeart",
@@ -4015,7 +4036,7 @@ function fireJiinHeartBurst(){
         y:player.y-20+Math.sin(a)*18,
         vx:Math.cos(a)*(250+level*18),vy:Math.sin(a)*(250+level*18),
         r:5.5+s.level*.35,life:2.65,age:0,dmg:(4+level*1.4)*basicDamageMul(),pierce:1,
-        color:"#ff6fa8",target,homingRange:880,wobble:rnd(0,Math.PI*2),delay:rapid?0:i*.045
+        color:"#ff6fa8",target,homingRange:880,wobble:rnd(0,Math.PI*2),delay:i*(ultimate?.032:.045)
       });
     }
   }
@@ -4082,7 +4103,7 @@ function fireHominBubblegum(){
   const fallbackAngle=Math.atan2(facing.y,facing.x);
   const firstTarget=targets[0]||null;
   const a=firstTarget?Math.atan2(firstTarget.y-(player.y-28),firstTarget.x-player.x):fallbackAngle;
-  s.t=Math.max(.58,.98-level*.07-(evolved?.18:0))*attackSpeedMul();
+  s.t=Math.max(.82,1.38-level*.06-(evolved?.16:0))*attackSpeedMul();
   player.attackTimer=.34;player.attackDuration=.34;player.attackDir={x:Math.cos(a),y:Math.sin(a)};
   playSfx("selectMove");
   for(let i=0;i<count;i++){
@@ -5081,6 +5102,41 @@ function updateEffects(dt){
   for(let i=enemies.length-1;i>=0;i--)if(enemies[i].hp<=0)killEnemy(i);
 }
 
+const EXPERIENCE_GEM_LIMIT=220;
+function isExperienceGem(g){
+  return g.kind==="blue"||g.kind==="green"||g.kind==="purple"||g.kind==="gold";
+}
+function experienceGemAppearance(stageNo,value,forceGold=false){
+  if(forceGold||value>=80)return {kind:"gold",r:9};
+  const stageFloor=stageNo>=6?2:stageNo>=3?1:0;
+  const valueTier=value>=18?2:value>=6?1:0;
+  const tier=Math.max(stageFloor,valueTier);
+  return tier>=2?{kind:"purple",r:8}:tier>=1?{kind:"green",r:7}:{kind:"blue",r:6};
+}
+function dropExperienceGem(x,y,value,{forceGold=false}={}){
+  const stageNo=clamp(currentStage||1,1,20);
+  const appearance=experienceGemAppearance(stageNo,value,forceGold);
+  let xpCount=0,bank=null,bestDist=-1;
+  for(const gem of gems){
+    if(!isExperienceGem(gem))continue;
+    xpCount++;
+    if(gem.xpBank){bank=gem;break}
+    const d=Math.hypot(gem.x-player.x,gem.y-player.y);
+    if(d>bestDist){bestDist=d;bank=gem}
+  }
+  if(xpCount>=EXPERIENCE_GEM_LIMIT&&bank){
+    bank.xpBank=true;
+    bank.value+=value;
+    const merged=experienceGemAppearance(stageNo,bank.value,forceGold||bank.kind==="gold");
+    bank.kind=merged.kind;
+    bank.r=merged.r;
+    return bank;
+  }
+  const gem={x,y,r:appearance.r,value,kind:appearance.kind};
+  gems.push(gem);
+  return gem;
+}
+
 function killEnemy(i){
   const e=enemies[i];
   if(e.boss){
@@ -5142,24 +5198,19 @@ function killEnemy(i){
   if(e.volatile){effects.push({kind:"bossDeath",x:e.x,y:e.y,r:70,t:.48,maxT:.48,color:"#55d9ff"});for(const other of enemies){if(other!==e&&!other.boss&&!other.object&&dist(e,other)<105){other.hp-=24;other.hit=.15}}if(dist(e,player)<90&&playerCanTakeDamage()){player.hp-=7;player.inv=.55;floaters.push({x:player.x,y:player.y-28,t:.55,text:"활선 감전",color:"#65e7ff"})}}
   const xpBase=Math.max(1,Math.ceil(e.xp||1));
   const stageNo=clamp(currentStage||1,1,20);
-  const stageValueScale=.66+stageNo*.16;
-  let gemKind="blue";
+  const stageValueScale=.8+stageNo*.2+Math.pow(stageNo-1,1.1)*.035;
   let gemValue=Math.max(1,Math.ceil(xpBase*stageValueScale));
-  const strong=xpBase>=12,mid=xpBase>=7;
-  if(stageNo>=4&&strong)gemKind="purple";
-  else if(stageNo>=3&&(mid||strong))gemKind="green";
-  if(stageNo>=3&&Math.random()<(.04+stageNo*.012)){gemKind="gold";gemValue=Math.ceil(gemValue*1.55)}
-  else if(gemKind==="purple")gemValue=Math.ceil(gemValue*1.22);
-  else if(gemKind==="green")gemValue=Math.ceil(gemValue*1.1);
-  const gemR=gemKind==="gold"?9:gemKind==="purple"?8:gemKind==="green"?7:6;
-  gems.push({x:e.x,y:e.y,r:gemR,value:gemValue,kind:gemKind});
+  const goldChance=clamp(Math.max(0,stageNo-3)*.025+(xpBase>=12?.05:0),0,.22);
+  const forceGold=Math.random()<goldChance;
+  if(forceGold)gemValue=Math.ceil(gemValue*1.65);
+  const droppedGem=dropExperienceGem(e.x,e.y,gemValue,{forceGold});
   if(!e.noItem){
     const itemRoll=Math.random();
     if(itemRoll<.021)gems.push({x:e.x+rnd(-18,18),y:e.y+rnd(-16,16),r:11,value:20,kind:"heal"});
     else if(itemRoll<.032)gems.push({x:e.x+rnd(-18,18),y:e.y+rnd(-16,16),r:13,value:0,kind:"powerMagnet"});
     else if(itemRoll<.04)gems.push({x:e.x+rnd(-18,18),y:e.y+rnd(-16,16),r:13,value:0,kind:"dynamite"});
   }
-  effects.push({kind:"pop",x:e.x,y:e.y,r:e.r,t:.35,color:gemKind==="gold"?"#ffd45a":"#dfe7ef"});enemies.splice(i,1);
+  effects.push({kind:"pop",x:e.x,y:e.y,r:e.r,t:.35,color:droppedGem.kind==="gold"?"#ffd45a":"#dfe7ef"});enemies.splice(i,1);
 }
 
 function collectGemReward(g){
@@ -5805,7 +5856,8 @@ function drawPlayer(){
     const col=Math.floor(progress*4);
     ctx.imageSmoothingEnabled=false;
     const size=isSangil?96:isSeunggwan?104:isJiin?88:isHomin?92:84;
-    ctx.drawImage(clearSheet,fw*col,0,fw,fh,-size/2,-size*.64,size,size);
+    const drawW=isHomin?size*fw/fh:size;
+    ctx.drawImage(clearSheet,fw*col,0,fw,fh,-drawW/2,-size*.64,drawW,size);
     ctx.restore();
     return;
   }
@@ -8824,6 +8876,10 @@ confirmLevelChoice=function(){
   levelOverlay.classList.add("hidden");
   paused=false;
   last=performance.now();
+  if(player.xp>=player.next){
+    levelUp();
+    return;
+  }
 };
 skillDisplayName=function(s){
   if(s.id==="golf"&&player.characterId==="sangil")return "등산스틱 클로";
@@ -8835,7 +8891,7 @@ skillDisplayName=function(s){
 skillDisplayDesc=function(s){
   if(player.characterId==="sangil"&&s.id==="golf")return "투사체 없이 전방 근접 범위만 공격합니다.";
   if(player.characterId==="seunggwan"&&s.id==="golf")return "철공을 포물선으로 던져 낙하지점 주변에 스플래시 피해를 줍니다.";
-  if(player.characterId==="jiin"&&s.id==="golf")return "레벨에 따라 최대 3명의 적에게 하트를 다중 연발합니다. 진화하면 3명을 향해 끊임없이 발사합니다.";
+  if(player.characterId==="jiin"&&s.id==="golf")return "\uB808\uBCA8\uC5D0 \uB530\uB77C \uCD5C\uB300 3\uBA85\uC758 \uC801\uC5D0\uAC8C \uD558\uD2B8\uB97C \uB2E4\uC911 \uC5F0\uBC1C\uD569\uB2C8\uB2E4. \uC9C4\uD654\uD558\uBA74 3\uBA85\uC744 \uD5A5\uD55C 6\uBC1C \uC5F0\uBC1C\uB85C \uAC15\uD654\uB418\uBA70, \uD544\uC0B4\uAE30 \uC911\uC5D0\uB294 \uAC19\uC740 \uBC1C\uC218\uB97C \uB354 \uBE60\uB974\uAC8C \uC5F0\uC0AC\uD569\uB2C8\uB2E4.";
   if(player.characterId==="homin"&&s.id==="golf")return "주변 적을 향해 투명한 소울 버블을 발사합니다. 터지면 범위 피해와 연쇄로 튕기는 작은 버블을 뿌립니다.";
   return s.desc;
 };
@@ -8865,7 +8921,7 @@ function __setMobileUltimateIcon(characterId){
   const hasMobile=typeof mobileUltimateBtn!=="undefined"&&mobileUltimateBtn;
   const hasPc=typeof ultimateBtn!=="undefined"&&ultimateBtn;
   if(!hasMobile&&!hasPc)return;
-  const src=characterId==="sangil"?"assets/ultimate_icon_sangil.png":characterId==="seunggwan"?"assets/ultimate_icon_seunggwan_chroma.png":characterId==="jiin"?"assets/ultimate_icon_jiin.png":characterId==="homin"?"assets/ultimate_icon_homin_bubble.png":"assets/ultimate_icon_geontaek_chroma.png";
+  const src=characterId==="sangil"?"assets/ultimate_icon_sangil.png":characterId==="seunggwan"?"assets/ultimate_icon_seunggwan_chroma.png":characterId==="jiin"?"assets/ultimate_icon_jiin.png":characterId==="homin"?"assets/skill_icon_homin_bubble.png":"assets/ultimate_icon_geontaek_chroma.png";
   const rawUrl=`url("${src}")`;
   if(hasMobile)mobileUltimateBtn.style.setProperty("--ultimate-icon-url",rawUrl);
   if(hasPc)ultimateBtn.style.setProperty("--ultimate-icon-url",rawUrl);
@@ -8959,7 +9015,7 @@ updateUltimateButton=function(){
   const characterId=typeof player!=="undefined"&&player&&player.characterId==="sangil"?"sangil":typeof player!=="undefined"&&player&&player.characterId==="seunggwan"?"seunggwan":typeof player!=="undefined"&&player&&player.characterId==="jiin"?"jiin":typeof player!=="undefined"&&player&&player.characterId==="homin"?"homin":"geontaek";
   const ratio=typeof ultimateChargeRatio==="function"?Math.max(0,Math.min(1,ultimateChargeRatio())):1;
   const isCooling=1-ratio>.01;
-  const src=characterId==="sangil"?"assets/ultimate_icon_sangil.png":characterId==="seunggwan"?"assets/ultimate_icon_seunggwan_chroma.png":characterId==="jiin"?"assets/ultimate_icon_jiin.png":characterId==="homin"?"assets/ultimate_icon_homin_bubble.png":"assets/ultimate_icon_geontaek_chroma.png";
+  const src=characterId==="sangil"?"assets/ultimate_icon_sangil.png":characterId==="seunggwan"?"assets/ultimate_icon_seunggwan_chroma.png":characterId==="jiin"?"assets/ultimate_icon_jiin.png":characterId==="homin"?"assets/skill_icon_homin_bubble.png":"assets/ultimate_icon_geontaek_chroma.png";
   const rawUrl=`url("${src}")`;
   ultimateBtn.style.setProperty("--ultimate-icon-url",rawUrl);
   ultimateBtn.dataset.character=characterId;

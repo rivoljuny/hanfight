@@ -903,6 +903,8 @@
   .mobile-action.ultimate::before{opacity:.9}
   .mobile-controls.has-pad .mobile-stick{opacity:.6}
   .mobile-controls.has-pad .mobile-action.ultimate{opacity:.78}
+  .mobile-controls.has-pad.is-idle .mobile-stick{opacity:.3}
+  .mobile-controls.has-pad.is-idle .mobile-action.ultimate{opacity:.55}
 }
 
 /* Game over presentation */
