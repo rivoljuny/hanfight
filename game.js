@@ -584,6 +584,7 @@ updateMobileControlsUi();
 
 function setTestMode(on){
   testMode=!!on;
+  if(testMode)window.hanFightRanking?.markIneligible();
   if(!testMode)testInvincible=false;
   localStorage.removeItem("hanFightTestMode");
   applyTestModeUi();
@@ -826,6 +827,7 @@ function startGame(){
   if(!selectedCharacter.playable){show(`${selectedCharacter.name}은 아직 준비 중`);return}
   player.characterId=selectedCharacter.id;
   applyCharacterStats();
+  window.hanFightRanking?.startRun({characterId:player.characterId});
   playSfx("selectConfirm");
   stopSelectBgm();
   startOverlay.classList.add("hidden");
@@ -872,6 +874,7 @@ function applyCharacterStats(){
 }
 function startFromTest(){
   try{unlockAudio()}catch(err){}
+  window.hanFightRanking?.markIneligible();
   if(!selectedCharacter.playable){
     selectedCharacterIndex=characterSelectList.findIndex(ch=>ch.playable);
     selectedCharacter=characterSelectList[selectedCharacterIndex];
@@ -5300,6 +5303,15 @@ function openEnd(){
     card.insertBefore(lead,startOverlay.querySelector(".start-row"));
   }
   lead.textContent=`${Math.floor(elapsed)}초 생존 · 사회 진상 ${kills}명 처치`;
+  window.hanFightRanking?.showGameOver({
+    characterId:player.characterId,
+    stage:Math.max(1,currentStage||1),
+    bossKills:Math.max(0,(currentStage||1)-1),
+    kills:Math.max(0,kills||0),
+    playerLevel:Math.max(1,player.level||1),
+    survivalSeconds:Math.max(0,Math.floor(elapsed||0)),
+    eligible:!testMode&&!testInvincible
+  });
   updateStartPrompt("restart");
   document.getElementById("startBtn").onclick=restart;
 }

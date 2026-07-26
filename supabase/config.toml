@@ -1,0 +1,4 @@
+project_id = "hanfight"
+
+[functions.hanfight-ranking]
+verify_jwt = false

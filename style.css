@@ -949,3 +949,56 @@
     .pause-menu #pauseInvincibleBtn.on{background:#56c7ee;color:#091018;border-color:#fff6d0}
     @media(max-width:760px){.test-select-choices{grid-template-columns:1fr}.test-select-card{padding:16px}.test-select-head{top:-16px;margin:-16px -16px 14px;padding:14px 16px}}
     @media(pointer:coarse){#pauseTestModeBtn,#pauseLevelUpBtn,#pauseInvincibleBtn{display:none!important}}
+
+
+/* Online ranking */
+.ranking-entry-row{display:flex;justify-content:center;margin-top:12px}
+.ranking-open-btn{min-width:148px;padding:9px 18px;border:2px solid #090c10;background:#2c7792;color:#fff8d6;font-weight:900;box-shadow:0 4px 0 #090c10}
+.ranking-open-btn:hover{background:#3895ae}
+.game-over-ranking{width:min(560px,100%);margin:14px auto 0}
+.ranking-submit-row{display:grid;grid-template-columns:auto minmax(120px,1fr) auto;align-items:center;gap:8px}
+.ranking-submit-row label{color:#8fefff;font-size:13px;font-weight:900}
+.ranking-submit-row input{min-width:0;height:42px;padding:0 12px;border:2px solid #40536a;border-radius:6px;outline:none;background:#f7f9fc;color:#172230;font:900 15px "Malgun Gothic",sans-serif}
+.ranking-submit-row input:focus{border-color:#70daf5;box-shadow:0 0 0 3px rgba(112,218,245,.2)}
+.ranking-submit-row button{height:42px;padding:0 15px;border:2px solid #090c10;background:#b84259;font-weight:900}
+.ranking-submit-row button:disabled{cursor:default;opacity:.55}
+.ranking-submit-status{min-height:20px;margin-top:7px;color:#d9e9f1;font-size:12px;text-align:center}
+.ranking-submit-status.is-error{color:#ff9aa9}
+.ranking-submit-status.is-success{color:#7ff0bd}
+.ranking-card{width:min(860px,calc(100vw - 32px));max-height:min(760px,calc(100vh - 32px));padding:0;overflow:hidden;border:4px solid #090c10;background:#172230;color:#edf6ff;box-shadow:0 22px 60px rgba(0,0,0,.52),inset 0 0 0 3px rgba(255,255,255,.05)}
+.ranking-head{display:flex;align-items:center;justify-content:space-between;min-height:82px;padding:15px 18px;border-bottom:2px solid rgba(218,228,240,.16);background:#1d2b3b}
+.ranking-head small{display:block;color:#70daf5;font:900 12px "Courier New","Lucida Console",monospace}
+.ranking-head h2{margin:3px 0 0;color:#fff6d0;font:900 27px "Malgun Gothic",sans-serif;text-shadow:0 3px 0 #090c10}
+.ranking-close-btn{display:grid;place-items:center;width:40px;height:40px;padding:0;border:2px solid rgba(218,228,240,.28);background:#2a3b50;font-size:28px;line-height:1}
+.ranking-controls{display:flex;align-items:end;justify-content:space-between;gap:14px;padding:14px 18px;border-bottom:1px solid rgba(218,228,240,.14)}
+.ranking-tabs{display:grid;grid-template-columns:1fr 1fr;width:230px;border:2px solid #090c10;border-radius:7px;overflow:hidden}
+.ranking-tabs button{min-height:38px;padding:7px 12px;border-radius:0;background:#26384c;font-weight:900}
+.ranking-tabs button+button{border-left:1px solid rgba(255,255,255,.16)}
+.ranking-tabs button.is-active{background:#56c7ee;color:#091018}
+.ranking-character-filter{display:flex;align-items:center;gap:8px;color:#b9c8d8;font-size:12px;font-weight:900}
+.ranking-character-filter.is-disabled{opacity:.4}
+.ranking-character-filter select{height:38px;min-width:128px;padding:0 30px 0 10px;border:2px solid #40536a;border-radius:6px;background:#f7f9fc;color:#172230;font-weight:900}
+.ranking-columns,.ranking-row{display:grid;grid-template-columns:62px minmax(150px,.8fr) minmax(300px,1.6fr);align-items:center}
+.ranking-columns{min-height:32px;padding:0 18px;color:#7f96ad;font-size:10px;font-weight:900}
+.ranking-list{min-height:240px;max-height:430px;overflow-y:auto;border-top:1px solid rgba(218,228,240,.1)}
+.ranking-row{min-height:58px;padding:6px 18px;border-bottom:1px solid rgba(218,228,240,.1)}
+.ranking-row.is-me{background:rgba(86,199,238,.12)}
+.ranking-position{color:#fff6d0;font:900 18px "Courier New","Lucida Console",monospace}
+.ranking-position.is-top{color:#ffcf5a}
+.ranking-player{min-width:0}
+.ranking-player strong{display:block;overflow:hidden;color:#f5f8fb;font-size:15px;text-overflow:ellipsis;white-space:nowrap}
+.ranking-player small{display:block;margin-top:3px;color:#8fefff;font-size:11px}
+.ranking-record{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:8px}
+.ranking-record span{display:block;min-width:0;color:#b9c8d8;font-size:10px;line-height:1.25;text-align:right}
+.ranking-record b{display:block;margin-top:2px;color:#fff;font-size:13px;white-space:nowrap}
+.ranking-message{display:grid;place-items:center;min-height:240px;padding:24px;color:#9fb1c4;text-align:center}
+.ranking-own{padding:10px 18px;border-top:2px solid #2c7792;background:#1d2b3b;color:#d9e9f1;font-size:12px;text-align:center}
+@media(max-width:760px){
+  .ranking-entry-row{margin-top:8px}.ranking-open-btn{min-width:126px;padding:7px 14px;font-size:12px}.game-over-ranking{margin-top:10px}
+  .ranking-submit-row{grid-template-columns:1fr 96px}.ranking-submit-row label{grid-column:1/-1;text-align:left}.ranking-submit-row input,.ranking-submit-row button{height:38px}
+  .ranking-card{width:calc(100vw - 12px);max-height:calc(100vh - 12px)}.ranking-head{min-height:65px;padding:10px 12px}.ranking-head h2{font-size:21px}.ranking-close-btn{width:36px;height:36px}
+  .ranking-controls{align-items:stretch;padding:10px 12px;gap:8px}.ranking-tabs{width:auto;flex:1}.ranking-character-filter{display:grid;gap:2px}.ranking-character-filter span{display:none}.ranking-character-filter select{min-width:104px;height:38px}
+  .ranking-columns{display:none}.ranking-list{min-height:210px;max-height:calc(100vh - 196px)}.ranking-row{grid-template-columns:40px minmax(86px,.72fr) minmax(180px,1.55fr);min-height:54px;padding:5px 9px}
+  .ranking-position{font-size:15px}.ranking-player strong{font-size:12px}.ranking-player small{font-size:9px}.ranking-record{gap:4px}.ranking-record span{font-size:8px}.ranking-record b{font-size:10px}.ranking-own{padding:8px 10px;font-size:10px}
+  .game-over-card .game-over-title{max-height:22vh}.game-over-card .ranking-entry-row{margin-top:7px}
+}

@@ -5,7 +5,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
   <title>HAN-SERVIVE</title>
   <!-- Cache version: increment whenever game files change -->
-  <link rel="stylesheet" href="style.css?v=20260706-1">
+  <link rel="stylesheet" href="style.css?v=20260726-01">
 </head>
 <body>
   <div class="app">
@@ -44,6 +44,17 @@
           </div>
           <span class="select-hint">A/D 또는 방향키로 선택</span>
         </div>
+        <div class="ranking-entry-row">
+          <button id="rankingOpenBtn" class="ranking-open-btn" type="button">랭킹 보기</button>
+        </div>
+        <section id="gameOverRanking" class="game-over-ranking hidden" aria-label="랭킹 기록 등록">
+          <div class="ranking-submit-row">
+            <label for="rankingNickname">닉네임</label>
+            <input id="rankingNickname" type="text" maxlength="12" autocomplete="nickname" placeholder="12자 이내">
+            <button id="rankingSubmitBtn" type="button">기록 등록</button>
+          </div>
+          <p id="rankingSubmitStatus" class="ranking-submit-status"></p>
+        </section>
         <div class="start-row">
           <div id="startBtn" class="press-space" role="button" tabindex="0"><span>PRESS</span><span class="space-key" aria-label="spacebar"></span><span>TO START</span></div>
         </div>
@@ -80,8 +91,35 @@
         <div id="testSelectChoices" class="test-select-choices"></div>
       </div>
     </div>
+    <div id="rankingOverlay" class="overlay hidden">
+      <div class="card ranking-card">
+        <div class="ranking-head">
+          <div>
+            <small id="rankingSeason">2026-S1</small>
+            <h2>사회 진상 랭킹</h2>
+          </div>
+          <button id="rankingCloseBtn" class="ranking-close-btn" type="button" aria-label="랭킹 닫기">&times;</button>
+        </div>
+        <div class="ranking-controls">
+          <div class="ranking-tabs" role="tablist" aria-label="랭킹 분류">
+            <button class="is-active" type="button" data-ranking-scope="overall" role="tab">종합</button>
+            <button type="button" data-ranking-scope="character" role="tab">캐릭터별</button>
+          </div>
+          <label class="ranking-character-filter">
+            <span>캐릭터</span>
+            <select id="rankingCharacterSelect"></select>
+          </label>
+        </div>
+        <div class="ranking-columns" aria-hidden="true">
+          <span>순위</span><span>플레이어</span><span>기록</span>
+        </div>
+        <div id="rankingList" class="ranking-list" aria-live="polite"></div>
+        <div id="rankingOwn" class="ranking-own hidden"></div>
+      </div>
+    </div>
   </div>
 
-<script src="game.js?v=20260716-03"></script>
+<script src="game.js?v=20260726-01"></script>
+<script src="ranking.js?v=20260726-01"></script>
 </body>
 </html>
