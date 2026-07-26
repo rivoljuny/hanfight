@@ -185,7 +185,7 @@ async function listRanking(request: Request) {
   const scope = url.searchParams.get("scope") === "character" ? "character" : "overall";
   const characterId = url.searchParams.get("character_id") ?? "";
   const clientId = url.searchParams.get("client_id") ?? "";
-  const limit = Math.min(100, Math.max(1, Number(url.searchParams.get("limit")) || 20));
+  const limit = Math.min(15, Math.max(1, Number(url.searchParams.get("limit")) || 15));
 
   if (scope === "character" && !CHARACTER_IDS.has(characterId)) {
     return json(request, { error: "invalid_character" }, 400);
@@ -207,18 +207,12 @@ async function listRanking(request: Request) {
   const { data, error } = await query;
   if (error) return json(request, { error: "ranking_unavailable" }, 503);
 
-  const seen = new Set<string>();
-  const best = [];
-  for (const row of data ?? []) {
-    if (seen.has(row.client_id)) continue;
-    seen.add(row.client_id);
-    best.push(row);
-  }
+  const ranked = data ?? [];
 
   const ownIndex = UUID_PATTERN.test(clientId)
-    ? best.findIndex((row) => row.client_id === clientId)
+    ? ranked.findIndex((row) => row.client_id === clientId)
     : -1;
-  const entries = best.slice(0, limit).map((row, index) => ({
+  const entries = ranked.slice(0, limit).map((row, index) => ({
     rank: index + 1,
     nickname: row.nickname,
     character_id: row.character_id,
@@ -232,13 +226,13 @@ async function listRanking(request: Request) {
 
   const own = ownIndex < 0 ? null : {
     rank: ownIndex + 1,
-    nickname: best[ownIndex].nickname,
-    character_id: best[ownIndex].character_id,
-    stage: best[ownIndex].stage,
-    boss_kills: best[ownIndex].boss_kills,
-    kills: best[ownIndex].kills,
-    player_level: best[ownIndex].player_level,
-    survival_seconds: best[ownIndex].survival_seconds,
+    nickname: ranked[ownIndex].nickname,
+    character_id: ranked[ownIndex].character_id,
+    stage: ranked[ownIndex].stage,
+    boss_kills: ranked[ownIndex].boss_kills,
+    kills: ranked[ownIndex].kills,
+    player_level: ranked[ownIndex].player_level,
+    survival_seconds: ranked[ownIndex].survival_seconds,
     is_me: true,
   };
 

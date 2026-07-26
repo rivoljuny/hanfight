@@ -4,7 +4,7 @@
     publishableKey: "sb_publishable_xx98T4HB410URRLGk2OT-A_YuX2fhhk",
     season: "2026-S1",
     gameVersion: "20260726-01",
-    limit: 20,
+    limit: 15,
   };
   const CHARACTER_NAMES = {
     geontaek: "건택",
