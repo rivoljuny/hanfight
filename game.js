@@ -1427,13 +1427,14 @@ function requestHitStop(seconds,priority=false){
   hitStopReadyAt=now+(mobileControlsAvailable()?95:68);
 }
 function spawnHitSpark(x,y,angleValue,color="#fff1b8",strength=1,heavy=false){
-  if(impactFxBudget<=0||!isVisibleWorld(x,y,90))return;
+  if(impactFxBudget<=0||!isVisibleWorld(x,y,90))return false;
   impactFxBudget--;
   effects.push({
     kind:"hitSpark",x,y,angle:angleValue,color,
-    r:(heavy?34:22)*strength,t:heavy?.24:.17,maxT:heavy?.24:.17,
+    r:(heavy?32:20)*strength,t:heavy?.18:.12,maxT:heavy?.18:.12,
     heavy,seed:rnd(0,99)
   });
+  return true;
 }
 function enemyHitFeedback(e,damage,fatal=false){
   if(!e||!Number.isFinite(damage)||damage<=0)return;
@@ -1442,19 +1443,24 @@ function enemyHitFeedback(e,damage,fatal=false){
   const decisive=fatal&&(e.boss||e.namedEnemy||e.object);
   const heavy=fatal||ratio>=.12||damage>=Math.max(20,maxHp*.08);
   const a=Math.atan2(e.y-player.y,e.x-player.x);
-  e.impactDx=Math.cos(a);
-  e.impactDy=Math.sin(a);
-  e.impactMaxT=heavy?.2:.14;
-  e.impactT=Math.max(e.impactT||0,e.impactMaxT);
-  e.impactFlash=Math.max(e.impactFlash||0,heavy?.12:.075);
-  spawnHitSpark(e.x,e.y-(e.r||18)*.12,a,e.color||"#ffd56a",clamp(.8+ratio*1.8,.8,1.35),heavy);
+  const showImpact=spawnHitSpark(e.x,e.y-(e.r||18)*.12,a,e.color||"#ffd56a",clamp(.8+ratio*1.8,.8,1.35),heavy);
+  if(showImpact){
+    e.impactDx=Math.cos(a);
+    e.impactDy=Math.sin(a);
+    e.impactMaxT=heavy?.18:.12;
+    e.impactT=Math.max(e.impactT||0,e.impactMaxT);
+    e.impactFlash=Math.max(e.impactFlash||0,heavy?.1:.065);
+  }
   playSfx(heavy?"hitHeavy":"hitLight");
   if(heavy){
-    shake=Math.max(shake,decisive?7:fatal?2.2:e.boss?5:3);
-    const freeze=decisive
-      ?(mobileControlsAvailable()?.026:.04)
-      :(mobileControlsAvailable()?.012:.018);
-    requestHitStop(freeze,decisive);
+    const shakeAmount=decisive?7:e.boss?4:fatal?1.2:0;
+    if(shakeAmount>0)shake=Math.max(shake,shakeAmount);
+    if(decisive||e.boss){
+      const freeze=decisive
+        ?(mobileControlsAvailable()?.026:.04)
+        :(mobileControlsAvailable()?.012:.018);
+      requestHitStop(freeze,decisive);
+    }
   }
 }
 function flushEnemyDamageFeedback(e,fatal=false){
@@ -1762,7 +1768,7 @@ function playSfx(name){
   if(!audioCtx)return;
   const now=audioCtx.currentTime;
   const gap={
-    selectMove:.055,selectConfirm:.2,hitLight:.045,hitHeavy:.1,playerHit:.14,playerHitHeavy:.2,golfThrow:.08,golfSpin:.18,golfReturn:.14,ultimateSwing:.2,bossDeath:.5,
+    selectMove:.055,selectConfirm:.2,hitLight:.075,hitHeavy:.13,playerHit:.14,playerHitHeavy:.2,golfThrow:.08,golfSpin:.18,golfReturn:.14,ultimateSwing:.2,bossDeath:.5,
     bossNagCast:.45,bossNagFire:.28,bossKickCast:.35,bossKickDash:.22,
     bossCoupon:.18,bubblePop:.08,iceBall:.09,iceShatter:.08,cheonHeatCast:.45,cheonHeatFire:.35,cheonBellyCast:.35,cheonBellyJump:.16,cheonBellyLand:.18,
     cultTalisman:.16,cultChant:.45,cultTotem:.42,cultHands:.45,cultCoffin:.65,
@@ -1939,7 +1945,7 @@ function loop(now){
 
 function update(dt){
   const playerHpBefore=player.hp;
-  impactFxBudget=mobileControlsAvailable()?3:7;
+  impactFxBudget=mobileControlsAvailable()?1:3;
   updateMobileControlsUi();
   elapsed+=dt;player.frame+=dt*6.5;shake=Math.max(0,shake-dt*18);player.inv=Math.max(0,player.inv-dt);player.slowT=Math.max(0,(player.slowT||0)-dt);
   player.hurtT=Math.max(0,(player.hurtT||0)-dt);
@@ -7951,7 +7957,7 @@ function drawEffect(e){
     ctx.beginPath();
     ctx.ellipse(0,0,radius*.72,radius*.42,0,0,Math.PI*2);
     ctx.stroke();
-    const rays=e.heavy?9:6;
+    const rays=e.heavy?7:4;
     for(let i=0;i<rays;i++){
       const spread=(i-(rays-1)/2)/(rays-1);
       const a=spread*1.7+Math.sin((e.seed||0)+i*8.13)*.12;
