@@ -893,6 +893,7 @@ function applyCharacterStats(){
   player.ultimateCd=0;
   player.ultimateCdMax=getUltimateCooldown();
   player.ultimateFired=false;
+  player.skillsMastered=false;
   player.hurtT=0;player.hurtFlash=0;player.hurtDx=0;player.hurtDy=0;
   hitStop=0;hitStopReadyAt=0;playerDamagePulse=0;
 }
@@ -5386,6 +5387,10 @@ function collectGemReward(g){
     detonateVisibleEnemies();
     floaters.push({x:player.x,y:player.y-42,t:.85,text:"펑!",color:"#ffd45a"});
   }else{
+    if(player.skillsMastered){
+      player.xp=0;
+      return;
+    }
     player.xp+=Math.ceil(g.value*experienceGainMultiplier());
     if(player.xp>=player.next)levelUp();
   }
@@ -9035,16 +9040,10 @@ function skillIconHtml(s){
   return `<b class="skill-icon${isPassive?" passive":""}" style="background-position:${col*100/3}% ${row*100}%">${s.icon}</b>`;
 }
 
-levelUp=function(){
-  player.xp-=player.next;
-  player.level++;
-  player.next=levelXpRequirement(player.level);
-  paused=true;
-  const allChoiceMode=!!testLevelAllChoices;
-  testLevelAllChoices=false;
+function levelUpCandidates(allChoiceMode=false){
   const activeOwned=ownedActiveSkills().length;
   const passiveOwned=skills.filter(s=>s.type==="passive"&&s.level>0).length;
-  const available=skills.filter(s=>{
+  return skills.filter(s=>{
     if(!allChoiceMode){
       if(s.type==="active"&&s.level<=0&&activeOwned>=3)return false;
       if(s.type==="passive"&&s.level<=0&&passiveOwned>=4)return false;
@@ -9054,6 +9053,27 @@ levelUp=function(){
     if(s.level<s.max)return true;
     return s.level>=s.max&&!s.evolved;
   });
+}
+levelUp=function(){
+  const allChoiceMode=!!testLevelAllChoices;
+  testLevelAllChoices=false;
+  const available=levelUpCandidates(allChoiceMode);
+  if(!available.length){
+    player.skillsMastered=true;
+    player.xp=0;
+    levelChoices=[];
+    selectedChoice=0;
+    choicesEl.innerHTML="";
+    choicesEl.classList.remove("test-all-choices");
+    levelOverlay.classList.add("hidden");
+    paused=false;
+    last=performance.now();
+    return;
+  }
+  player.xp-=player.next;
+  player.level++;
+  player.next=levelXpRequirement(player.level);
+  paused=true;
   const picks=[];
   if(allChoiceMode){
     picks.push(...available.sort((a,b)=>{
@@ -9067,11 +9087,8 @@ levelUp=function(){
     }
   }
   if(!picks.length){
-    while(player.xp>=player.next){
-      player.xp-=player.next;
-      player.level++;
-      player.next=levelXpRequirement(player.level);
-    }
+    player.skillsMastered=true;
+    player.xp=0;
     levelChoices=[];
     selectedChoice=0;
     choicesEl.innerHTML="";
@@ -9119,12 +9136,16 @@ confirmLevelChoice=function(){
       player.hp=Math.min(player.maxHp,player.hp+Math.max(8,player.maxHp-before));
     }
   }
+  if(!levelUpCandidates(false).length){
+    player.skillsMastered=true;
+    player.xp=0;
+  }
   levelChoices=[];
   choicesEl.classList.remove("test-all-choices");
   levelOverlay.classList.add("hidden");
   paused=false;
   last=performance.now();
-  if(player.xp>=player.next){
+  if(!player.skillsMastered&&player.xp>=player.next){
     levelUp();
     return;
   }
