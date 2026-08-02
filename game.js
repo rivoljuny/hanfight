@@ -464,17 +464,27 @@ function basePlayerMaxHp(){
 function resize(){
   dpr=Math.min(devicePixelRatio||1,mobileControlsAvailable()?1.5:2);
   const isMobile=mobileControlsAvailable();
-  const fixedW=isMobile?innerWidth:Math.min(innerWidth,1600);
-  const fixedH=isMobile?innerHeight:Math.min(innerHeight,900);
-  W=Math.floor(fixedW);H=Math.floor(fixedH);
+  const appRect=isMobile?canvas.parentElement?.getBoundingClientRect():null;
+  const fixedW=isMobile?(appRect?.width||innerWidth):Math.min(innerWidth,1600);
+  const fixedH=isMobile?(appRect?.height||innerHeight):Math.min(innerHeight,900);
+  const nextW=Math.max(1,Math.floor(fixedW));
+  const nextH=Math.max(1,Math.floor(fixedH));
+  const nextCanvasW=Math.floor(nextW*dpr);
+  const nextCanvasH=Math.floor(nextH*dpr);
+  const sizeChanged=W!==nextW||H!==nextH||canvas.width!==nextCanvasW||canvas.height!==nextCanvasH;
+  W=nextW;H=nextH;
   const gameLeft=isMobile?0:Math.floor((innerWidth-W)/2);
   const gameTop=isMobile?0:Math.floor((innerHeight-H)/2);
   document.documentElement.style.setProperty("--game-left",gameLeft+"px");
   document.documentElement.style.setProperty("--game-top",gameTop+"px");
   document.documentElement.style.setProperty("--game-w",W+"px");
   document.documentElement.style.setProperty("--game-h",H+"px");
-  canvas.width=W*dpr;canvas.height=H*dpr;
   canvas.style.width=W+"px";canvas.style.height=H+"px";
+  if(!sizeChanged){
+    if(startOverlay)updateStartPrompt(gameOver?"restart":"start");
+    return;
+  }
+  canvas.width=nextCanvasW;canvas.height=nextCanvasH;
   if(isMobile){
     canvas.style.position="static";
     canvas.style.left="";
@@ -490,7 +500,12 @@ function resize(){
   ctx.imageSmoothingEnabled=false;
   if(startOverlay)updateStartPrompt(gameOver?"restart":"start");
 }
-addEventListener("resize",resize);resize();
+let resizeFrame=0;
+function queueResize(){
+  if(resizeFrame)return;
+  resizeFrame=requestAnimationFrame(()=>{resizeFrame=0;resize()});
+}
+addEventListener("resize",queueResize,{passive:true});resize();
 addEventListener("keydown",e=>{
   keys[e.key.toLowerCase()]=true;
   if(e.key==="Escape"&&overlayVisible(testSelectOverlay)){e.preventDefault();closeTestSelect();return}
